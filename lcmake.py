@@ -1,7 +1,8 @@
 import svgwrite
 from wall import *
 
-
+# Same stroke width for all as used for laser
+stroke_width = 1
 cut_stroke = svgwrite.rgb(0, 0, 0, '%')
 etch_stroke = svgwrite.rgb(30, 30, 30, '%')
 # don't show filled in - use fill in laser cutter
@@ -81,10 +82,10 @@ for wall in walls:
         if (cut[0] == "line"):
             start_line = (offset[0]+cut[1][0], offset[1]+cut[1][1])
             end_line = (offset[0]+cut[2][0], offset[1]+cut[2][1])
-            dwg.add(dwg.line(start_line, end_line, stroke=cut_stroke))
+            dwg.add(dwg.line(start_line, end_line, stroke=cut_stroke, stroke_width=stroke_width))
         elif (cut[0] == "rect"):
             start_rect = (offset[0]+cut[1][0], offset[1]+cut[1][1])
-            dwg.add(dwg.rect(start_rect, cut[2], stroke=cut_stroke, fill="none"))
+            dwg.add(dwg.rect(start_rect, cut[2], stroke=cut_stroke, fill="none", stroke_width=stroke_width))
             
     # Get the etching
     etches = wall.get_scale_etches()
@@ -93,16 +94,16 @@ for wall in walls:
             if (etch[0] == "line"):
                 start_line = (offset[0]+etch[1][0], offset[1]+etch[1][1])
                 end_line = (offset[0]+etch[2][0], offset[1]+etch[2][1])
-                dwg.add(dwg.line(start_line, end_line, stroke=etch_stroke))
+                dwg.add(dwg.line(start_line, end_line, stroke=etch_stroke, stroke_width=stroke_width))
             elif (etch[0] == "rect"):
                 start_rect = (offset[0]+etch[1][0], offset[1]+etch[1][1])
-                dwg.add(dwg.rect(start_rect, etch[2], stroke=etch_stroke, fill=etch_fill))
+                dwg.add(dwg.rect(start_rect, etch[2], stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
             elif (etch[0] == "polygon"):
                 # iterate over each of the points to make a new list
                 new_points = []
                 for point in etch[1]:
-                    new_points.append(((offset[0]+point[0]),(offset[1]+point[1])))
-                dwg.add(dwg.polygon(new_points, stroke=etch_stroke, fill=etch_fill))
+                    new_points.append([(offset[0]+point[0]),(offset[1]+point[1])])
+                dwg.add(dwg.polygon(new_points, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
                 
         # Add offset for the end - do even if this is last on row as it will be reset when next line
         offset[0] = offset[0] + spacing  + num_objectsect_size[0]

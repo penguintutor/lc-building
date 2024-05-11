@@ -1,6 +1,7 @@
 # Wall class with subclasses
 # Create using actual dimensions in mm, then many of the methods return scaled dimensions
 import math
+from texture import *
 
 
 mm_to_pixels = 3.543307
@@ -56,7 +57,7 @@ class ApexWall(Wall):
         return cuts
     
     def get_scale_etches (self):
-        etches = []
+        textures = []
         if self.material == "wood":
             # mark wood joins
             # Start from bottom
@@ -68,7 +69,8 @@ class ApexWall(Wall):
                 if y_pos < self.roof_height - self.wall_height:
                     break
                 # Add a rectangle
-                etches.append (("rect", (0, (self.to_pixels(y_pos - self.wood_etch))), (self.to_pixels(self.width), self.to_pixels(self.wood_etch))))
+                textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch)))
+                
             # Continue to top of apex
             # Start by calculating angle of roof
             angle=math.atan((self.roof_height-self.wall_height)/(self.width/2))
@@ -81,42 +83,33 @@ class ApexWall(Wall):
                 half_width_top = (y_pos-self.wood_etch) / math.tan(angle)
                 
                 # create polygon
-                etches.append (("polygon", [
-                    # top left
-                    (self.to_pixels(self.width/2 - half_width_top), self.to_pixels(y_pos-self.wood_etch)),
-                    # top right
-                    (self.to_pixels(self.width/2 + half_width_top), self.to_pixels(y_pos-self.wood_etch)),
-                    # bottom right
-                    (self.to_pixels(self.width/2 + half_width_bottom), self.to_pixels(y_pos)),
-                    # bottom left
-                    (self.to_pixels(self.width/2 - half_width_bottom), self.to_pixels(y_pos)),
-                    # top left
-                    (self.to_pixels(self.width/2 - half_width_top), self.to_pixels(y_pos-self.wood_etch))
+                textures.append (TrapezoidTexture([
+                    (self.width/2 - half_width_top, y_pos-self.wood_etch),  # top left
+                    (self.width/2 + half_width_top, y_pos-self.wood_etch),  # top right
+                    (self.width/2 + half_width_bottom, y_pos),              # bottom right
+                    (self.width/2 - half_width_bottom, y_pos)               # bottom left
                     ]))
-                    
-                    
-                                
-#                 # top line
-#                 etches.append (("line",
-#                                 (self.to_pixels(self.width/2 - half_width_top), self.to_pixels(y_pos-self.wood_etch)),
-#                                 (self.to_pixels(self.width/2 + half_width_top), self.to_pixels(y_pos-self.wood_etch))))
-#                 # right line
-#                 etches.append (("line",
-#                                 (self.to_pixels(self.width/2 + half_width_top), self.to_pixels(y_pos-self.wood_etch)),
-#                                 (self.to_pixels(self.width/2 + half_width_bottom), self.to_pixels(y_pos))))
-#                 # bottom line
-#                 etches.append (("line",
-#                                 (self.to_pixels(self.width/2 - half_width_bottom), self.to_pixels(y_pos)),
-#                                 (self.to_pixels(self.width/2 + half_width_bottom), self.to_pixels(y_pos))))
-#                 # left line
-#                 etches.append (("line",
-#                                 (self.to_pixels(self.width/2 - half_width_top), self.to_pixels(y_pos-self.wood_etch)),
-#                                 (self.to_pixels(self.width/2 - half_width_bottom), self.to_pixels(y_pos))))
                 
                 y_pos -= self.wood_height
                 if y_pos < self.wood_height / 4:
                     break
                 
+        # Apply transformation to sketches
+        ## Todo
+        
+        etches = []
+        for texture in textures:
+            this_etch = texture.get_etch()
+            # convert to pixels
+            if this_etch[0] == "rect":
+                etches.append (("rect", (self.to_pixels(this_etch[1][0]), self.to_pixels(this_etch[1][1])), (self.to_pixels(this_etch[2][0]), self.to_pixels(this_etch[2][1]))))
+            if this_etch[0] == "polygon":
+                # convert points into new list of pixel points
+                pixel_points = []
+                for i in range (1, len(this_etch)):
+                    pixel_points.append((self.to_pixels(this_etch[1][i][0]), self.to_pixels(this_etch[1][i][1]))) 
+                    
+                etches.append (("polygon", pixel_points)) 
             
         return etches
 
@@ -139,7 +132,8 @@ class RectWall(Wall):
         return cuts
     
     def get_scale_etches (self):
-        etches = []
+        # First apply textures
+        textures = []
         if self.material == "wood":
             # mark wood joins
             # Start from bottom
@@ -151,7 +145,19 @@ class RectWall(Wall):
                 if y_pos < self.wood_height / 4:
                     break
                 # Add a rectangle
-                etches.append (("rect", (0, (self.to_pixels(y_pos - self.wood_etch))), (self.to_pixels(self.width), self.to_pixels(self.wood_etch))))
+                textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch)))
+        # Apply transformations to textures
+        ## Todo
+        
+        # Convert textures into etches
+        etches = []
+        for texture in textures:
+            this_etch = texture.get_etch()
+            # convert to pixels
+            if this_etch[0] == "rect":
+                etches.append (("rect", (self.to_pixels(this_etch[1][0]), self.to_pixels(this_etch[1][1])), (self.to_pixels(this_etch[2][0]), self.to_pixels(this_etch[2][1]))))
+
+        #etches.append (("rect", (0, (self.to_pixels(y_pos - self.wood_etch))), (self.to_pixels(self.width), self.to_pixels(self.wood_etch))))
         return etches
     
 
