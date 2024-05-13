@@ -1,4 +1,7 @@
 # Wall class with subclasses
+# A wall is something that is cut out which could be a wall or a roof
+# Can have texures applied or features added
+
 # Create using actual dimensions in mm, then many of the methods return scaled dimensions
 import math
 from texture import *
