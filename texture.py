@@ -43,12 +43,13 @@ class TrapezoidTexture(Texture):
         super().__init__ (min_x, min_y, max_x, max_y)
         self.points = points
     
-    def get_etch(self):
+    # Return a list even if only one element
+    def get_etches(self):
         # convert to polygon
         # Add start to end
         new_points = self.points.copy()
         new_points.append(self.points[0])
-        return ("polygon", new_points)
+        return [("polygon", new_points)]
     
     
 # start is x, y - dimension w, l
@@ -59,6 +60,7 @@ class RectTexture(Texture):
         self.start_pos = start_pos
         self.dimension = dimension
     
-    def get_etch(self):
-        return ("rect", (self.start_pos[0], self.start_pos[1]), (self.dimension[0], self.dimension[1]))
+    # Return a list even if only one element
+    def get_etches(self):
+        return [("rect", (self.start_pos[0], self.start_pos[1]), (self.dimension[0], self.dimension[1]))]
     

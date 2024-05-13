@@ -57,18 +57,19 @@ class Wall():
     def _texture_to_etch(self, textures):
         etches = []
         for texture in textures:
-            this_etch = texture.get_etch()
-            # convert to pixels
-            if this_etch[0] == "rect":
-                etches.append (("rect", (this_etch[1][0], this_etch[1][1]), (this_etch[2][0], this_etch[2][1])))
-            if this_etch[0] == "polygon":
-                # convert points into new list of pixel points
-                pixel_points = []
-                for i in range (1, len(this_etch)):
-                    pixel_points.append((this_etch[1][i][0], this_etch[1][i][1]))
-                    
-                etches.append (("polygon", pixel_points)) 
-            
+            # Each texture can have one or more etches
+            these_etches = texture.get_etches()
+            for this_etch in these_etches:
+                # convert to pixels
+                if this_etch[0] == "rect":
+                    etches.append (("rect", (this_etch[1][0], this_etch[1][1]), (this_etch[2][0], this_etch[2][1])))
+                if this_etch[0] == "polygon":
+                    # convert points into new list of pixel points
+                    pixel_points = []
+                    for i in range (1, len(this_etch)):
+                        pixel_points.append((this_etch[1][i][0], this_etch[1][i][1]))
+                        
+                    etches.append (("polygon", pixel_points))             
         return etches
 
         
