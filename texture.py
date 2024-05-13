@@ -15,6 +15,10 @@ class Texture():
         self.min_y = min_y
         self.max_x = max_x
         self.max_y = max_y
+        
+    # detcect if collide with a feature and if so remove those parts of the etch
+    def collide_feature (self, feature_min_x, feature_min_y, feature_max_x, feature_max_y):
+        pass
     
     
 # must be parallel top and bottom

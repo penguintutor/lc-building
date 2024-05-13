@@ -27,6 +27,10 @@ door_height = 1800
 wood_height = 150
 wood_etch = 10
 
+# Example window (wall 0)
+window_pos = (713, 50)
+window_size = (400, 555)
+
 building_type="shed"
 building_subtype="apex"
 
@@ -58,6 +62,11 @@ walls = [
 # Add wood etching to all walls
 for wall in walls:
     wall.add_wood_etch (wood_height, wood_etch)
+    
+# Add window to wall 0
+walls[0].add_feature("window", (*window_pos, *window_size))
+    
+# Create output
 
 for wall in walls:
     # Is this modulo grid_width if so then start next line

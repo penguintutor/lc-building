@@ -5,14 +5,21 @@
 # Create using actual dimensions in mm, then many of the methods return scaled dimensions
 import math
 from texture import *
+from feature import *
 
-# Template class - normally use RectWall
+# Texture is generated as part of get_etch,
+# This means that if a feature is added as long as it
+# is before get etch, then that part will be removed from
+# the etch
+
+# Template class - normally use RectWall / ApexWall etc
 # scale is divisor to convert from standard to scale size (eg. 76.2 for OO)
 class Wall():
     def __init__ (self, width, height):
         self.max_width = width
         self.max_height = height
         self.material = "smooth"
+        self.features = []
     
     
     def get_maxsize (self):
@@ -29,7 +36,41 @@ class Wall():
         self.material = "wood"
         self.wood_height = wood_height
         self.wood_etch = wood_etch
-        
+
+    def add_feature (self, type, values):
+        if type == "window":
+            if len(values) > 4:
+                cuts = []
+                pos = 4
+                while pos < len(values):
+                    # Must be in groups of 4 (startx, starty, endx, endy)
+                    if (len(values) - pos) < 4:
+                        break
+                    cuts.append((values[pos], values[pos+1], values[pos+2], values[pos+3]))
+                    pos += 4
+                self.features.append(Window((values[0], values[1]), (values[2], values[3], cuts)))
+            else:
+                self.features.append(Window((values[0], values[1]), (values[2], values[3])))
+                
+
+    # This is later stage in get_etches
+    def _texture_to_etch(self, textures):
+        etches = []
+        for texture in textures:
+            this_etch = texture.get_etch()
+            # convert to pixels
+            if this_etch[0] == "rect":
+                etches.append (("rect", (this_etch[1][0], this_etch[1][1]), (this_etch[2][0], this_etch[2][1])))
+            if this_etch[0] == "polygon":
+                # convert points into new list of pixel points
+                pixel_points = []
+                for i in range (1, len(this_etch)):
+                    pixel_points.append((this_etch[1][i][0], this_etch[1][i][1]))
+                    
+                etches.append (("polygon", pixel_points)) 
+            
+        return etches
+
         
 class ApexWall(Wall):
     def __init__ (self, width, roof_height, wall_height):
@@ -37,6 +78,7 @@ class ApexWall(Wall):
         self.width = width
         self.roof_height = roof_height
         self.wall_height = wall_height
+        
 
     # Return all cuts as tuples shapestype followed by dimensions
     # Start from 0,0
@@ -50,7 +92,9 @@ class ApexWall(Wall):
         # right
         cuts.append (("line", (self.width, self.roof_height-self.wall_height), (self.width, self.roof_height)))
         cuts.append (("line", (0, self.roof_height), (self.width, self.roof_height)))
-        # Add any accessories (windows etc.)       
+        # Add any accessories (windows etc.)
+        for feature in self.features:
+            cuts.extend(feature.get_cuts())
         return cuts
     
     def get_etches (self):
@@ -92,23 +136,7 @@ class ApexWall(Wall):
                     break
                 
         # Apply transformation to sketches
-        ## Todo
-        
-        etches = []
-        for texture in textures:
-            this_etch = texture.get_etch()
-            # convert to pixels
-            if this_etch[0] == "rect":
-                etches.append (("rect", (this_etch[1][0], this_etch[1][1]), (this_etch[2][0], this_etch[2][1])))
-            if this_etch[0] == "polygon":
-                # convert points into new list of pixel points
-                pixel_points = []
-                for i in range (1, len(this_etch)):
-                    pixel_points.append((this_etch[1][i][0], this_etch[1][i][1]))
-                    
-                etches.append (("polygon", pixel_points)) 
-            
-        return etches
+        return self._texture_to_etch(textures)
 
 
 
@@ -125,7 +153,9 @@ class RectWall(Wall):
         cuts = []
         # frame as rectangle
         cuts.append (("rect", (0,0), (self.width, self.height)))
-        # Add any accessories (windows etc.)       
+        # Add any accessories (windows etc.)
+        for feature in self.features:
+            cuts.extend(feature.get_cuts())
         return cuts
     
     def get_etches (self):
@@ -143,19 +173,8 @@ class RectWall(Wall):
                     break
                 # Add a rectangle
                 textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch)))
-        # Apply transformations to textures
-        ## Todo
-        
-        # Convert textures into etches
-        etches = []
-        for texture in textures:
-            this_etch = texture.get_etch()
-            # convert to pixels
-            if this_etch[0] == "rect":
-                etches.append (("rect", (this_etch[1][0], this_etch[1][1]), (this_etch[2][0], this_etch[2][1])))
-
-        #etches.append (("rect", (0, (self.to_pixels(y_pos - self.wood_etch))), (self.to_pixels(self.width), self.to_pixels(self.wood_etch))))
-        return etches
+        # Apply transformation to sketches
+        return self._texture_to_etch(textures)
     
 
     
