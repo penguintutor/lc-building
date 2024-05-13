@@ -6,30 +6,24 @@
 import math
 from texture import *
 
-
-mm_to_pixels = 3.543307
-
 # Template class - normally use RectWall
 # scale is divisor to convert from standard to scale size (eg. 76.2 for OO)
 class Wall():
-    def __init__ (self, width, height, scale):
+    def __init__ (self, width, height):
         self.max_width = width
         self.max_height = height
-        self.scale = scale
         self.material = "smooth"
     
-    def to_pixels (self, mm_value):
-        return (mm_value / self.scale) * mm_to_pixels
     
-    def get_scale_maxsize (self):
-        return (self.get_scale_maxwidth(), self.get_scale_maxheight())
+    def get_maxsize (self):
+        return (self.get_maxwidth(), self.get_maxheight())
     
-    def get_scale_maxwidth (self):
-        return self.to_pixels(self.max_width)
+    def get_maxwidth (self):
+        return self.max_width
     
-    def get_scale_maxheight (self):
-        return self.to_pixels(self.max_height)
-    
+    def get_maxheight (self):
+        return self.max_height
+       
     # Etching is created later, this defines settings
     def add_wood_etch (self, wood_height, wood_etch):
         self.material = "wood"
@@ -38,28 +32,28 @@ class Wall():
         
         
 class ApexWall(Wall):
-    def __init__ (self, width, roof_height, wall_height, scale):
-        super().__init__(width, roof_height, scale)
+    def __init__ (self, width, roof_height, wall_height):
+        super().__init__(width, roof_height)
         self.width = width
         self.roof_height = roof_height
         self.wall_height = wall_height
 
     # Return all cuts as tuples shapestype followed by dimensions
     # Start from 0,0
-    def get_scale_cuts (self):
+    def get_cuts (self):
         cuts = []
         #top centre to left
-        cuts.append (("line", (self.to_pixels(self.width/2), 0), (0, self.to_pixels(self.roof_height-self.wall_height))))
-        cuts.append (("line", (self.to_pixels(self.width/2), 0), (self.to_pixels(self.width), self.to_pixels(self.roof_height-self.wall_height))))
+        cuts.append (("line", (self.width/2, 0), (0, self.roof_height-self.wall_height)))
+        cuts.append (("line", (self.width/2, 0), (self.width, self.roof_height-self.wall_height)))
         # left
-        cuts.append (("line", (0, self.to_pixels(self.roof_height-self.wall_height)), (0, self.to_pixels(self.roof_height))))
+        cuts.append (("line", (0, self.roof_height-self.wall_height), (0, self.roof_height)))
         # right
-        cuts.append (("line", (self.to_pixels(self.width), self.to_pixels(self.roof_height-self.wall_height)), (self.to_pixels(self.width), self.to_pixels(self.roof_height))))
-        cuts.append (("line", (0, self.to_pixels(self.roof_height)), (self.to_pixels(self.width), self.to_pixels(self.roof_height))))
+        cuts.append (("line", (self.width, self.roof_height-self.wall_height), (self.width, self.roof_height)))
+        cuts.append (("line", (0, self.roof_height), (self.width, self.roof_height)))
         # Add any accessories (windows etc.)       
         return cuts
     
-    def get_scale_etches (self):
+    def get_etches (self):
         textures = []
         if self.material == "wood":
             # mark wood joins
@@ -105,12 +99,12 @@ class ApexWall(Wall):
             this_etch = texture.get_etch()
             # convert to pixels
             if this_etch[0] == "rect":
-                etches.append (("rect", (self.to_pixels(this_etch[1][0]), self.to_pixels(this_etch[1][1])), (self.to_pixels(this_etch[2][0]), self.to_pixels(this_etch[2][1]))))
+                etches.append (("rect", (this_etch[1][0], this_etch[1][1]), (this_etch[2][0], this_etch[2][1])))
             if this_etch[0] == "polygon":
                 # convert points into new list of pixel points
                 pixel_points = []
                 for i in range (1, len(this_etch)):
-                    pixel_points.append((self.to_pixels(this_etch[1][i][0]), self.to_pixels(this_etch[1][i][1]))) 
+                    pixel_points.append((this_etch[1][i][0], this_etch[1][i][1]))
                     
                 etches.append (("polygon", pixel_points)) 
             
@@ -120,21 +114,21 @@ class ApexWall(Wall):
 
 # Standard rectangle - inherits most methods
 class RectWall(Wall):
-    def __init__ (self, width, height, scale=1):
-        super().__init__(width, height, scale)
+    def __init__ (self, width, height):
+        super().__init__(width, height)
         self.width = width
         self.height = height
         
     # Return all cuts as tuples shapestype followed by dimensions
     # Start from 0,0
-    def get_scale_cuts (self):
+    def get_cuts (self):
         cuts = []
         # frame as rectangle
-        cuts.append (("rect", (0,0), (self.to_pixels(self.width), self.to_pixels(self.height))))
+        cuts.append (("rect", (0,0), (self.width, self.height)))
         # Add any accessories (windows etc.)       
         return cuts
     
-    def get_scale_etches (self):
+    def get_etches (self):
         # First apply textures
         textures = []
         if self.material == "wood":
@@ -158,7 +152,7 @@ class RectWall(Wall):
             this_etch = texture.get_etch()
             # convert to pixels
             if this_etch[0] == "rect":
-                etches.append (("rect", (self.to_pixels(this_etch[1][0]), self.to_pixels(this_etch[1][1])), (self.to_pixels(this_etch[2][0]), self.to_pixels(this_etch[2][1]))))
+                etches.append (("rect", (this_etch[1][0], this_etch[1][1]), (this_etch[2][0], this_etch[2][1])))
 
         #etches.append (("rect", (0, (self.to_pixels(y_pos - self.wood_etch))), (self.to_pixels(self.width), self.to_pixels(self.wood_etch))))
         return etches

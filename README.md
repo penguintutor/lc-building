@@ -19,4 +19,11 @@ After setting appropriate dimensions run
 
     python3 lcmake.py 
     
-    
+   
+## Development tests
+Tests are written using unittest
+Run using:
+
+    python3 -m unittest tests
+or
+    python3 tests.py

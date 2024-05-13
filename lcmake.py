@@ -1,5 +1,6 @@
 import svgwrite
 from wall import *
+from scale import *
 
 # Same stroke width for all as used for laser
 stroke_width = 1
@@ -29,16 +30,8 @@ wood_etch = 10
 building_type="shed"
 building_subtype="apex"
 
-scales = {
-    'N': 148,
-    'OO': 76.2,
-    'HO': 87,
-    'TT': 120,
-    'G': 22.5
-    }
-
-#scale = "OO"
-scale = "G"
+scale = "OO"
+#scale = "G"
 
 # Export in grid 3 wide
 grid_width = 3
@@ -51,13 +44,15 @@ current_height = 0 # Only need for height to track which piece needs most space
 
 dwg = svgwrite.Drawing(filename, profile='tiny')
 
+sc = Scale(scale)
+
 
 # Create side wall
 walls = [
-    RectWall(depth, wall_height, scales[scale]),
-    RectWall(depth, wall_height, scales[scale]),
-    ApexWall(width, roof_height, wall_height, scales[scale]),
-    ApexWall(width, roof_height, wall_height, scales[scale])
+    RectWall(depth, wall_height),
+    RectWall(depth, wall_height),
+    ApexWall(width, roof_height, wall_height),
+    ApexWall(width, roof_height, wall_height)
     ]
 
 # Add wood etching to all walls
@@ -74,41 +69,53 @@ for wall in walls:
     num_objects += 1
     # At end of adding each shape we extend the x position (but not the y)
     # Get overall dimensions for positioning
-    num_objectsect_size = wall.get_scale_maxsize()
+    num_objectsect_size = sc.convert(wall.get_maxsize())
         
     # get the cuts
-    cuts = wall.get_scale_cuts()
+    cuts = wall.get_cuts()
     for cut in cuts:
         if (cut[0] == "line"):
-            start_line = (offset[0]+cut[1][0], offset[1]+cut[1][1])
-            end_line = (offset[0]+cut[2][0], offset[1]+cut[2][1])
+            # start cut is relative to object
+            start_cut = sc.convert(cut[1])
+            # start line includes offset
+            start_line = (offset[0]+start_cut[0], offset[1]+start_cut[1])
+            end_cut = sc.convert(cut[2])
+            end_line = (offset[0]+end_cut[0], offset[1]+end_cut[1])
             dwg.add(dwg.line(start_line, end_line, stroke=cut_stroke, stroke_width=stroke_width))
         elif (cut[0] == "rect"):
-            start_rect = (offset[0]+cut[1][0], offset[1]+cut[1][1])
-            dwg.add(dwg.rect(start_rect, cut[2], stroke=cut_stroke, fill="none", stroke_width=stroke_width))
+            start_cut = sc.convert(cut[1])
+            start_rect = (offset[0]+start_cut[0], offset[1]+start_cut[1])
+            rect_size = sc.convert(cut[2])
+            dwg.add(dwg.rect(start_rect, rect_size, stroke=cut_stroke, fill="none", stroke_width=stroke_width))
             
     # Get the etching
-    etches = wall.get_scale_etches()
+    etches = wall.get_etches()
     if etches != None:
         for etch in etches:
             if (etch[0] == "line"):
-                start_line = (offset[0]+etch[1][0], offset[1]+etch[1][1])
-                end_line = (offset[0]+etch[2][0], offset[1]+etch[2][1])
+                start_etch = sc.convert(etch[1])
+                start_line = (offset[0]+start_etch[0], offset[1]+start_etch[1])
+                end_etch = sc.convert(etch[2])
+                end_line = (offset[0]+end_etch[0], offset[1]+end_etch[1])
                 dwg.add(dwg.line(start_line, end_line, stroke=etch_stroke, stroke_width=stroke_width))
             elif (etch[0] == "rect"):
-                start_rect = (offset[0]+etch[1][0], offset[1]+etch[1][1])
-                dwg.add(dwg.rect(start_rect, etch[2], stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
+                start_etch = sc.convert(etch[1])
+                start_rect = (offset[0]+start_etch[0], offset[1]+start_etch[1])
+                
+                rect_size = sc.convert(etch[2])
+                dwg.add(dwg.rect(start_rect, rect_size, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
             elif (etch[0] == "polygon"):
                 # iterate over each of the points to make a new list
                 new_points = []
                 for point in etch[1]:
-                    new_points.append([(offset[0]+point[0]),(offset[1]+point[1])])
+                    sc_point = sc.convert(point)
+                    new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
                 dwg.add(dwg.polygon(new_points, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
                 
-        # Add offset for the end - do even if this is last on row as it will be reset when next line
-        offset[0] = offset[0] + spacing  + num_objectsect_size[0]
-        if num_objectsect_size[1] > current_height :
-            current_height = num_objectsect_size[1]
+    # Add offset for the end - do this even if this is last on row as it will be reset when next line
+    offset[0] = offset[0] + spacing  + num_objectsect_size[0]
+    if num_objectsect_size[1] > current_height :
+        current_height = num_objectsect_size[1]
             
             
 #dwg.add(dwg.text('Test', insert=(10, 30), stroke=etch_stroke, fill=etch_fill))
