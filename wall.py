@@ -57,6 +57,11 @@ class Wall():
     def _texture_to_etch(self, textures):
         etches = []
         for texture in textures:
+            # First apply any features exclude areas to textures
+            for feature in self.features:
+                texture.exclude_etch(*feature.get_area())
+            
+            
             # Each texture can have one or more etches
             these_etches = texture.get_etches()
             for this_etch in these_etches:

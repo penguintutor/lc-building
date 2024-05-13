@@ -16,8 +16,12 @@ class Texture():
         self.max_x = max_x
         self.max_y = max_y
         
-    # detcect if collide with a feature and if so remove those parts of the etch
-    def collide_feature (self, feature_min_x, feature_min_y, feature_max_x, feature_max_y):
+    # Areas to exclude for the output
+    # Ensure this is only called once per instance
+    # Normally textures only exist during export so isn't normally
+    # a problem
+    def exclude_etch(self, startx, starty, endx, endy):
+        # check if collide if so add to exclusions
         pass
     
     
@@ -42,6 +46,7 @@ class TrapezoidTexture(Texture):
                 max_y = point[1]
         super().__init__ (min_x, min_y, max_x, max_y)
         self.points = points
+        
     
     # Return a list even if only one element
     def get_etches(self):

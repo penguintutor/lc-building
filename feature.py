@@ -10,6 +10,10 @@ class Feature():
         self.max_x = max_x
         self.max_y = max_y
         
+    # Get area to exclude
+    def get_area (self):
+        return (self.min_x, self.min_y, self.max_x, self.max_y)
+        
 # Start pos is top left
 # Size is (width, height)
 # Size is of full window including any sills / border
