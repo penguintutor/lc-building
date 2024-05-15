@@ -1,6 +1,8 @@
 # A feature is always something that is part of a wall - eg. a door or a window
 # Or a roof (which is treated as a type of wall)
 # Different to an "extra" which is cut separately (eg. decoration that is mounted afterwards)
+
+# Features must NOT overlap - unpredictable results in textures if do
 class Feature():
     # x, y is top left
     # max is bottom right - forms rectangle to exclude

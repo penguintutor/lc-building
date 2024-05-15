@@ -64,6 +64,9 @@ class Wall():
             
             # Each texture can have one or more etches
             these_etches = texture.get_etches()
+            # Skip any that are disabled
+            if this_etch == None:
+                return etches
             for this_etch in these_etches:
                 # convert to pixels
                 if this_etch[0] == "rect":

@@ -15,6 +15,8 @@ class Texture():
         self.min_y = min_y
         self.max_x = max_x
         self.max_y = max_y
+        self.disable = False   # Allows to disable completely if not required 
+        self.exclude = []
         
     # Areas to exclude for the output
     # Ensure this is only called once per instance
@@ -22,7 +24,19 @@ class Texture():
     # a problem
     def exclude_etch(self, startx, starty, endx, endy):
         # check if collide if so add to exclusions
-        pass
+        # First look if texture totally enclosed (if so then remove completely)
+        # Eg. Brick within a window position
+        if (self.min_x >= startx and self.min_y >= starty and self.max_x <= endx and self.max_y <= endy):
+            # completely disable this part of the texture
+            self.disable = True
+            # Add to exclude (although most likely not required)
+            self.exclude.append(startx, starty, endx, endy)
+        # If not fully contained then does it overlap (ie. either start or end of exclude is
+        # within the rect of the texture
+        elif (startx >= self.min_x and startx <= self.min_y and starty >= self.min_y and starty <= self.max-y):
+            self.exclude.append(startx, starty, endx, endy)
+        elif (endx >= self.min_x and endx <= self.min_y and endy >= self.min_y and endy <= self.max-y):
+            self.exclude.append(startx, starty, endx, endy)
     
     
 # must be parallel top and bottom
@@ -50,6 +64,8 @@ class TrapezoidTexture(Texture):
     
     # Return a list even if only one element
     def get_etches(self):
+        if self.exclude == True:
+            return None
         # convert to polygon
         # Add start to end
         new_points = self.points.copy()
@@ -67,5 +83,10 @@ class RectTexture(Texture):
     
     # Return a list even if only one element
     def get_etches(self):
-        return [("rect", (self.start_pos[0], self.start_pos[1]), (self.dimension[0], self.dimension[1]))]
+        if self.exclude == True:
+            return None
+        if len(self.exclude) == 0:
+        # If no exclusions then just return a single rectangle
+            return [("rect", (self.start_pos[0], self.start_pos[1]), (self.dimension[0], self.dimension[1]))]
+        
     
