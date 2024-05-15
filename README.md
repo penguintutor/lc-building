@@ -10,6 +10,7 @@ More details will be provided as the code is developed further.
 Module Python svgwrite
 
 On Debian / Ubuntu use
+
     sudo apt install python3-svgwrite
     
     
@@ -21,9 +22,12 @@ After setting appropriate dimensions run
     
    
 ## Development tests
+There are some limited tests provided.
 Tests are written using unittest
+
 Run using:
 
     python3 -m unittest tests
 or
+
     python3 tests.py

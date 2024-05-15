@@ -12,6 +12,9 @@ from feature import *
 # is before get etch, then that part will be removed from
 # the etch
 
+# Textures are currently created in walls - may make sense to pull this into a
+# separate texture generator class in future
+
 # Template class - normally use RectWall / ApexWall etc
 # scale is divisor to convert from standard to scale size (eg. 76.2 for OO)
 class Wall():
@@ -20,7 +23,11 @@ class Wall():
         self.max_height = height
         self.material = "smooth"
         self.features = []
+        # by default are a wall, or could be roof
+        self.type = "wall"
     
+    def get_type (self):
+        return self.type
     
     def get_maxsize (self):
         return (self.get_maxwidth(), self.get_maxheight())
@@ -65,7 +72,7 @@ class Wall():
             # Each texture can have one or more etches
             these_etches = texture.get_etches()
             # Skip any that are disabled
-            if this_etch == None:
+            if these_etches == None:
                 return etches
             for this_etch in these_etches:
                 # convert to pixels
@@ -119,7 +126,7 @@ class ApexWall(Wall):
                 if y_pos < self.roof_height - self.wall_height:
                     break
                 # Add a rectangle
-                textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch)))
+                textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch), direction="horizontal"))
                 
             # Continue to top of apex
             # Start by calculating angle of roof
@@ -137,8 +144,10 @@ class ApexWall(Wall):
                     (self.width/2 - half_width_top, y_pos-self.wood_etch),  # top left
                     (self.width/2 + half_width_top, y_pos-self.wood_etch),  # top right
                     (self.width/2 + half_width_bottom, y_pos),              # bottom right
-                    (self.width/2 - half_width_bottom, y_pos)               # bottom left
-                    ]))
+                    (self.width/2 - half_width_bottom, y_pos)              # bottom left
+                    ],
+                    direction = "horizontal"
+                    ))
                 
                 y_pos -= self.wood_height
                 if y_pos < self.wood_height / 4:
@@ -181,9 +190,34 @@ class RectWall(Wall):
                 if y_pos < self.wood_height / 4:
                     break
                 # Add a rectangle
-                textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch)))
+                textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch), direction="horizontal"))
         # Apply transformation to sketches
         return self._texture_to_etch(textures)
     
 
+# Roof wall is used for a roof - like a wall
+# In future may need to handle different, but for now it's sale as a RectWall
+# Actually implemented as a wall
+# For type = "apex" then roof is half of shed - but width is still width of building
+# Type can be flat (actually still sloping, but one whole roof)
+# Or apex (two identical apex segments - create two instances if you want it printed twice)
+# or apexleft, apexright if dimensions are different
+# For apex if left and right are different then average both, for each sides
+# Note that apexleft and apexright still need right and left overlap even though one is ignored
+# handled internally as calculated in constructor
+# Note setting depth, then querying depth may result in different value (same with width)
+# Height difference is not stored - just used in calculation
+# Overlap is the distance to extend the roof by, not the actual distance it sticks out from the width of the building
+class RoofWall (RectWall):
+    def __init__ (self, depth, width, height_difference, type, right_overlap, left_overlap, front_overlap, rear_overlap):
+        roof_depth = depth + front_overlap + rear_overlap
+        roof_width = width # Most likely this will be replaced
+        if type == "flat":
+            roof_width = math.sqrt (width ** 2 + height_difference **2) + right_overlap + left_overlap
+        if type == "apex":
+            roof_width = math.sqrt ((width / 2) ** 2 + height_difference **2) + ((right_overlap + left_overlap)/2)
+        # Although init is for width, height enter as depth, width
+        # As that will ensure any texture goes the right way
+        super().__init__(roof_depth, roof_width)
+        self.type = "roof"
     

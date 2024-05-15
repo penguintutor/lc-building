@@ -24,6 +24,13 @@ roof_width = 1342 # width relative to floor (not actual size of roof)
 door_width = 800
 door_height = 1800
 
+# Overlap is different for each side
+# Eg. may have a canope for front
+roof_right_overlap = 100
+roof_left_overlap = 100
+roof_front_overlap = 50
+roof_rear_overlap = 50
+
 wood_height = 150
 wood_etch = 10
 
@@ -45,23 +52,31 @@ spacing = 10
 num_objects = 0
 current_height = 0 # Only need for height to track which piece needs most space
 
+# Approx 200 x 200mm in pixels
+doc_size = (710, 710)
 
-dwg = svgwrite.Drawing(filename, profile='tiny')
+dwg = svgwrite.Drawing(filename, profile='tiny', size=(str(doc_size[0]),str(doc_size[1])))
 
 sc = Scale(scale)
 
 
-# Create side wall
+# Create walls
 walls = [
     RectWall(depth, wall_height),
     RectWall(depth, wall_height),
     ApexWall(width, roof_height, wall_height),
-    ApexWall(width, roof_height, wall_height)
+    ApexWall(width, roof_height, wall_height),
+    # Roof is a type of "wall" depth is first followed by width
+    # For type = "apex" then roof is half of shed - but width is still width of building
+    # Create two roof segments - although identical , one for left one for right
+    RoofWall(depth, width, roof_height-wall_height, "apex", roof_right_overlap, roof_left_overlap, roof_front_overlap, roof_rear_overlap),
+    RoofWall(depth, width, roof_height-wall_height, "apex", roof_right_overlap, roof_left_overlap, roof_front_overlap, roof_rear_overlap)
     ]
 
 # Add wood etching to all walls
 for wall in walls:
-    wall.add_wood_etch (wood_height, wood_etch)
+    if wall.get_type() != "roof":
+        wall.add_wood_etch (wood_height, wood_etch)
     
 # Add window to wall 0
 walls[0].add_feature("window", (*window_pos, *window_size))
