@@ -50,6 +50,8 @@ window_size = (400, 555)
 window_cuts = []
 window_etches = []
 
+hinge_size = (300, 50)
+
 # Example door (wall 2)
 door_pos = (190, 322)
 door_size = (800, 1800)
@@ -69,6 +71,19 @@ door_etches = [
     EtchRect ((door_pos[0]+325, door_pos[1]), (wood_etch, door_size[1])),
     EtchRect ((door_pos[0]+475, door_pos[1]), (wood_etch, door_size[1])),
     EtchRect ((door_pos[0]+625, door_pos[1]), (wood_etch, door_size[1])),
+    # Hinges
+    EtchPolygon (((door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.15)),
+                  (door_pos[0]+door_size[0]-hinge_size[0], door_pos[1]+int(door_size[1]*0.15) + (hinge_size[1]/2)),
+                  (door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.15) + hinge_size[1]),
+                  )),
+    EtchPolygon (((door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.5)-(hinge_size[1]/2)),
+                  (door_pos[0]+door_size[0]-hinge_size[0], door_pos[1]+int(door_size[1]*0.5)),
+                  (door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.5) + (hinge_size[1]/2)),
+                  )),
+    EtchPolygon (((door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.85)),
+                  (door_pos[0]+door_size[0]-hinge_size[0], door_pos[1]+int(door_size[1]*0.85) + (hinge_size[1]/2)),
+                  (door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.85) + hinge_size[1]),
+                  )),
     ]
 
 building_type="shed"
