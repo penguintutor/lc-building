@@ -65,10 +65,10 @@ door_cuts = [
     ]
 # vertical wood effect
 door_etches = [
-    EtchRect ((door_pos[0]+100, door_pos[1]), (wood_etch, door_size[1])),
-    EtchRect ((door_pos[0]+350, door_pos[1]), (wood_etch, door_size[1])),
-    EtchRect ((door_pos[0]+500, door_pos[1]), (wood_etch, door_size[1])),
-    EtchRect ((door_pos[0]+650, door_pos[1]), (wood_etch, door_size[1])),
+    EtchRect ((door_pos[0]+175, door_pos[1]), (wood_etch, door_size[1])),
+    EtchRect ((door_pos[0]+325, door_pos[1]), (wood_etch, door_size[1])),
+    EtchRect ((door_pos[0]+475, door_pos[1]), (wood_etch, door_size[1])),
+    EtchRect ((door_pos[0]+625, door_pos[1]), (wood_etch, door_size[1])),
     ]
 
 building_type="shed"
