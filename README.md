@@ -31,3 +31,12 @@ Run using:
 or
 
     python3 tests.py
+    
+## Limitations
+When creating templates it may be simpler to allow overlapping etches. 
+For example shed hinges that overlap with the texture. In this case
+it will need to be handled appropriately in the laser burn software
+(eg. Lightburn weld feature), or through edit in Inkscape
+
+Alternatively templates can be manually created that create all 
+etches as polygons to avoid that problem.

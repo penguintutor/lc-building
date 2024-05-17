@@ -12,6 +12,9 @@ class Laser():
         self.type = type
         self.values = values
         
+    def get_type(self):
+        return self.type
+        
 
 class Cut(Laser):
     def __init__(self, type, values):
@@ -48,12 +51,32 @@ class Etch(Laser):
 # Start and end are tuples
 class EtchLine(Etch):
     def __init__(self, start, end):
+        self.start = start
+        self.end = end
         super().__init__("line", (start, end))
+        
+    def get_start(self):
+        return self.start
+    
+    def get_end(self):
+        return self.end
         
 class EtchRect(Etch):
     def __init__(self, start, size):
+        self.start = start
+        self.size = size
         super().__init__("rect", (start, size))
+    
+    def get_start(self):
+        return self.start
+    
+    def get_size(self):
+        return self.size
         
 class EtchPolygon(Etch):
     def __init__(self, points):
+        self.points = points
         super().__init__("polygon", (points))
+        
+    def get_points(self):
+        return self.points

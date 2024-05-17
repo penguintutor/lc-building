@@ -48,56 +48,33 @@ class Wall():
     # Add a feature - such as a window
     # Values are startx, starty, endx, endy
     # Settings is dict of settings eg. {"windowtype":"rect"} for basic rectangle window
-    def add_feature (self, type, values, settings=None):
+    def add_feature (self, type, startpos, size, cuts=[], etches=[], settings=None):
         # feature number will be next number
         # Will return that assuming that this is successful
         feature_num = len(self.features)
         if type == "window":
-            if len(values) > 4:
-                cuts = []
-                pos = 4
-                while pos < len(values):
-                    # Must be in groups of 4 (startx, starty, endx, endy)
-                    if (len(values) - pos) < 4:
-                        break
-                    cuts.append((values[pos], values[pos+1], values[pos+2], values[pos+3]))
-                    pos += 4
-                self.features.append(Window((values[0], values[1]), (values[2], values[3], cuts)))
-            else:
-                self.features.append(Window((values[0], values[1]), (values[2], values[3])))
+            self.features.append(Window(startpos, size, cuts, etches))
             # Now added window check for relevant settings
             if settings != None and "windowtype" in settings.keys() and settings["windowtype"]=="rect":
                 self.features[feature_num].set_cuts_rect()
-                return feature_num
-
-                
-
+            return feature_num
+        elif type == "door":
+            self.features.append(Door(startpos, size, cuts, etches))
+            # If want to handle settings can do so here
+            # Eg. support textures
+            return feature_num
+            
     # This is later stage in get_etches
-    def _texture_to_etch(self, textures):
+    def _texture_to_etches(self, textures):
         etches = []
         for texture in textures:
             # First apply any features exclude areas to textures
             for feature in self.features:
                 texture.exclude_etch(*feature.get_area())
-            
-            
             # Each texture can have one or more etches
-            these_etches = texture.get_etches()
-            # Skip any that are disabled
-            if these_etches == None:
-                return etches
-            for this_etch in these_etches:
-                # convert to pixels
-                if this_etch[0] == "rect":
-                    etches.append (("rect", (this_etch[1][0], this_etch[1][1]), (this_etch[2][0], this_etch[2][1])))
-                if this_etch[0] == "polygon":
-                    # convert points into new list of pixel points
-                    pixel_points = []
-                    for i in range (1, len(this_etch)):
-                        pixel_points.append((this_etch[1][i][0], this_etch[1][i][1]))
-                        
-                    etches.append (("polygon", pixel_points))             
+            etches.extend(texture.get_etches())
         return etches
+            
 
         
 class ApexWall(Wall):
@@ -166,7 +143,11 @@ class ApexWall(Wall):
                     break
                 
         # Apply transformation to sketches
-        return self._texture_to_etch(textures)
+        etches = self._texture_to_etches(textures)
+        # Add any features
+        for feature in self.features:
+            etches.extend(feature.get_etches())
+        return etches
 
 
 
@@ -204,8 +185,11 @@ class RectWall(Wall):
                 # Add a rectangle
                 textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch), direction="horizontal"))
         # Apply transformation to sketches
-        return self._texture_to_etch(textures)
-    
+        etches = self._texture_to_etches(textures)
+        # Add any features
+        for feature in self.features:
+            etches.extend(feature.get_etches())
+        return etches
 
 # Roof wall is used for a roof - like a wall
 # In future may need to handle different, but for now it's sale as a RectWall

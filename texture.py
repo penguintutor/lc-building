@@ -3,6 +3,8 @@
 # Creates an instance for each element - then can use to detect
 # if it needs to be removed because of other features
 
+from laser import *
+
 # Texture needs to be applied with direction either vertical or horizontal
 # Could have diagonal elements (eg. polygon representing stone), but still define
 # by horizontal or vertical
@@ -81,7 +83,7 @@ class TrapezoidTexture(Texture):
         # Add start to end
         new_points = self.points.copy()
         new_points.append(self.points[0])
-        return [("polygon", new_points)]
+        return [EtchPolygon(new_points)]
     
     
 # start is x, y - dimension w, l
@@ -98,7 +100,8 @@ class RectTexture(Texture):
             return None
         if len(self.exclude) == 0:
         # If no exclusions then just return a single rectangle
-            return [("rect", (self.start_pos[0], self.start_pos[1]), (self.dimension[0], self.dimension[1]))]
+            #return [("rect", (self.start_pos[0], self.start_pos[1]), (self.dimension[0], self.dimension[1]))]
+            return [EtchRect((self.start_pos[0], self.start_pos[1]), (self.dimension[0], self.dimension[1]))]
         # Handle partial exclusion
         rects = []
         if self.direction == "horizontal":
@@ -111,12 +114,14 @@ class RectTexture(Texture):
                     current_x = this_exclude[2]
                     continue
                 # create rect from current pos to this exclude
-                rects.append(("rect", (current_x, self.start_pos[1]), (this_exclude[0]-current_x, self.dimension[1])))
+                #rects.append(("rect", (current_x, self.start_pos[1]), (this_exclude[0]-current_x, self.dimension[1])))
+                rects.append(EtchRect((current_x, self.start_pos[1]), (this_exclude[0]-current_x, self.dimension[1])))
                 # Set current pos to end of exclude
                 current_x = this_exclude[2]
             # if not reached end of wall then add final rectangle
             if current_x < self.start_pos[0] + self.dimension[0]:
-                rects.append(("rect", (current_x, self.start_pos[1]), (self.dimension[0]-current_x, self.dimension[1])))
+                #rects.append(("rect", (current_x, self.start_pos[1]), (self.dimension[0]-current_x, self.dimension[1])))
+                rects.append(EtchRect ((current_x, self.start_pos[1]), (self.dimension[0]-current_x, self.dimension[1])))
         if self.direction == "vertical":
             # Get sorted list of exclusions by y
             sorted_list = sorted(self.exclude, key=lambda sortkey: sortkey[1])
@@ -127,12 +132,14 @@ class RectTexture(Texture):
                     current_y = this_exclude[3]
                     continue
                 # create rect from current pos to this exclude
-                rects.append(("rect", (self.start_pos[0], current_y ), (self.dimension[1], this_exclude[1]-current_y)))
+                #rects.append(("rect", (self.start_pos[0], current_y ), (self.dimension[1], this_exclude[1]-current_y)))
+                rects.append(EtchRect ((self.start_pos[0], current_y ), (self.dimension[1], this_exclude[1]-current_y)))
                 # Set current pos to end of exclude
                 current_y = this_exclude[3]
             # if not reached end of wall then add final rectangle
             if current_y < self.start_pos[1] + self.dimension[1]:
-                rects.append(("rect", (self.start_pos[0], current_y), (self.dimension[1], self.dimension[1]-current_y)))
+                #rects.append(("rect", (self.start_pos[0], current_y), (self.dimension[1], self.dimension[1]-current_y)))
+                rects.append(EtchRect ((self.start_pos[0], current_y), (self.dimension[1], self.dimension[1]-current_y)))
         
         return rects
                 

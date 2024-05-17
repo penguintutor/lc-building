@@ -12,7 +12,6 @@ class TestWall(unittest.TestCase):
         test_wall = RectWall(depth, height)
         cutsobj = test_wall.get_cuts()
         cuts = cutsobj[0].get_cut()
-        print (str(cuts))
         self.assertEqual(cuts[0], "rect")
         self.assertEqual(cuts[2][0], depth)
         self.assertEqual(cuts[2][1], height)

@@ -22,8 +22,7 @@ wall_height = 1864
 roof_height = 2122
 roof_depth = 1882
 roof_width = 1342 # width relative to floor (not actual size of roof)
-door_width = 800
-door_height = 1800
+
 
 # Overlap is different for each side
 # Eg. may have a canope for front
@@ -35,9 +34,42 @@ roof_rear_overlap = 50
 wood_height = 150
 wood_etch = 10
 
+# Feature positions are top left
+# Note y=0 is top of roof height 
+
+# Features can have cuts and etches applied
+# either manually or using textures / settings etc.
+# cuts and etches can always be added to
+
+# cuts are ethches are relative to the wall (as are all other values)
+# But may want to include relative to door_pos etc.
+
 # Example window (wall 0)
 window_pos = (713, 50)
 window_size = (400, 555)
+window_cuts = []
+window_etches = []
+
+# Example door (wall 2)
+door_pos = (190, 322)
+door_size = (800, 1800)
+# Example where cut 3 sides (ie. door is to the floor)
+# y direction is top to bottom - so add size to get to bottom
+door_cuts = [
+    # bottom left to top left
+    CutLine ((door_pos[0], door_pos[1]+door_size[1]), (door_pos[0], door_pos[1])),
+    # top line
+    CutLine ((door_pos[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1])),
+    # top right to bottom right
+    CutLine ((door_pos[0] + door_size[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1]+door_size[1]))
+    ]
+# vertical wood effect
+door_etches = [
+    EtchRect ((door_pos[0]+100, door_pos[1]), (wood_etch, door_size[1])),
+    EtchRect ((door_pos[0]+350, door_pos[1]), (wood_etch, door_size[1])),
+    EtchRect ((door_pos[0]+500, door_pos[1]), (wood_etch, door_size[1])),
+    EtchRect ((door_pos[0]+650, door_pos[1]), (wood_etch, door_size[1])),
+    ]
 
 building_type="shed"
 building_subtype="apex"
@@ -80,10 +112,11 @@ for wall in walls:
         wall.add_wood_etch (wood_height, wood_etch)
     
 # Add window to wall 0
-walls[0].add_feature("window", (*window_pos, *window_size), {"windowtype":"rect"})
+walls[0].add_feature("window", window_pos, window_size, cuts=window_cuts, etches=window_etches, settings={"windowtype":"rect"})
+# Add door to apex wall 2
+walls[2].add_feature("door", door_pos, door_size, cuts=door_cuts, etches=door_etches)
     
 # Create output
-
 for wall in walls:
     # Is this modulo grid_width if so then start next line
     # Will match on first one - which will add spacing
@@ -118,22 +151,23 @@ for wall in walls:
     etches = wall.get_etches()
     if etches != None:
         for etch in etches:
-            if (etch[0] == "line"):
-                start_etch = sc.convert(etch[1])
+            if (etch.get_type() == "line"):
+                # start_etch is modified start
+                start_etch = sc.convert(etch.get_start())
                 start_line = (offset[0]+start_etch[0], offset[1]+start_etch[1])
-                end_etch = sc.convert(etch[2])
+                end_etch = sc.convert(etch.get_end())
                 end_line = (offset[0]+end_etch[0], offset[1]+end_etch[1])
                 dwg.add(dwg.line(start_line, end_line, stroke=etch_stroke, stroke_width=stroke_width))
-            elif (etch[0] == "rect"):
-                start_etch = sc.convert(etch[1])
+            elif (etch.get_type() == "rect"):
+                start_etch = sc.convert(etch.get_start())
                 start_rect = (offset[0]+start_etch[0], offset[1]+start_etch[1])
                 
-                rect_size = sc.convert(etch[2])
+                rect_size = sc.convert(etch.get_size())
                 dwg.add(dwg.rect(start_rect, rect_size, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
-            elif (etch[0] == "polygon"):
+            elif (etch.get_type() == "polygon"):
                 # iterate over each of the points to make a new list
                 new_points = []
-                for point in etch[1]:
+                for point in etch.get_points():
                     sc_point = sc.convert(point)
                     new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
                 dwg.add(dwg.polygon(new_points, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
