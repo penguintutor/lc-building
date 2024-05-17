@@ -1,4 +1,5 @@
 import svgwrite
+from laser import *
 from wall import *
 from scale import *
 
@@ -79,7 +80,7 @@ for wall in walls:
         wall.add_wood_etch (wood_height, wood_etch)
     
 # Add window to wall 0
-walls[0].add_feature("window", (*window_pos, *window_size))
+walls[0].add_feature("window", (*window_pos, *window_size), {"windowtype":"rect"})
     
 # Create output
 
@@ -97,7 +98,8 @@ for wall in walls:
         
     # get the cuts
     cuts = wall.get_cuts()
-    for cut in cuts:
+    for cutobj in cuts:
+        cut = cutobj.get_cut()
         if (cut[0] == "line"):
             # start cut is relative to object
             start_cut = sc.convert(cut[1])

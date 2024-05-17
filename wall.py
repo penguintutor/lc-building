@@ -6,6 +6,7 @@
 import math
 from texture import *
 from feature import *
+from laser import *
 
 # Texture is generated as part of get_etch,
 # This means that if a feature is added as long as it
@@ -44,7 +45,13 @@ class Wall():
         self.wood_height = wood_height
         self.wood_etch = wood_etch
 
-    def add_feature (self, type, values):
+    # Add a feature - such as a window
+    # Values are startx, starty, endx, endy
+    # Settings is dict of settings eg. {"windowtype":"rect"} for basic rectangle window
+    def add_feature (self, type, values, settings=None):
+        # feature number will be next number
+        # Will return that assuming that this is successful
+        feature_num = len(self.features)
         if type == "window":
             if len(values) > 4:
                 cuts = []
@@ -58,6 +65,11 @@ class Wall():
                 self.features.append(Window((values[0], values[1]), (values[2], values[3], cuts)))
             else:
                 self.features.append(Window((values[0], values[1]), (values[2], values[3])))
+            # Now added window check for relevant settings
+            if settings != None and "windowtype" in settings.keys() and settings["windowtype"]=="rect":
+                self.features[feature_num].set_cuts_rect()
+                return feature_num
+
                 
 
     # This is later stage in get_etches
@@ -101,13 +113,13 @@ class ApexWall(Wall):
     def get_cuts (self):
         cuts = []
         #top centre to left
-        cuts.append (("line", (self.width/2, 0), (0, self.roof_height-self.wall_height)))
-        cuts.append (("line", (self.width/2, 0), (self.width, self.roof_height-self.wall_height)))
+        cuts.append (CutLine((self.width/2, 0), (0, self.roof_height-self.wall_height)))
+        cuts.append (CutLine((self.width/2, 0), (self.width, self.roof_height-self.wall_height)))
         # left
-        cuts.append (("line", (0, self.roof_height-self.wall_height), (0, self.roof_height)))
+        cuts.append (CutLine((0, self.roof_height-self.wall_height), (0, self.roof_height)))
         # right
-        cuts.append (("line", (self.width, self.roof_height-self.wall_height), (self.width, self.roof_height)))
-        cuts.append (("line", (0, self.roof_height), (self.width, self.roof_height)))
+        cuts.append (CutLine((self.width, self.roof_height-self.wall_height), (self.width, self.roof_height)))
+        cuts.append (CutLine((0, self.roof_height), (self.width, self.roof_height)))
         # Add any accessories (windows etc.)
         for feature in self.features:
             cuts.extend(feature.get_cuts())
@@ -170,7 +182,7 @@ class RectWall(Wall):
     def get_cuts (self):
         cuts = []
         # frame as rectangle
-        cuts.append (("rect", (0,0), (self.width, self.height)))
+        cuts.append (CutRect((0,0), (self.width, self.height)))
         # Add any accessories (windows etc.)
         for feature in self.features:
             cuts.extend(feature.get_cuts())

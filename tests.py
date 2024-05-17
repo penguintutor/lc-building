@@ -1,6 +1,7 @@
 import unittest
 from wall import *
 from scale import *
+from laser import *
 
 class TestWall(unittest.TestCase):
     
@@ -9,10 +10,12 @@ class TestWall(unittest.TestCase):
         depth = 1826
         height = 1864
         test_wall = RectWall(depth, height)
-        cuts = test_wall.get_cuts()
-        self.assertEqual(cuts[0][0], "rect")
-        self.assertEqual(cuts[0][2][0], depth)
-        self.assertEqual(cuts[0][2][1], height)
+        cutsobj = test_wall.get_cuts()
+        cuts = cutsobj[0].get_cut()
+        print (str(cuts))
+        self.assertEqual(cuts[0], "rect")
+        self.assertEqual(cuts[2][0], depth)
+        self.assertEqual(cuts[2][1], height)
         
     def test_wall_maxsize(self):
         depth = 1826
