@@ -50,9 +50,15 @@ class Etch(Laser):
         
 # Start and end are tuples
 class EtchLine(Etch):
-    def __init__(self, start, end):
+    # Default etch width if none others set on individual class
+    # Used by etch lines only, but can be accessed by all instances
+    global_etch_width = 10
+    def __init__(self, start, end, etch_width=None):
         self.start = start
         self.end = end
+        # how wide to cut (cannot have line as lightburn doesn't like it)
+        # If set to None (default) then look at class variable global_etch_width
+        self.etch_width = etch_width
         super().__init__("line", (start, end))
         
     def get_start(self):
@@ -60,6 +66,9 @@ class EtchLine(Etch):
     
     def get_end(self):
         return self.end
+    
+    def set_global_width(self, line_width):
+        self.global_etch_width = line_width
         
 class EtchRect(Etch):
     def __init__(self, start, size):

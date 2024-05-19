@@ -32,7 +32,10 @@ roof_front_overlap = 50
 roof_rear_overlap = 50
 
 wood_height = 150
+# Width of a wood etch line (boundry between wood)
 wood_etch = 10
+# Set width of other etch_lines (eg. door outside)
+etch_line_width = 10
 
 # Feature positions are top left
 # Note y=0 is top of roof height 
@@ -57,13 +60,22 @@ door_pos = (190, 322)
 door_size = (800, 1800)
 # Example where cut 3 sides (ie. door is to the floor)
 # y direction is top to bottom - so add size to get to bottom
-door_cuts = [
+door_outside_cuts = [
     # bottom left to top left
     CutLine ((door_pos[0], door_pos[1]+door_size[1]), (door_pos[0], door_pos[1])),
     # top line
     CutLine ((door_pos[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1])),
     # top right to bottom right
     CutLine ((door_pos[0] + door_size[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1]+door_size[1]))
+    ]
+door_cuts = []
+door_outside_etches = [
+    # bottom left to top left
+    EtchLine ((door_pos[0], door_pos[1]+door_size[1]), (door_pos[0], door_pos[1])),
+    # top line
+    EtchLine ((door_pos[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1])),
+    # top right to bottom right
+    EtchLine ((door_pos[0] + door_size[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1]+door_size[1]))
     ]
 # vertical wood effect
 door_etches = [
@@ -88,14 +100,26 @@ door_etches = [
 
 building_type="shed"
 building_subtype="apex"
+# Do we "etch" or "cut" the door out
+door_burn="etch"
+if door_burn == "cut":
+    door_cuts.extend(door_outside_cuts)
+elif door_burn == "etch":
+    door_etches.extend(door_outside_etches)
 
 scale = "OO"
 #scale = "G"
+
+# Dummy EtchLine entry allowing us to set parameters for all EtchLines
+global_etch_line = EtchLine((0,0),(0,0))
+# Set width for all etch lines
+global_etch_line.set_global_width(etch_line_width)
 
 # Export in grid 3 wide
 grid_width = 3
 # Start position
 offset = [0, 0]
+# spacing is distance beteen objects (eg. walls) when exported to SVG
 spacing = 10
 num_objects = 0
 current_height = 0 # Only need for height to track which piece needs most space
