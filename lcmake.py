@@ -34,7 +34,14 @@ roof_rear_overlap = 50
 wood_height = 150
 # Width of a wood etch line (boundry between wood)
 wood_etch = 10
-# Set width of other etch_lines (eg. door outside)
+# Setting option (if set then a line is returned as a polygon based on etch_line_width
+# Normally want as True as Lightburn will not allow lines as etches (recommended)
+# If you prefer to edit as a line (eg. ink InkScape) then you can set to False
+# Note that the co-ordinates will be centre of the line so will be extended in all directions
+# This may have implications for overlapping 
+etch_as_polygon = True
+# Set width of etch lines (eg. door outside)
+# If etch as polygon True then this value moust be set
 etch_line_width = 10
 
 # Feature positions are top left
@@ -69,6 +76,8 @@ door_outside_cuts = [
     CutLine ((door_pos[0] + door_size[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1]+door_size[1]))
     ]
 door_cuts = []
+# Alternative to door_outside_cuts - etch instead
+# Commonly used for small scales - otherwise need to create hinge to mount door back on
 door_outside_etches = [
     # bottom left to top left
     EtchLine ((door_pos[0], door_pos[1]+door_size[1]), (door_pos[0], door_pos[1])),
@@ -77,6 +86,7 @@ door_outside_etches = [
     # top right to bottom right
     EtchLine ((door_pos[0] + door_size[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1]+door_size[1]))
     ]
+# Feature etches have to be defined explicitly 
 # vertical wood effect
 door_etches = [
     EtchRect ((door_pos[0]+175, door_pos[1]), (wood_etch, door_size[1])),
@@ -110,6 +120,7 @@ elif door_burn == "etch":
 scale = "OO"
 #scale = "G"
 
+
 # Dummy EtchLine entry allowing us to set parameters for all EtchLines
 global_etch_line = EtchLine((0,0),(0,0))
 # Set width for all etch lines
@@ -125,12 +136,18 @@ num_objects = 0
 current_height = 0 # Only need for height to track which piece needs most space
 
 # Approx 200 x 200mm in pixels
-doc_size = (710, 710)
-
-dwg = svgwrite.Drawing(filename, profile='tiny', size=(str(doc_size[0]),str(doc_size[1])))
+# Eg. size of a small laser cutter / 3D printer
+doc_size_mm = (200, 200)
 
 sc = Scale(scale)
+# Create laser class so pass objects / settings for laser parent
+laser = Laser("master", None)
+# Pass scale instance to laser class
+laser.set_scale_object(sc)
 
+doc_size = sc.mms_to_pixels(doc_size_mm)
+
+dwg = svgwrite.Drawing(filename, profile='tiny', size=(str(doc_size[0]),str(doc_size[1])))
 
 # Create walls
 walls = [
@@ -170,52 +187,44 @@ for wall in walls:
         
     # get the cuts
     cuts = wall.get_cuts()
-    for cutobj in cuts:
-        cut = cutobj.get_cut()
-        if (cut[0] == "line"):
-            # start cut is relative to object
-            start_cut = sc.convert(cut[1])
-            # start line includes offset
-            start_line = (offset[0]+start_cut[0], offset[1]+start_cut[1])
-            end_cut = sc.convert(cut[2])
-            end_line = (offset[0]+end_cut[0], offset[1]+end_cut[1])
+    for cut in cuts:
+        if (cut.get_type() == "line"):
+            # get as pixels with offset added
+            start_line = cut.get_start_pixels(offset)
+            end_line = cut.get_end_pixels(offset)
             dwg.add(dwg.line(start_line, end_line, stroke=cut_stroke, stroke_width=stroke_width))
-        elif (cut[0] == "rect"):
-            start_cut = sc.convert(cut[1])
-            start_rect = (offset[0]+start_cut[0], offset[1]+start_cut[1])
-            rect_size = sc.convert(cut[2])
+        elif (cut.get_type() == "rect"):
+            start_rect = cut.get_start_pixels(offset)
+            rect_size = cut.get_size_pixels()
             dwg.add(dwg.rect(start_rect, rect_size, stroke=cut_stroke, fill="none", stroke_width=stroke_width))
             
     # Get the etching
     etches = wall.get_etches()
     if etches != None:
         for etch in etches:
+            # Special case for line etch as software tools not allow, plus need to add width
             if (etch.get_type() == "line"):
-                # start_etch is modified start
-                start_etch = sc.convert(etch.get_start())
-                start_line = (offset[0]+start_etch[0], offset[1]+start_etch[1])
-                end_etch = sc.convert(etch.get_end())
-                end_line = (offset[0]+end_etch[0], offset[1]+end_etch[1])
-                dwg.add(dwg.line(start_line, end_line, stroke=etch_stroke, stroke_width=stroke_width))
+                # Check if etch_as_polygon set (in which case get polygon instead of line)
+                if etch_as_polygon == True:
+                    new_points = etch.get_polygon_pixels(offset)
+                    dwg.add(dwg.polygon(new_points, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
+                # Otherwise treat as line
+                else:
+                    # start_etch is modified start
+                    start_line = etch.get_start_pixels(offset)
+                    end_line = etch.get_end_pixels(offset)
+                    dwg.add(dwg.line(start_line, end_line, stroke=etch_stroke, stroke_width=stroke_width))
             elif (etch.get_type() == "rect"):
-                start_etch = sc.convert(etch.get_start())
-                start_rect = (offset[0]+start_etch[0], offset[1]+start_etch[1])
-                
-                rect_size = sc.convert(etch.get_size())
+                start_rect = etch.get_start_pixels(offset)
+                rect_size = etch.get_size_pixels()
                 dwg.add(dwg.rect(start_rect, rect_size, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
             elif (etch.get_type() == "polygon"):
-                # iterate over each of the points to make a new list
-                new_points = []
-                for point in etch.get_points():
-                    sc_point = sc.convert(point)
-                    new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
+                new_points = etch.get_points_pixels(offset)
                 dwg.add(dwg.polygon(new_points, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
                 
-    # Add offset for the end - do this even if this is last on row as it will be reset when next line
+    # Add offset for the end - do this even if this is last on column as it will be reset when next line
     offset[0] = offset[0] + spacing  + num_objectsect_size[0]
     if num_objectsect_size[1] > current_height :
         current_height = num_objectsect_size[1]
             
-            
-#dwg.add(dwg.text('Test', insert=(10, 30), stroke=etch_stroke, fill=etch_fill))
 dwg.save()

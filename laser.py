@@ -8,12 +8,27 @@
 
 # all dimensions are in mm (convert using scale if required)
 class Laser():
+    # Scale convertor set as a class variable
+    # Set once during app startup and then can use for all subclasses
+    # Alternative to setting up a singleton
+    sc = None
+    
     def __init__(self, type, values):
         self.type = type
         self.values = values
         
     def get_type(self):
         return self.type
+    
+    # Call this once to pass the scale object
+    def set_scale_object(self, sc):
+        Laser.sc = sc
+        
+    # If want to change scale use this - not the set_scale_object
+    # Provide as the scale name (eg. OO)
+    # Returns scale if success or None
+    def set_scale(self, scale):
+        return self.sc.set_scale(scale)
         
 
 class Cut(Laser):
@@ -37,11 +52,54 @@ class Cut(Laser):
 # Start and end are tuples
 class CutLine(Cut):
     def __init__(self, start, end):
+        self.start = start
+        self.end = end
         super().__init__("line", (start, end))
-        
+
+    # Get start value converted by scale and into pixels
+    # If supplied offset is in pixels relative to start of object
+    def get_start_pixels(self, offset=(0,0)):
+        start_pixels = Laser.sc.convert(self.start)
+        # Add offset
+        return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
+    
+    # Get end value converted by scale and into pixels
+    # If supplied offset is in pixels relative to start of object
+    def get_end_pixels(self, offset=(0,0)):
+        end_pixels = Laser.sc.convert(self.end)
+        # Add offset
+        return ([end_pixels[0]+offset[0], end_pixels[1]+offset[1]])
+
 class CutRect(Cut):
     def __init__(self, start, size):
+        self.start = start
+        self.size = size
         super().__init__("rect", (start, size))
+        
+    def get_start_pixels(self, offset=(0,0)):
+        start_pixels = Laser.sc.convert(self.start)
+        # Add offset
+        return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
+    
+    # Note that size does not need offset
+    def get_size_pixels(self):
+        return Laser.sc.convert(self.size)
+    
+class CutPolygon(Cut):
+    def __init__(self, points):
+        self.points = points
+        super().__init__("polygon", (points))
+        
+    def get_points(self):
+        return self.points
+    
+    # Offset is applied to all points
+    def get_points_pixels(self, offset=(0,0)):
+        new_points = []
+        for point in self.points:
+            sc_point = Laser.sc.convert(point)
+            new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
+        return new_points
 
 # type could be "line" / "rect" etc. 
 class Etch(Laser):
@@ -64,11 +122,68 @@ class EtchLine(Etch):
     def get_start(self):
         return self.start
     
+    # Get start value converted by scale and into pixels
+    # If supplied offset is in pixels relative to start of object
+    def get_start_pixels(self, offset=(0,0)):
+        start_pixels = self.sc.convert(self.start)
+        # Add offset
+        return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
+    
+    # Get end value converted by scale and into pixels
+    # If supplied offset is in pixels relative to start of object
+    def get_end_pixels(self, offset=(0,0)):
+        end_pixels = self.sc.convert(self.end)
+        # Add offset
+        return ([end_pixels[0]+offset[0], end_pixels[1]+offset[1]])
+    
     def get_end(self):
         return self.end
     
     def set_global_width(self, line_width):
-        self.global_etch_width = line_width
+        EtchLine.global_etch_width = line_width
+        
+    # Gets a line as a polygon instead
+    # Required for etches which don't allow lines
+    def get_polygon_pixels(self, offset=(0,0)):
+        # half the width - first check local (to this line) - otherwise default to global
+        if self.etch_width != None:
+            hw = self.etch_width / 2
+        else:
+            hw = EtchLine.global_etch_width / 2
+        # Create an approxmation by only widening along thinest part (dx vs dy)
+        # For a horizontal / vertical line this this is accurate
+        # If not then it's an approximation
+        # As this is for a laser cutter the approximation will not be noticed when etched
+        # although may be able to see if using vector editor
+
+        # Need to know which is min and max x determine if increase
+        # or decrease appropriate values
+        dx = abs(self.end[0] - self.start[0])
+        dy = abs(self.end[1] - self.start[1])
+        # If more vertical than horizontal
+        if (dy > dx):
+            points = [
+                (self.start[0]-hw, self.start[1]),
+                (self.start[0]+hw, self.start[1]),
+                (self.end[0]+hw, self.end[1]),
+                (self.end[0]-hw, self.end[1]),
+                (self.start[0]-hw, self.start[1])
+                ]
+        # More horizontal than vertical
+        else:
+            points = [
+                (self.start[0], self.start[1]-hw),
+                (self.end[0], self.end[1]-hw),
+                (self.end[0], self.end[1]+hw),
+                (self.start[0], self.start[1]+hw),
+                (self.start[0], self.start[1]-hw)
+                ]
+        # Now convert to scale and add offsets
+        new_points = []
+        for point in points:
+            sc_point = Laser.sc.convert(point)
+            new_points.append(((offset[0]+sc_point[0]),(offset[1]+sc_point[1])))
+        return new_points
         
 class EtchRect(Etch):
     def __init__(self, start, size):
@@ -81,6 +196,15 @@ class EtchRect(Etch):
     
     def get_size(self):
         return self.size
+    
+    def get_start_pixels(self, offset=(0,0)):
+        start_pixels = Laser.sc.convert(self.start)
+        # Add offset
+        return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
+    
+    # Note that size does not need offset
+    def get_size_pixels(self):
+        return Laser.sc.convert(self.size)
         
 class EtchPolygon(Etch):
     def __init__(self, points):
@@ -89,3 +213,11 @@ class EtchPolygon(Etch):
         
     def get_points(self):
         return self.points
+    
+    # Offset is applied to all points
+    def get_points_pixels(self, offset=(0,0)):
+        new_points = []
+        for point in self.points:
+            sc_point = Laser.sc.convert(point)
+            new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
+        return new_points

@@ -5,11 +5,15 @@ class Scale():
     
     
     scales = {
-        'N': 148,
+        'N': 148,      # Note that some of the objects are very small with N scale
         'OO': 76.2,
         'HO': 87,
         'TT': 120,
-        'G': 22.5
+        'G': 22.5,
+        'F': 20.3,
+        '1': 32,	# Gauge 1one
+        '3': 22.6,	# Gauge 3 (full size equivelant of G)
+        '16': 19	# 16mm scale
         }
 
     mm_to_pixel_factor = 3.543307
@@ -25,7 +29,7 @@ class Scale():
             sys.exit("Need valid scale")
     
     def set_scale (self, scale):
-        if  (scale in self.scales):
+        if  (scale in self.scales.keys()):
             self.scale = scale
             return self.scale
         else:
@@ -47,6 +51,13 @@ class Scale():
     def mm_to_pixel(self, mm_value):
         pixel_value = mm_value * self.mm_to_pixel_factor
         return pixel_value
+    
+    # Plural of mm_to_pixel - convert all entries in tuple or list
+    def mms_to_pixels(self, mm_values):
+        return_list = []
+        for value in mm_values:
+            return_list.append(self.mm_to_pixel(value))
+        return return_list
     
     # Convert does full conversion from mm to scale to mm
     # Can handle list of values or single value
