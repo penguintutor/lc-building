@@ -16,7 +16,7 @@ class Scale():
         '16': 19	# 16mm scale
         }
 
-    mm_to_pixel_factor = 3.543307
+    mm_to_pixel_factor = 3.8
     
     # If not defined use default of OO - can change later
     def __init__ (self, scale='OO'):
