@@ -2,6 +2,7 @@ import svgwrite
 from laser import *
 from wall import *
 from scale import *
+from svgout import *
 
 # Same stroke width for all as used for laser
 stroke_width = 1
@@ -145,9 +146,15 @@ laser = Laser("master", None)
 # Pass scale instance to laser class
 laser.set_scale_object(sc)
 
-doc_size = sc.mms_to_pixels(doc_size_mm)
+svgsettings = {}
+svgsettings['docsize'] = sc.mms_to_pixels(doc_size_mm)
+svgsettings["strokewidth"] = stroke_width
+svgsettings["cutstroke"] = cut_stroke
+svgsettings["etchstroke"] = etch_stroke
+svgsettings["etchfill"] = etch_fill
+svgsettings["etchaspolygon"] = etch_as_polygon
+svg = SVGOut(filename, svgsettings)
 
-dwg = svgwrite.Drawing(filename, profile='tiny', size=(str(doc_size[0]),str(doc_size[1])))
 
 # Create walls
 walls = [
@@ -180,51 +187,26 @@ for wall in walls:
         # Reset x and extend y
         offset [0] = spacing
         offset [1] = offset[1] + current_height + spacing
+        svg.set_offset(offset)
     num_objects += 1
     # At end of adding each shape we extend the x position (but not the y)
     # Get overall dimensions for positioning
     num_objectsect_size = sc.convert(wall.get_maxsize())
         
     # get the cuts
-    cuts = wall.get_cuts()
-    for cut in cuts:
-        if (cut.get_type() == "line"):
-            # get as pixels with offset added
-            start_line = cut.get_start_pixels(offset)
-            end_line = cut.get_end_pixels(offset)
-            dwg.add(dwg.line(start_line, end_line, stroke=cut_stroke, stroke_width=stroke_width))
-        elif (cut.get_type() == "rect"):
-            start_rect = cut.get_start_pixels(offset)
-            rect_size = cut.get_size_pixels()
-            dwg.add(dwg.rect(start_rect, rect_size, stroke=cut_stroke, fill="none", stroke_width=stroke_width))
+    for cut in wall.get_cuts():
+        svg.add_cut(cut)
             
     # Get the etching
     etches = wall.get_etches()
     if etches != None:
         for etch in etches:
-            # Special case for line etch as software tools not allow, plus need to add width
-            if (etch.get_type() == "line"):
-                # Check if etch_as_polygon set (in which case get polygon instead of line)
-                if etch_as_polygon == True:
-                    new_points = etch.get_polygon_pixels(offset)
-                    dwg.add(dwg.polygon(new_points, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
-                # Otherwise treat as line
-                else:
-                    # start_etch is modified start
-                    start_line = etch.get_start_pixels(offset)
-                    end_line = etch.get_end_pixels(offset)
-                    dwg.add(dwg.line(start_line, end_line, stroke=etch_stroke, stroke_width=stroke_width))
-            elif (etch.get_type() == "rect"):
-                start_rect = etch.get_start_pixels(offset)
-                rect_size = etch.get_size_pixels()
-                dwg.add(dwg.rect(start_rect, rect_size, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
-            elif (etch.get_type() == "polygon"):
-                new_points = etch.get_points_pixels(offset)
-                dwg.add(dwg.polygon(new_points, stroke=etch_stroke, fill=etch_fill, stroke_width=stroke_width))
+            svg.add_etch(etch)
                 
     # Add offset for the end - do this even if this is last on column as it will be reset when next line
     offset[0] = offset[0] + spacing  + num_objectsect_size[0]
+    svg.set_offset(offset)
     if num_objectsect_size[1] > current_height :
         current_height = num_objectsect_size[1]
             
-dwg.save()
+svg.save()
