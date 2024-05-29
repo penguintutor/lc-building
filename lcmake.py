@@ -1,8 +1,12 @@
 import svgwrite
 from laser import *
 from wall import *
+from wallfactory import *
+from buildingdata import *
 from scale import *
 from svgout import *
+from buildingtemplate import *
+from featuretemplate import *
 
 # Same stroke width for all as used for laser
 stroke_width = 1
@@ -13,28 +17,22 @@ etch_fill = "none"
 
 filename = "testoutput.svg"
 
-# Typical dimensions for an Apex (pointed pitched roof)
-# depth is from front door to rear
-# dimensions in mm
-# eg. of 6 x 4 shed
-depth = 1826
-width = 1180
-wall_height = 1864
-roof_height = 2122
-roof_depth = 1882
-roof_width = 1342 # width relative to floor (not actual size of roof)
+building_template = BuildingTemplate()
+building_template.load_template("templates/building_shed_apex_1.json")
 
 
-# Overlap is different for each side
-# Eg. may have a canope for front
-roof_right_overlap = 100
-roof_left_overlap = 100
-roof_front_overlap = 50
-roof_rear_overlap = 50
+building = BuildingData()
+# Copy all date from template into building data
+building.set_all_data(building_template.get_data())
+
+# Get all the values from 
+bdata = building.get_values()
 
 wood_height = 150
 # Width of a wood etch line (boundry between wood)
 wood_etch = 10
+
+
 # Setting option (if set then a line is returned as a polygon based on etch_line_width
 # Normally want as True as Lightburn will not allow lines as etches (recommended)
 # If you prefer to edit as a line (eg. ink InkScape) then you can set to False
@@ -109,8 +107,7 @@ door_etches = [
                   )),
     ]
 
-building_type="shed"
-building_subtype="apex"
+
 # Do we "etch" or "cut" the door out
 door_burn="etch"
 if door_burn == "cut":
@@ -155,19 +152,31 @@ svgsettings["etchfill"] = etch_fill
 svgsettings["etchaspolygon"] = etch_as_polygon
 svg = SVGOut(filename, svgsettings)
 
+wf = WallFactory()
+
+walls = []
+for wall in building.get_walls():
+    #print (f"Wall is {wall}")
+    wall_values = []
+    for value in wall[1]:
+        #print (f"Value {value}")
+        wall_values.append(bdata[value])
+    walls.append(wf.create_wall(wall[0], wall_values))
+    #print (f"Created Wall {walls[len(walls)-1]}")
+
 
 # Create walls
-walls = [
-    RectWall(depth, wall_height),
-    RectWall(depth, wall_height),
-    ApexWall(width, roof_height, wall_height),
-    ApexWall(width, roof_height, wall_height),
+#walls = [
+#    RectWall(depth, wall_height),
+#    RectWall(depth, wall_height),
+#    ApexWall(width, roof_height, wall_height),
+#    ApexWall(width, roof_height, wall_height),
     # Roof is a type of "wall" depth is first followed by width
     # For type = "apex" then roof is half of shed - but width is still width of building
     # Create two roof segments - although identical , one for left one for right
-    RoofWall(depth, width, roof_height-wall_height, "apex", roof_right_overlap, roof_left_overlap, roof_front_overlap, roof_rear_overlap),
-    RoofWall(depth, width, roof_height-wall_height, "apex", roof_right_overlap, roof_left_overlap, roof_front_overlap, roof_rear_overlap)
-    ]
+#    RoofWall(depth, width, roof_height-wall_height, "apex", roof_right_overlap, roof_left_overlap, roof_front_overlap, roof_rear_overlap),
+#    RoofWall(depth, width, roof_height-wall_height, "apex", roof_right_overlap, roof_left_overlap, roof_front_overlap, roof_rear_overlap)
+#    ]
 
 # Add wood etching to all walls
 for wall in walls:
@@ -175,7 +184,7 @@ for wall in walls:
         wall.add_wood_etch (wood_height, wood_etch)
     
 # Add window to wall 0
-walls[0].add_feature("window", window_pos, window_size, cuts=window_cuts, etches=window_etches, settings={"windowtype":"rect"})
+walls[1].add_feature("window", window_pos, window_size, cuts=window_cuts, etches=window_etches, settings={"windowtype":"rect"})
 # Add door to apex wall 2
 walls[2].add_feature("door", door_pos, door_size, cuts=door_cuts, etches=door_etches)
     

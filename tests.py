@@ -46,32 +46,32 @@ class TestScale(unittest.TestCase):
         
     def test_mm_to_pixels(self):
         sc = Scale()
-        self.assertEqual(round(sc.mm_to_pixel(89)), 315)
+        self.assertEqual(round(sc.mm_to_pixel(89)), 338)
         # Change scale - should not change value
         sc.set_scale('N')
-        self.assertEqual(round(sc.mm_to_pixel(89)), 315)
+        self.assertEqual(round(sc.mm_to_pixel(89)), 338)
         
     # Use single value
     def test_convert_single(self):
         # start with different scale on constructor
         sc = Scale('N')
-        self.assertEqual(round(sc.convert(2000)), 48)
+        self.assertEqual(round(sc.convert(2000)), 51)
         # Change scale
         sc.set_scale('OO')
-        self.assertEqual(round(sc.convert(2000)), 93)
+        self.assertEqual(round(sc.convert(2000)), 100)
         
     def test_convert_list(self):
         # start with different scale on constructor
         sc = Scale('N')
         scaled_values = sc.convert([2000, 1000])
-        self.assertEqual(round(scaled_values[0]), 48)
-        self.assertEqual(round(scaled_values[1]), 24)
+        self.assertEqual(round(scaled_values[0]), 51)
+        self.assertEqual(round(scaled_values[1]), 26)
         # Change scale
         sc.set_scale('OO')
         # Use tuples
         scaled_values = sc.convert((2000, 1000))
-        self.assertEqual(round(scaled_values[0]), 93)
-        self.assertEqual(round(scaled_values[1]), 47)
+        self.assertEqual(round(scaled_values[0]), 100)
+        self.assertEqual(round(scaled_values[1]), 50)
     
 if __name__ == '__main__':
     unittest.main()

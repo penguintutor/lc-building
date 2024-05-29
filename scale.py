@@ -11,9 +11,9 @@ class Scale():
         'TT': 120,
         'G': 22.5,
         'F': 20.3,
-        '1': 32,	# Gauge 1one
-        '3': 22.6,	# Gauge 3 (full size equivelant of G)
-        '16': 19	# 16mm scale
+        '1': 32,    # Gauge 1one
+        '3': 22.6,  # Gauge 3 (full size equivelant of G)
+        '16': 19    # 16mm scale
         }
 
     mm_to_pixel_factor = 3.8

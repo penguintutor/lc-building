@@ -1,0 +1,43 @@
+{
+  "name": "Apex shed",
+  "type": "shed",
+  "subtype": "apex",
+  "description": "Typical 6x4 Apex shed",
+  "defaults": 
+    {
+      "depth": 1826, 
+      "width": 1180, 
+      "wall_height": 1864,
+      "roof_height": 2122,
+      "roof_depth": 1882,
+      "roof_width": 1342 
+    },
+  "typical": 
+    {
+      "roof_right_overlap": 100,
+      "roof_left_overlap": 100,
+      "roof_front_overlap": 50,
+      "roof_rear_overlap": 50,
+      "wood_height": 150,
+      "wood_etch": 10
+    },
+  "walls":
+    [
+      ["ApexWall", ["width", "roof_height", "wall_height"]],
+      ["RectWall", ["depth", "wall_height"]],
+      ["ApexWall", ["width", "roof_height", "wall_height"]],
+      ["RectWall", ["depth", "wall_height"]]
+    ],
+  "roofs":
+    [
+      "ApexRoof", 
+      "ApexRoof"
+    ],
+  "options":
+    [
+      "window_shed_1",
+      "door_shed_1"
+    ]
+}
+
+

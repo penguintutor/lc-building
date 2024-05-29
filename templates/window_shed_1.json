@@ -1,0 +1,18 @@
+{
+  "name": "Basic shed window",
+  "type": "Window",
+  "subtype": "shed",
+  "description": "Basic frameless shed window",
+  "defaults": 
+    {
+      "width": 713, 
+      "height": 50, 
+    },
+  "cuts": 
+    [
+
+    ],
+  "etches":
+    [
+
+    ],
