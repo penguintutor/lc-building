@@ -18,3 +18,6 @@ class BuildingTemplate (Template):
     
     def __init__ (self):
         super().__init__()
+        
+    def get_type (self):
+        return "building"

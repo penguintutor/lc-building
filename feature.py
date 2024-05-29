@@ -3,6 +3,9 @@
 # Different to an "extra" which is cut separately (eg. decoration that is mounted afterwards)
 from laser import *
 
+# Each cut is defined in templates (and building data)
+# Cut type (eg. rect) followed by list containing strings or values (must work with eval string after subsitution)
+# "rect" [x, y, width, height]
 # Features must NOT overlap - unpredictable results in textures if do
 class Feature():
     # x, y is top left

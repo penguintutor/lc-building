@@ -2,6 +2,8 @@ import unittest
 from wall import *
 from scale import *
 from laser import *
+from buildingtemplate import *
+from featuretemplate import *
 
 class TestWall(unittest.TestCase):
     
@@ -23,7 +25,7 @@ class TestWall(unittest.TestCase):
         max_size = test_wall.get_maxsize()
         self.assertEqual(max_size[0], depth)
         self.assertEqual(max_size[1], height)
-        
+              
 class TestScale(unittest.TestCase):
 
     def test_get_scales(self):
@@ -72,6 +74,64 @@ class TestScale(unittest.TestCase):
         scaled_values = sc.convert((2000, 1000))
         self.assertEqual(round(scaled_values[0]), 100)
         self.assertEqual(round(scaled_values[1]), 50)
+        
+        
+# Based on example template - test loading file etc.
+class TestTemplate(unittest.TestCase):   
+    
+    def test_load_file(self):
+        filename = "templates/building_shed_apex_1.json"
+        template = BuildingTemplate()
+        template.load_template (filename)
+        data = template.get_data()
+        # Text some particular values
+        self.assertEqual(data["name"], "Apex shed")
+        self.assertEqual(data["defaults"]["depth"], 1826)
+        self.assertEqual(data["typical"]["wood_height"], 150)
+        self.assertEqual(data["walls"][0][0], "ApexWall")
+        self.assertEqual(data["roofs"][0], "ApexRoof")
+        self.assertEqual(data["options"][0], "door_shed_1")
+        self.assertEqual(data["options"][1], "window_shed_1")
+        
+    def test_feature_window(self):
+        filename = "templates/window_shed_1.json"
+        template = FeatureTemplate()
+        template.load_template (filename)
+        data = template.get_data()
+        self.assertEqual(data["type"], "Window")
+        self.assertEqual(data["defaults"]["width"], 713)
+        self.assertEqual(data["cuts"][0][0], "rect")
+        
+        
+    def test_feature_window_cuts(self):
+        filename = "templates/window_shed_1.json"
+        template = FeatureTemplate()
+        template.load_template (filename)
+        cuts = template.get_cuts()
+        self.assertEqual(cuts[0][0], "rect")
+        
+        
+    # Test parsing of strings
+    def test_token_process_1(self):
+        filename = "templates/window_shed_1.json"
+        template = FeatureTemplate()
+        template.load_template (filename)
+        test_string = "x+3"
+        output_string = template.process_token_str(test_string)
+        self.assertEqual(output_string, "0+3")
+        output = template.process_token(test_string)
+        self.assertEqual(output, 3)
+        test_string = "y"
+        output_string = template.process_token_str(test_string)
+        self.assertEqual(output_string, "0")
+        output = template.process_token(test_string)
+        self.assertEqual(output, 0)
+        test_string = "((7+x+width/2))"
+        output_string = template.process_token_str(test_string)
+        self.assertEqual(output_string, "((7+0+713/2))")
+        output = template.process_token(test_string)
+        self.assertEqual(output, 363.5)
+    
     
 if __name__ == '__main__':
     unittest.main()

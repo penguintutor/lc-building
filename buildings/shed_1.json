@@ -10,7 +10,7 @@
       "wall_height": 1864,
       "roof_height": 2122,
       "roof_depth": 1882,
-      "roof_width": 1342 
+      "roof_width": 1342,
       "roof_right_overlap": 100,
       "roof_left_overlap": 100,
       "roof_front_overlap": 50,
@@ -33,24 +33,24 @@
   "features":
     [
       {
-	template: "window_shed_1",
-	wall: 1,
-	parameters: 
+	"template": "window_shed_1",
+	"wall": 1,
+	"parameters": 
         {
           "width": 713, 
           "height": 50, 
-          "pos": (715, 50),
+          "pos": [715, 50]
         }
       },
       {
-        template: "door_shed_1",
-        wall: 2
-        parameters: 
-	{
+        "template": "door_shed_1",
+        "wall": 2,
+        "parameters": 
+	    {
           "width": 800,
           "height": 1800,
-          "pos": (190, 322),
-          "hinge_size": (300, 50),
+          "pos": [190, 322],
+          "hinge_size": [300, 50]
         }
       }
     ]

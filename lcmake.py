@@ -20,10 +20,14 @@ filename = "testoutput.svg"
 building_template = BuildingTemplate()
 building_template.load_template("templates/building_shed_apex_1.json")
 
+building_datafile = "buildings/shed_1.json"
 
 building = BuildingData()
+building.load_file(building_datafile)
 # Copy all date from template into building data
-building.set_all_data(building_template.get_data())
+
+# If using a template then use the following
+# building.set_all_data(building_template.get_data())
 
 # Get all the values from 
 bdata = building.get_values()

@@ -6,13 +6,14 @@
   "defaults": 
     {
       "width": 713, 
-      "height": 50, 
+      "height": 50
     },
   "cuts": 
     [
-
+        ["rect", ["x", "y", "width", "height"]]
     ],
   "etches":
     [
 
-    ],
+    ]
+}

@@ -1,4 +1,5 @@
 # Take template data and store in BuildingData
+import json
 
 # Create as an empty class with no data - all empty
 # This allows template to be loaded afterwards or for data to be
@@ -8,7 +9,14 @@ class BuildingData ():
         self.data = {}
         pass
     
-    # Sets all the data entries - used when loading a template
+    # Load a data file
+    # Overrides all data
+    def load_file (self, filename):
+        self.filename = filename
+        with open(filename, 'r') as datafile:
+            self.data = json.load(datafile)
+    
+    # Sets all the data entries - used when loading a template 
     # Overwrites all data
     def set_all_data(self, data):
         # Make a copy of the data
@@ -44,9 +52,9 @@ class BuildingData ():
     def get_walls(self):
         return self.data["walls"]
     
-    # Return combination of defaults and typical values
+    # Returns as a copy of the parameters
     def get_values(self):
-        return {**self.data["defaults"], **self.data["typical"]}
+        return self.data["parameters"].copy()
         #for key in data.keys():
         #    # is this one of the multi-layer categories
         #    if key == "defaults" :
