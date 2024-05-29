@@ -55,12 +55,9 @@ class BuildingData ():
     # Returns as a copy of the parameters
     def get_values(self):
         return self.data["parameters"].copy()
-        #for key in data.keys():
-        #    # is this one of the multi-layer categories
-        #    if key == "defaults" :
-        #        for defaults_key in data['defaults'].keys():
-        #            self.data['defaults'][defaults_key] = 
-        #    else:
-        #        self.data['key']
+
+
+    def get_features(self):
+        return self.data["features"]
                     
             

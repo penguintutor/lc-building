@@ -33,16 +33,34 @@
   "features":
     [
       {
-	"template": "window_shed_1",
-	"wall": 1,
-	"parameters": 
+      "type": "window",
+	  "template": "window_shed_1",
+	  "wall": 1,
+	  "parameters": 
         {
-          "width": 713, 
-          "height": 50, 
+          "width": 400, 
+          "height": 555, 
           "pos": [715, 50]
-        }
+        },
+      "settings":
+        {
+          "windowtype": "rect"
+        },
+      "cuts":
+        [
+          ["rect", [[0, 0], [400, 555]]]
+        ],
+      "etches":
+        [
+          []
+        ],
+      "outer":
+        [
+          []
+        ]
       },
       {
+      	"type": "door",
         "template": "door_shed_1",
         "wall": 2,
         "parameters": 
@@ -51,7 +69,23 @@
           "height": 1800,
           "pos": [190, 322],
           "hinge_size": [300, 50]
-        }
+        },
+      "settings":
+        {
+          "windowtype": "rect"
+        },
+      "outer":
+        [
+          ["rect", [[0, 0], [800, 1800]]]
+        ],
+      "cuts":
+        [
+          []
+        ],
+      "etches":
+        [
+          []
+        ]
       }
     ]
 }

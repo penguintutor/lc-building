@@ -158,39 +158,30 @@ svg = SVGOut(filename, svgsettings)
 
 wf = WallFactory()
 
+
 walls = []
 for wall in building.get_walls():
-    #print (f"Wall is {wall}")
     wall_values = []
     for value in wall[1]:
-        #print (f"Value {value}")
         wall_values.append(bdata[value])
     walls.append(wf.create_wall(wall[0], wall_values))
-    #print (f"Created Wall {walls[len(walls)-1]}")
-
-
-# Create walls
-#walls = [
-#    RectWall(depth, wall_height),
-#    RectWall(depth, wall_height),
-#    ApexWall(width, roof_height, wall_height),
-#    ApexWall(width, roof_height, wall_height),
-    # Roof is a type of "wall" depth is first followed by width
-    # For type = "apex" then roof is half of shed - but width is still width of building
-    # Create two roof segments - although identical , one for left one for right
-#    RoofWall(depth, width, roof_height-wall_height, "apex", roof_right_overlap, roof_left_overlap, roof_front_overlap, roof_rear_overlap),
-#    RoofWall(depth, width, roof_height-wall_height, "apex", roof_right_overlap, roof_left_overlap, roof_front_overlap, roof_rear_overlap)
-#    ]
 
 # Add wood etching to all walls
 for wall in walls:
     if wall.get_type() != "roof":
         wall.add_wood_etch (wood_height, wood_etch)
+
     
-# Add window to wall 0
-walls[1].add_feature("window", window_pos, window_size, cuts=window_cuts, etches=window_etches, settings={"windowtype":"rect"})
+for feature in building.get_features():
+    walls[feature["wall"]].add_feature(feature["type"],
+                                       feature["parameters"]["pos"], (feature["parameters"]["width"], feature["parameters"]["height"]),
+                                       feature["cuts"], feature["etches"], feature["settings"])
+
+
+# Add window to wall 1
+#walls[1].add_feature("window", window_pos, window_size, cuts=window_cuts, etches=window_etches, settings={"windowtype":"rect"})
 # Add door to apex wall 2
-walls[2].add_feature("door", door_pos, door_size, cuts=door_cuts, etches=door_etches)
+#walls[2].add_feature("door", door_pos, door_size, cuts=door_cuts, etches=door_etches)
     
 # Create output
 for wall in walls:

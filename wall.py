@@ -16,7 +16,7 @@ from laser import *
 # Textures are currently created in walls - may make sense to pull this into a
 # separate texture generator class in future
 
-# Template class - normally use RectWall / ApexWall etc
+# Abstract class - normally use RectWall / ApexWall etc
 # scale is divisor to convert from standard to scale size (eg. 76.2 for OO)
 class Wall():
     def __init__ (self, width, height):

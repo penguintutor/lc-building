@@ -2,12 +2,14 @@
 # Or a roof (which is treated as a type of wall)
 # Different to an "extra" which is cut separately (eg. decoration that is mounted afterwards)
 from laser import *
+from laserfactory import *
 
 # Each cut is defined in templates (and building data)
 # Cut type (eg. rect) followed by list containing strings or values (must work with eval string after subsitution)
 # "rect" [x, y, width, height]
 # Features must NOT overlap - unpredictable results in textures if do
 class Feature():
+    lf = LaserFactory()
     # x, y is top left
     # max is bottom right - forms rectangle to exclude
     def __init__ (self, min_x, min_y, max_x, max_y, cuts=[], etches=[]):
@@ -15,8 +17,21 @@ class Feature():
         self.min_y = min_y
         self.max_x = max_x
         self.max_y = max_y
-        self.cuts = cuts
-        self.etches = etches
+        # Cuts needs to be converted into laser cut objects
+        self.cuts = []
+        for cut in cuts:
+            if cut == []:
+                break
+            print (f"This cut {cut}")
+            self.cuts.append(Feature.lf.create_cut(cut[0], cut[1]))
+        # Do the same for etches
+        self.etches = []
+        for etch in etches:
+            if etch == []:
+                break
+            print (f"This etch {etch}")
+            self.etches.append(Feature.lf.create_etch(etch[0], etch[1]))
+        
         
     # Get area to exclude
     def get_area (self):

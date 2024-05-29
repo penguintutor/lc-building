@@ -99,7 +99,7 @@ class TestTemplate(unittest.TestCase):
         template.load_template (filename)
         data = template.get_data()
         self.assertEqual(data["type"], "Window")
-        self.assertEqual(data["defaults"]["width"], 713)
+        self.assertEqual(data["defaults"]["width"], 400)
         self.assertEqual(data["cuts"][0][0], "rect")
         
         
@@ -128,9 +128,9 @@ class TestTemplate(unittest.TestCase):
         self.assertEqual(output, 0)
         test_string = "((7+x+width/2))"
         output_string = template.process_token_str(test_string)
-        self.assertEqual(output_string, "((7+0+713/2))")
+        self.assertEqual(output_string, "((7+0+400/2))")
         output = template.process_token(test_string)
-        self.assertEqual(output, 363.5)
+        self.assertEqual(output, 207.0)
     
     
 if __name__ == '__main__':

@@ -61,7 +61,11 @@ class Template (ABC):
     def process_multiple_tokens (self, token_strings):
         new_list = []
         for this_string in token_strings:
-            new_list.append(self.process_token (this_string))
+            # if this_string is actually a list then call recursively
+            if type(this_string) is list:
+                new_list.append(self.process_multiple_tokens (this_string))
+            else:
+                new_list.append(self.process_token (this_string))
         return new_list
             
     # Processes values from loaded cuts and etches looking for tokens and
