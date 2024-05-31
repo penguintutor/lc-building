@@ -7,15 +7,19 @@
 # to create
 
 # all dimensions are in mm (convert using scale if required)
+
+# internal_offset if used is for relative to wall
+# eg position of top left of feature
+
 class Laser():
     # Scale convertor set as a class variable
     # Set once during app startup and then can use for all subclasses
     # Alternative to setting up a singleton
     sc = None
     
-    def __init__(self, type, values):
+    def __init__(self, type, internal_offset):
         self.type = type
-        self.values = values
+        self.io = internal_offset
         
     def get_type(self):
         return self.type
@@ -23,6 +27,9 @@ class Laser():
     # Call this once to pass the scale object
     def set_scale_object(self, sc):
         Laser.sc = sc
+        
+    def set_internal_offset(self, internal_offset):
+        self.io = internal_offset
         
     # If want to change scale use this - not the set_scale_object
     # Provide as the scale name (eg. OO)
@@ -32,52 +39,45 @@ class Laser():
         
 
 class Cut(Laser):
-    def __init__(self, type, values):
-        super().__init__(type, values)
+    def __init__(self, type, internal_offset):
+        super().__init__(type, internal_offset)
         
-    # Returns as appropriate format for using in svg write
-    # Even though subclassed we use a single get_cut which handles
-    # All different subclasses in a uniform way
-    # Note returns a tuple, but different depending upon the shape
-    # eg. line is start and end, rect is start and size and polygon is list of points
-    def get_cut(self):
-        if self.type == "line":
-            return ("line", self.values[0], self.values[1])
-        elif self.type == "rect":
-            return ("rect", self.values[0], self.values[1])
-        elif self.type == "polygon":
-            return ("polygon", points)
-        
-        
+       
 # Start and end are tuples
+
 class CutLine(Cut):
-    def __init__(self, start, end):
+    def __init__(self, start, end, internal_offset=(0,0)):
         self.start = start
         self.end = end
-        super().__init__("line", (start, end))
+        super().__init__("line", internal_offset)
+
 
     # Get start value converted by scale and into pixels
     # If supplied offset is in pixels relative to start of object
     def get_start_pixels(self, offset=(0,0)):
-        start_pixels = Laser.sc.convert(self.start)
+        # Add internal offset to offset
+        start_io = (self.start[0]+self.io[0], self.start[1]+self.io[1])
+        start_pixels = Laser.sc.convert(start_io)
         # Add offset
         return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
     
     # Get end value converted by scale and into pixels
     # If supplied offset is in pixels relative to start of object
     def get_end_pixels(self, offset=(0,0)):
-        end_pixels = Laser.sc.convert(self.end)
+        end_io = (self.end[0]+self.io[0], self.end[1]+self.io[1])
+        end_pixels = Laser.sc.convert(end_io)
         # Add offset
         return ([end_pixels[0]+offset[0], end_pixels[1]+offset[1]])
 
 class CutRect(Cut):
-    def __init__(self, start, size):
+    def __init__(self, start, size, internal_offset=(0,0)):
         self.start = start
         self.size = size
-        super().__init__("rect", (start, size))
-        
+        super().__init__("rect", internal_offset)
+          
     def get_start_pixels(self, offset=(0,0)):
-        start_pixels = Laser.sc.convert(self.start)
+        start_io = (self.start[0]+self.io[0], self.start[1]+self.io[1])
+        start_pixels = Laser.sc.convert(start_io)
         # Add offset
         return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
     
@@ -86,58 +86,63 @@ class CutRect(Cut):
         return Laser.sc.convert(self.size)
     
 class CutPolygon(Cut):
-    def __init__(self, points):
+    def __init__(self, points, internal_offset=(0,0)):
         self.points = points
-        super().__init__("polygon", (points))
+        super().__init__("polygon", internal_offset)
         
+    # Add inernal offset to points
     def get_points(self):
-        return self.points
+        new_points = []
+        for point in self.points:
+            new_points.append((point[0]+self.io[0], point[1]+self.io[1]))
+        return new_points
     
     # Offset is applied to all points
     def get_points_pixels(self, offset=(0,0)):
         new_points = []
         for point in self.points:
-            sc_point = Laser.sc.convert(point)
+            sc_point = Laser.sc.convert((point[0]+self.io[0], point[1]+self.io[1]))
             new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
         return new_points
 
 # type could be "line" / "rect" etc. 
 class Etch(Laser):
-    def __init__(self, type, values):
-        super().__init__(type, values)
+    def __init__(self, type, internal_offset):
+        super().__init__(type, internal_offset)
         
 # Start and end are tuples
 class EtchLine(Etch):
     # Default etch width if none others set on individual class
     # Used by etch lines only, but can be accessed by all instances
     global_etch_width = 10
-    def __init__(self, start, end, etch_width=None):
+    def __init__(self, start, end, etch_width=None, internal_offset=(0,0)):
         self.start = start
         self.end = end
         # how wide to cut (cannot have line as lightburn doesn't like it)
         # If set to None (default) then look at class variable global_etch_width
         self.etch_width = etch_width
-        super().__init__("line", (start, end))
+        super().__init__("line", internal_offset)
         
     def get_start(self):
-        return self.start
+        return (self.start[0]+self.io[0], self.start[1]+self.io[1])
     
     # Get start value converted by scale and into pixels
     # If supplied offset is in pixels relative to start of object
     def get_start_pixels(self, offset=(0,0)):
-        start_pixels = self.sc.convert(self.start)
+        # Add internal offset to offset
+        start_pixels = self.sc.convert(self.get_start())
         # Add offset
         return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
     
     # Get end value converted by scale and into pixels
     # If supplied offset is in pixels relative to start of object
     def get_end_pixels(self, offset=(0,0)):
-        end_pixels = self.sc.convert(self.end)
+        end_pixels = self.sc.convert(self.get_end())
         # Add offset
         return ([end_pixels[0]+offset[0], end_pixels[1]+offset[1]])
     
     def get_end(self):
-        return self.end
+        return (self.end[0]+self.io[0], self.end[1]+self.io[1])
     
     def set_global_width(self, line_width):
         EtchLine.global_etch_width = line_width
@@ -181,24 +186,25 @@ class EtchLine(Etch):
         # Now convert to scale and add offsets
         new_points = []
         for point in points:
-            sc_point = Laser.sc.convert(point)
+            point_io = (point[0]+self.io[0], point[1]+self.io[1])
+            sc_point = Laser.sc.convert(point_io)
             new_points.append(((offset[0]+sc_point[0]),(offset[1]+sc_point[1])))
         return new_points
         
 class EtchRect(Etch):
-    def __init__(self, start, size):
+    def __init__(self, start, size, internal_offset=(0,0)):
         self.start = start
         self.size = size
-        super().__init__("rect", (start, size))
+        super().__init__("rect", internal_offset)
     
     def get_start(self):
-        return self.start
+        return (self.start[0]+self.io[0], self.start[1]+self.io[1])
     
     def get_size(self):
         return self.size
     
     def get_start_pixels(self, offset=(0,0)):
-        start_pixels = Laser.sc.convert(self.start)
+        start_pixels = Laser.sc.convert(self.get_start())
         # Add offset
         return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
     
@@ -207,17 +213,26 @@ class EtchRect(Etch):
         return Laser.sc.convert(self.size)
         
 class EtchPolygon(Etch):
-    def __init__(self, points):
+    def __init__(self, points, internal_offset=(0,0)):
         self.points = points
-        super().__init__("polygon", (points))
+        super().__init__("polygon", internal_offset)
         
     def get_points(self):
-        return self.points
+        new_points = []
+        for point in self.points:
+            new_points.append((point[0]+self.io[0], point[1]+self.io[1]))
+        return new_points
+    
+    def get_points_offset(self, offset):
+        new_points = []
+        for point in self.get_points():
+            new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
+        return new_points
     
     # Offset is applied to all points
     def get_points_pixels(self, offset=(0,0)):
         new_points = []
-        for point in self.points:
+        for point in self.get_points():
             sc_point = Laser.sc.convert(point)
             new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
         return new_points

@@ -22,16 +22,25 @@ class Feature():
         for cut in cuts:
             if cut == []:
                 break
-            print (f"This cut {cut}")
-            self.cuts.append(Feature.lf.create_cut(cut[0], cut[1]))
+            self.cuts.append(Feature.lf.create_cut(cut[0], cut[1], (min_x, min_y)))
         # Do the same for etches
         self.etches = []
         for etch in etches:
             if etch == []:
                 break
-            print (f"This etch {etch}")
             self.etches.append(Feature.lf.create_etch(etch[0], etch[1]))
         
+    # if changing start then need to update cuts so use setters
+    def set_start(self, start):
+        self.min_x = start[0]
+        self.min_y = start[1]
+        self.update_pos()
+        
+    # If start changes then update cuts and etches
+    def update_pos(self):
+        # Also set all cuts to new start
+        for cut in cuts:
+            cut.set_internal_offset((self.min_x, self.min_y))
         
     # Get area to exclude
     def get_area (self):
@@ -42,6 +51,8 @@ class Feature():
     def set_cuts_rect(self):
         self.cuts.append (CutRect(self.start_pos, self.size))
     
+    # Get all the cuts
+    # First add the offset of the x,y position of the feature
     def get_cuts(self):
         return self.cuts
     

@@ -17,12 +17,12 @@ class LaserFactory:
         }
         
     @staticmethod
-    def create_etch(type, args):
+    def create_etch(type, args, io):
         creator = LaserFactory._etch_creators[type]
-        return creator(*args)
+        return creator(*args, io)
     
     
     @staticmethod
-    def create_cut(type, args):
+    def create_cut(type, args, io):
         creator = LaserFactory._cut_creators[type]
-        return creator(*args)
+        return creator(*args, io)

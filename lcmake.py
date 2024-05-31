@@ -143,7 +143,7 @@ doc_size_mm = (200, 200)
 
 sc = Scale(scale)
 # Create laser class so pass objects / settings for laser parent
-laser = Laser("master", None)
+laser = Laser("master", (0,0))
 # Pass scale instance to laser class
 laser.set_scale_object(sc)
 

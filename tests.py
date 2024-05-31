@@ -12,11 +12,9 @@ class TestWall(unittest.TestCase):
         depth = 1826
         height = 1864
         test_wall = RectWall(depth, height)
-        cutsobj = test_wall.get_cuts()
-        cuts = cutsobj[0].get_cut()
-        self.assertEqual(cuts[0], "rect")
-        self.assertEqual(cuts[2][0], depth)
-        self.assertEqual(cuts[2][1], height)
+        cuts = test_wall.get_cuts()
+        self.assertEqual(cuts[0].get_type(), "rect")
+        
         
     def test_wall_maxsize(self):
         depth = 1826

@@ -55,8 +55,8 @@ class Wall():
         if type == "window":
             self.features.append(Window(startpos, size, cuts, etches))
             # Now added window check for relevant settings
-            if settings != None and "windowtype" in settings.keys() and settings["windowtype"]=="rect":
-                self.features[feature_num].set_cuts_rect()
+            #if settings != None and "windowtype" in settings.keys() and settings["windowtype"]=="rect":
+            #    self.features[feature_num].set_cuts_rect()
             return feature_num
         elif type == "door":
             self.features.append(Door(startpos, size, cuts, etches))
