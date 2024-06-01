@@ -24,7 +24,11 @@ class LaserFactory:
     @staticmethod
     def create_etch(type, args, io):
         creator = LaserFactory._etch_creators[type]
-        return creator(*args, io)
+        # special case for polygon need to keep args as a list
+        if type == "polygon":
+            return creator(args, io)
+        else:
+            return creator(*args, io)
     
     @staticmethod
     def create_cut(type, args, io):

@@ -68,29 +68,13 @@ hinge_size = (300, 50)
 # Example door (wall 2)
 door_pos = (190, 322)
 door_size = (800, 1800)
-# Example where cut 3 sides (ie. door is to the floor)
+
+
+# Shed door has cut 3 sides (ie. door is to the floor)
 
 # Feature etches have to be defined explicitly 
-# vertical wood effect
-door_etches = [
-    EtchRect ((door_pos[0]+175, door_pos[1]), (wood_etch, door_size[1])),
-    EtchRect ((door_pos[0]+325, door_pos[1]), (wood_etch, door_size[1])),
-    EtchRect ((door_pos[0]+475, door_pos[1]), (wood_etch, door_size[1])),
-    EtchRect ((door_pos[0]+625, door_pos[1]), (wood_etch, door_size[1])),
-    # Hinges
-    EtchPolygon (((door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.15)),
-                  (door_pos[0]+door_size[0]-hinge_size[0], door_pos[1]+int(door_size[1]*0.15) + (hinge_size[1]/2)),
-                  (door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.15) + hinge_size[1]),
-                  )),
-    EtchPolygon (((door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.5)-(hinge_size[1]/2)),
-                  (door_pos[0]+door_size[0]-hinge_size[0], door_pos[1]+int(door_size[1]*0.5)),
-                  (door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.5) + (hinge_size[1]/2)),
-                  )),
-    EtchPolygon (((door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.85)),
-                  (door_pos[0]+door_size[0]-hinge_size[0], door_pos[1]+int(door_size[1]*0.85) + (hinge_size[1]/2)),
-                  (door_pos[0]+door_size[0], door_pos[1]+int(door_size[1]*0.85) + hinge_size[1]),
-                  )),
-    ]
+# including vertical wood effect
+
 
 
 scale = "OO"
@@ -150,12 +134,7 @@ for feature in building.get_features():
     walls[feature["wall"]].add_feature(feature["parameters"]["pos"], (feature["parameters"]["width"], feature["parameters"]["height"]),
                                        feature["cuts"], feature["etches"], feature["outers"])
 
-
-# Add window to wall 1
-#walls[1].add_feature("window", window_pos, window_size, cuts=window_cuts, etches=window_etches, settings={"windowtype":"rect"})
-# Add door to apex wall 2
-#walls[2].add_feature("door", door_pos, door_size, cuts=door_cuts, etches=door_etches)
-    
+   
 # Create output
 for wall in walls:
     # Is this modulo grid_width if so then start next line
