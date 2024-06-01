@@ -3,7 +3,7 @@
 # Typically cuts will be lines which cut fully through the material
 # whereas etches are shapes (rect / polygons)
 
-# Subclasses are created for both Cut and Etch to make it easier
+# Child classes are created for both Cut and Etch to make it easier
 # to create
 
 # all dimensions are in mm (convert using scale if required)
@@ -76,7 +76,7 @@ class CutRect(Cut):
         super().__init__("rect", internal_offset)
           
     def get_start_pixels(self, offset=(0,0)):
-        start_io = (self.start[0]+self.io[0], self.start[1]+self.io[1])
+        start_io = ([self.start[0]+self.io[0], self.start[1]+self.io[1]])
         start_pixels = Laser.sc.convert(start_io)
         # Add offset
         return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
@@ -90,7 +90,7 @@ class CutPolygon(Cut):
         self.points = points
         super().__init__("polygon", internal_offset)
         
-    # Add inernal offset to points
+    # Add internal offset to points
     def get_points(self):
         new_points = []
         for point in self.points:
@@ -236,3 +236,63 @@ class EtchPolygon(Etch):
             sc_point = Laser.sc.convert(point)
             new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
         return new_points
+
+
+# Outer can be either cut or edge
+# Determined when generating, so convert to appropriate type when required
+# Outer must have a get_args method that allows creation of cut / edge
+class Outer(Laser):
+    def __init__(self, type, internal_offset):
+        super().__init__(type, internal_offset)
+        
+    # Unable to use laserfactory due to circular imports
+    # implement get_cut / get_etch in each of the child classes
+class OuterLine(Outer):
+    def __init__(self, start, end, internal_offset=(0,0)):
+        self.start = start
+        self.end = end
+        super().__init__("line", internal_offset)
+        
+    def get_args(self):
+        return [self.start, self.end]
+    
+    # Returns as a cut object
+    def get_cut(self):
+        return CutLine(*self.get_args(), self.io)
+    
+    def get_etch(self):
+        return EtchLine(*self.get_args(), self.io)
+    
+class OuterRect(Outer):
+    def __init__(self, start, size, internal_offset=(0,0)):
+        self.start = start
+        self.size = size
+        super().__init__("rect", internal_offset)
+        
+    def get_args(self):
+        return [self.start, self.size]
+    
+    # Returns as a cut object
+    def get_cut(self):
+        return CutRect(*self.get_args(), self.io)
+    
+    def get_etch(self):
+        return EtchRect(*self.get_args(), self.io)
+
+        
+class OuterPolygon(Outer):
+    def __init__(self, points, internal_offset=(0,0)):
+        self.points = points
+        super().__init__("polygon", internal_offset)
+        
+    def get_args(self):
+        return self.points
+
+    # Returns as a cut object
+    def get_cut(self):
+        return CutPolygon(self.get_args(), self.io)
+    
+    def get_etch(self):
+        return EtchPolygon(self.get_args(), self.io)
+
+

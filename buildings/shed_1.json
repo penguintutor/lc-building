@@ -54,7 +54,7 @@
         [
           []
         ],
-      "outer":
+      "outers":
         [
           []
         ]
@@ -74,7 +74,7 @@
         {
           "windowtype": "rect"
         },
-      "outer":
+      "outers":
         [
           ["rect", [[0, 0], [800, 1800]]]
         ],

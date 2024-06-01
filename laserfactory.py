@@ -1,6 +1,5 @@
 # Laser Factory class
 # Implements Factory Method Pattern using object classes
-
 from laser import *
 
 class LaserFactory:
@@ -15,14 +14,24 @@ class LaserFactory:
         "rect" : CutRect,
         "polygon" : CutPolygon
         }
+    
+    _outer_creators = {
+        "line" : OuterLine,
+        "rect" : OuterRect,
+        "polygon" : OuterPolygon
+        }
         
     @staticmethod
     def create_etch(type, args, io):
         creator = LaserFactory._etch_creators[type]
         return creator(*args, io)
     
-    
     @staticmethod
     def create_cut(type, args, io):
         creator = LaserFactory._cut_creators[type]
+        return creator(*args, io)
+    
+    @staticmethod
+    def create_outer(type, args, io):
+        creator = LaserFactory._outer_creators[type]
         return creator(*args, io)

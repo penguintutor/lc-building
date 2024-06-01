@@ -1,7 +1,3 @@
 # Todo
 
 Handle edges - either cuts or etches depending upon setting
-
-Handle cut / etch relative offset from feature, not wall
-
-Perhaps remove window setting - replace with edges and cuts

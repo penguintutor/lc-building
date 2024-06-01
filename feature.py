@@ -12,7 +12,7 @@ class Feature():
     lf = LaserFactory()
     # x, y is top left
     # max is bottom right - forms rectangle to exclude
-    def __init__ (self, min_x, min_y, max_x, max_y, cuts=[], etches=[]):
+    def __init__ (self, min_x, min_y, max_x, max_y, cuts=[], etches=[], outers=[]):
         self.min_x = min_x
         self.min_y = min_y
         self.max_x = max_x
@@ -28,7 +28,14 @@ class Feature():
         for etch in etches:
             if etch == []:
                 break
-            self.etches.append(Feature.lf.create_etch(etch[0], etch[1]))
+            self.etches.append(Feature.lf.create_etch(etch[0], etch[1], (min_x, min_y)))
+        self.outers = []
+        for outer in outers:
+            if outer == []:
+                break
+            self.outers.append(Feature.lf.create_outer(outer[0], outer[1], (min_x, min_y)))
+        
+            
         
     # if changing start then need to update cuts so use setters
     def set_start(self, start):
@@ -58,6 +65,22 @@ class Feature():
     
     def get_etches(self):
         return self.etches
+    
+    def get_outers(self):
+        return self.outers
+    
+    def get_outers_cuts(self):
+        cuts = []
+        for outer in self.outers:
+            cuts.append(outer.get_cut())
+        return cuts
+    
+    def get_outers_etches(self):
+        etches = []
+        for outer in self.outers:
+            etches.append(outer.get_etch())
+        return etches
+        
         
 # Start pos is top left
 # Size is (width, height)
@@ -67,10 +90,10 @@ class Feature():
 # are as tuples, (startx, starty, endx, endy) - only lines allowed
 # If use lines then must cut external lines as well, rectangle won't be cut
 class Window(Feature):
-    def __init__ (self, start_pos, size, cuts=[], etches=[]):
+    def __init__ (self, start_pos, size, cuts=[], etches=[], outers=[]):
         self.start_pos = start_pos
         self.size = size
-        super().__init__ (start_pos[0], start_pos[1], start_pos[0]+size[0], start_pos[1]+size[1], cuts, etches)
+        super().__init__ (start_pos[0], start_pos[1], start_pos[0]+size[0], start_pos[1]+size[1], cuts, etches, outers)
     
 
 # Defaults to cuts = None
@@ -78,8 +101,8 @@ class Window(Feature):
 # If do want to cut out then cuts may be just 3 sides no bottom as that's cut already (unless step etc.)
 # Perhaps handle by having different templates - Door with cutout, vs Etch Door
 class Door(Feature):
-    def __init__ (self, start_pos, size, cuts=[], etches=[]):
+    def __init__ (self, start_pos, size, cuts=[], etches=[], outers=[]):
         self.start_pos = start_pos
         self.size = size
-        super().__init__ (start_pos[0], start_pos[1], start_pos[0]+size[0], start_pos[1]+size[1], cuts, etches)
+        super().__init__ (start_pos[0], start_pos[1], start_pos[0]+size[0], start_pos[1]+size[1], cuts, etches, outers)
         

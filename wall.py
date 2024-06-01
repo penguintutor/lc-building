@@ -26,6 +26,15 @@ class Wall():
         self.features = []
         # by default are a wall, or could be roof
         self.type = "wall"
+        # default to cuts
+        self.outer_type = "cuts"
+        
+    def get_outers (self):
+        outers = []
+        # Add any accessories (windows etc.)
+        for feature in self.features:
+            outers.extend(feature.get_outers())
+        return outers
     
     def get_type (self):
         return self.type
@@ -47,19 +56,20 @@ class Wall():
 
     # Add a feature - such as a window
     # Values are startx, starty, endx, endy
-    # Settings is dict of settings eg. {"windowtype":"rect"} for basic rectangle window
-    def add_feature (self, type, startpos, size, cuts=[], etches=[], settings=None):
+    ##### Settings is likely to be deprecated - previous feature commented out
+    ##### Settings is dict of settings eg. {"windowtype":"rect"} for basic rectangle window
+    def add_feature (self, type, startpos, size, cuts=[], etches=[], outers=[]):
         # feature number will be next number
         # Will return that assuming that this is successful
         feature_num = len(self.features)
         if type == "window":
-            self.features.append(Window(startpos, size, cuts, etches))
+            self.features.append(Window(startpos, size, cuts, etches, outers))
             # Now added window check for relevant settings
-            #if settings != None and "windowtype" in settings.keys() and settings["windowtype"]=="rect":
-            #    self.features[feature_num].set_cuts_rect()
+            #####if settings != None and "windowtype" in settings.keys() and settings["windowtype"]=="rect":
+            #####    self.features[feature_num].set_cuts_rect()
             return feature_num
         elif type == "door":
-            self.features.append(Door(startpos, size, cuts, etches))
+            self.features.append(Door(startpos, size, cuts, etches, outers))
             # If want to handle settings can do so here
             # Eg. support textures
             return feature_num
@@ -100,6 +110,8 @@ class ApexWall(Wall):
         # Add any accessories (windows etc.)
         for feature in self.features:
             cuts.extend(feature.get_cuts())
+            if self.outer_type == "cuts":
+                cuts.extend(feature.get_outers_cuts())
         return cuts
     
     def get_etches (self):
@@ -147,6 +159,8 @@ class ApexWall(Wall):
         # Add any features
         for feature in self.features:
             etches.extend(feature.get_etches())
+            if self.outer_type == "etches":
+                etches.extend(feature.get_outers_etches())
         return etches
 
 
@@ -167,6 +181,10 @@ class RectWall(Wall):
         # Add any accessories (windows etc.)
         for feature in self.features:
             cuts.extend(feature.get_cuts())
+            if self.outer_type == "cuts":
+                new_cuts = feature.get_outers_cuts()
+                if new_cuts != None:
+                    cuts.extend(new_cuts)
         return cuts
     
     def get_etches (self):
@@ -189,6 +207,8 @@ class RectWall(Wall):
         # Add any features
         for feature in self.features:
             etches.extend(feature.get_etches())
+            if self.outer_type == "etches":
+                etches.extend(feature.get_outers_etches())
         return etches
 
 # Roof wall is used for a roof - like a wall

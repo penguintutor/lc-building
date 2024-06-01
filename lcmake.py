@@ -175,7 +175,7 @@ for wall in walls:
 for feature in building.get_features():
     walls[feature["wall"]].add_feature(feature["type"],
                                        feature["parameters"]["pos"], (feature["parameters"]["width"], feature["parameters"]["height"]),
-                                       feature["cuts"], feature["etches"], feature["settings"])
+                                       feature["cuts"], feature["etches"], feature["outers"])
 
 
 # Add window to wall 1
