@@ -173,8 +173,7 @@ for wall in walls:
 
     
 for feature in building.get_features():
-    walls[feature["wall"]].add_feature(feature["type"],
-                                       feature["parameters"]["pos"], (feature["parameters"]["width"], feature["parameters"]["height"]),
+    walls[feature["wall"]].add_feature(feature["parameters"]["pos"], (feature["parameters"]["width"], feature["parameters"]["height"]),
                                        feature["cuts"], feature["etches"], feature["outers"])
 
 

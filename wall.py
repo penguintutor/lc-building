@@ -58,21 +58,14 @@ class Wall():
     # Values are startx, starty, endx, endy
     ##### Settings is likely to be deprecated - previous feature commented out
     ##### Settings is dict of settings eg. {"windowtype":"rect"} for basic rectangle window
-    def add_feature (self, type, startpos, size, cuts=[], etches=[], outers=[]):
+    def add_feature (self, startpos, size, cuts=[], etches=[], outers=[]):
         # feature number will be next number
         # Will return that assuming that this is successful
         feature_num = len(self.features)
-        if type == "window":
-            self.features.append(Window(startpos, size, cuts, etches, outers))
-            # Now added window check for relevant settings
-            #####if settings != None and "windowtype" in settings.keys() and settings["windowtype"]=="rect":
-            #####    self.features[feature_num].set_cuts_rect()
-            return feature_num
-        elif type == "door":
-            self.features.append(Door(startpos, size, cuts, etches, outers))
-            # If want to handle settings can do so here
-            # Eg. support textures
-            return feature_num
+        self.features.append(Feature(startpos, size, cuts, etches, outers))
+        # If want to handle settings can do so here
+        # Eg. support textures
+        return feature_num
             
     # This is later stage in get_etches
     def _texture_to_etches(self, textures):
