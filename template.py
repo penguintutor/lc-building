@@ -74,7 +74,7 @@ class Template (ABC):
     def process_token_str (self, token_string):
         new_string = ""
         # Token can be any alphanumeric and _
-        # Note include numbers as token - including . for fractions
+        # Note include numbers as token including . for fractions
         current_pos = 0
         for m in re.finditer(r"[\w.]+", token_string):
             this_token = m.group(0)

@@ -69,26 +69,7 @@ hinge_size = (300, 50)
 door_pos = (190, 322)
 door_size = (800, 1800)
 # Example where cut 3 sides (ie. door is to the floor)
-# y direction is top to bottom - so add size to get to bottom
-door_outside_cuts = [
-    # bottom left to top left
-    CutLine ((door_pos[0], door_pos[1]+door_size[1]), (door_pos[0], door_pos[1])),
-    # top line
-    CutLine ((door_pos[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1])),
-    # top right to bottom right
-    CutLine ((door_pos[0] + door_size[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1]+door_size[1]))
-    ]
-door_cuts = []
-# Alternative to door_outside_cuts - etch instead
-# Commonly used for small scales - otherwise need to create hinge to mount door back on
-door_outside_etches = [
-    # bottom left to top left
-    EtchLine ((door_pos[0], door_pos[1]+door_size[1]), (door_pos[0], door_pos[1])),
-    # top line
-    EtchLine ((door_pos[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1])),
-    # top right to bottom right
-    EtchLine ((door_pos[0] + door_size[0], door_pos[1]), (door_pos[0] + door_size[0], door_pos[1]+door_size[1]))
-    ]
+
 # Feature etches have to be defined explicitly 
 # vertical wood effect
 door_etches = [
@@ -111,13 +92,6 @@ door_etches = [
                   )),
     ]
 
-
-# Do we "etch" or "cut" the door out
-door_burn="etch"
-if door_burn == "cut":
-    door_cuts.extend(door_outside_cuts)
-elif door_burn == "etch":
-    door_etches.extend(door_outside_etches)
 
 scale = "OO"
 #scale = "G"

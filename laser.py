@@ -115,7 +115,7 @@ class EtchLine(Etch):
     # Default etch width if none others set on individual class
     # Used by etch lines only, but can be accessed by all instances
     global_etch_width = 10
-    def __init__(self, start, end, etch_width=None, internal_offset=(0,0)):
+    def __init__(self, start, end, internal_offset=(0,0), etch_width=None):
         self.start = start
         self.end = end
         # how wide to cut (cannot have line as lightburn doesn't like it)

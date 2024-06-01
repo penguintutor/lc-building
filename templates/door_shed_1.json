@@ -1,0 +1,31 @@
+{
+  "name": "Basic shed door",
+  "type": "Door",
+  "subtype": "shed",
+  "description": "Basic vertical wood door with etched hinges",
+  "defaults": 
+    {
+      "width": 800, 
+      "height": 1800
+    },
+  "typical": 
+    {
+      "hingewidth": 300,
+      "hingeheight": 50
+    }
+  "outers":
+    [
+        ["line", [["x", "y + height"], ["x", "y"]]],
+        ["line", [["x", "y"], ["x + width", "y"]]],
+        ["line", [["x + width", "y"], ["x + width", "y = height"]]]
+    ]
+  "cuts": 
+    [
+
+    ],
+  "etches":
+    [
+
+    ]
+
+}

@@ -26,7 +26,8 @@ class Wall():
         self.features = []
         # by default are a wall, or could be roof
         self.type = "wall"
-        # default to cuts
+        # default to "cuts" - can be "etches"
+        # todo move this to a setting that can be changed by the user
         self.outer_type = "cuts"
         
     def get_outers (self):
