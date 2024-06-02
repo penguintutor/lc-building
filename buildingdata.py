@@ -52,6 +52,9 @@ class BuildingData ():
     def get_walls(self):
         return self.data["walls"]
     
+    def get_textures(self):
+        return self.data["textures"]
+    
     # Returns as a copy of the parameters
     def get_values(self):
         return self.data["parameters"].copy()

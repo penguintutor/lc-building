@@ -11,10 +11,10 @@
     },
   "typical": 
     {
-      "hingewidth": 300,
-      "hingeheight": 50,
-      "woodetch" : 10,
-      "woodheight" : 150
+      "hinge_width": 300,
+      "hinge_height": 50,
+      "wood_etch" : 10,
+      "wood_height" : 150
     }
   "outers":
     [
@@ -28,24 +28,24 @@
     ],
   "etches":
     [
-        ["rect", [["x + 175", "y"], ["woodetch", "height"]]],
-        ["rect", [["x + 325", "y"], ["woodetch", "height"]]],
-        ["rect", [["x + 475", "y"], ["woodetch", "height"]]],
-        ["rect", [["x + 625", "y"], ["woodetch", "height"]]],
+        ["rect", [["x + 175", "y"], ["wood_etch", "height"]]],
+        ["rect", [["x + 325", "y"], ["wood_etch", "height"]]],
+        ["rect", [["x + 475", "y"], ["wood_etch", "height"]]],
+        ["rect", [["x + 625", "y"], ["wood_etch", "height"]]],
         ["polygon", [
             ["x + 800", "y + (height*0.15)"],
-            ["x + 800 - hingewidth", "y + (height*0.15) + (hingeheight/2)"],
-            ["x + 800", "y + (height*0.15) + (hingeheight)"]
+            ["x + 800 - hinge_width", "y + (height*0.15) + (hinge_height/2)"],
+            ["x + 800", "y + (height*0.15) + (hinge_height)"]
         ]],
         ["polygon", [
             ["x + 800", "y + (height*0.5)"],
-            ["x + 800 - hingewidth", "y + (height*0.5) + (hingeheight/2)"],
-            ["x + 800", "y + (height*0.5) + (hingeheight)"]
+            ["x + 800 - hinge_width", "y + (height*0.5) + (hinge_height/2)"],
+            ["x + 800", "y + (height*0.5) + (hinge_height)"]
         ]],
         ["polygon", [
             ["x + 800", "y + (height*0.85)"],
-            ["x + 800 - hingewidth", "y + (height*0.85) + (hingeheight/2)"],
-            ["x + 800", "y + (height*0.85) + (hingeheight)"]
+            ["x + 800 - hinge_width", "y + (height*0.85) + (hinge_height/2)"],
+            ["x + 800", "y + (height*0.85) + (hinge_height)"]
         ]]            
     ]
 

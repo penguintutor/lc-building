@@ -124,10 +124,8 @@ for wall in building.get_walls():
         wall_values.append(bdata[value])
     walls.append(wf.create_wall(wall[0], wall_values))
 
-# Add wood etching to all walls
-for wall in walls:
-    if wall.get_type() != "roof":
-        wall.add_wood_etch (wood_height, wood_etch)
+for texture in building.get_textures():
+    walls[texture["wall"]].add_texture(texture["type"], texture["settings"] )
 
     
 for feature in building.get_features():

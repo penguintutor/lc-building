@@ -49,6 +49,10 @@ class Wall():
     def get_maxheight (self):
         return self.max_height
        
+    def add_texture (self, type, settings):
+        if type == "wood":
+            self.add_wood_etch(settings["wood_height"], settings["wood_etch"])
+       
     # Etching is created later, this defines settings
     def add_wood_etch (self, wood_height, wood_etch):
         self.material = "wood"

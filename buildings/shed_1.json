@@ -14,10 +14,13 @@
       "roof_right_overlap": 100,
       "roof_left_overlap": 100,
       "roof_front_overlap": 50,
-      "roof_rear_overlap": 50,
-      "wood_height": 150,
-      "wood_etch": 10
+      "roof_rear_overlap": 50
     },
+    "settings":
+      {
+        "outertype": "cut",
+        "interlocking": "true"
+      },
   "walls":
     [
       ["ApexWall", ["width", "roof_height", "wall_height"]],
@@ -30,6 +33,45 @@
       "ApexRoof", 
       "ApexRoof"
     ],
+  "textures":
+    [
+        {
+        "type": "wood",
+        "wall": 0,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        },
+        {
+        "type": "wood",
+        "wall": 1,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        },
+        {
+        "type": "wood",
+        "wall": 2,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        },
+        {
+        "type": "wood",
+        "wall": 3,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        }
+    ],
   "features":
     [
       {
@@ -41,10 +83,6 @@
           "width": 400, 
           "height": 555, 
           "pos": [715, 50]
-        },
-      "settings":
-        {
-          "windowtype": "rect"
         },
       "cuts":
         [
