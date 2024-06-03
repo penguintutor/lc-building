@@ -5,8 +5,11 @@ from wall import *
 
 class WallFactory:
     _creators = {
-        "RectWall" : RectWall,
-        "ApexWall" : ApexWall
+        "WallRect" : WallRect,
+        "WallApex" : WallApex,
+        "RoofApexLeft" : RoofApexLeft,
+        "RoofApexRight" : RoofApexRight,
+        "RoofFlat" : RoofFlat
         }
         
     @staticmethod

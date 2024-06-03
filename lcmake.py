@@ -54,7 +54,7 @@ etch_line_width = 10
 # either manually or using textures / settings etc.
 # cuts and etches can always be added to
 
-# cuts are ethches are relative to the wall (as are all other values)
+# cuts and etches are relative to the wall (or feature within feature)
 # But may want to include relative to door_pos etc.
 
 # Example window (wall 0)
@@ -116,17 +116,20 @@ svg = SVGOut(filename, svgsettings)
 
 wf = WallFactory()
 
-
 walls = []
 for wall in building.get_walls():
+    # Convert from string values to values from bdata
     wall_values = []
     for value in wall[1]:
         wall_values.append(bdata[value])
     walls.append(wf.create_wall(wall[0], wall_values))
+    
+# Add roofs (loads differently but afterwards is handled as a wall)
+for roof in building.get_roofs():
+    walls.append(wf.create_wall(roof[0], (*roof[1], building.get_roof_overlap())))
 
 for texture in building.get_textures():
     walls[texture["wall"]].add_texture(texture["type"], texture["settings"] )
-
     
 for feature in building.get_features():
     walls[feature["wall"]].add_feature(feature["parameters"]["pos"], (feature["parameters"]["width"], feature["parameters"]["height"]),

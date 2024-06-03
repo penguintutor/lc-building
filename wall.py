@@ -84,8 +84,32 @@ class Wall():
         return etches
             
 
+    # Get cuts if rectangular wall
+    def get_cuts_rect (self):
+        # If width & height defined use those
+        # otherwise use max_width & max_height
+        if hasattr(self, "width"):
+            width = self.width
+        else:
+            width = self.max_width
+        if hasattr(self, "height"):
+            height = self.height
+        else:
+            height = self.max_height
+        cuts = []
+        # frame as rectangle
+        cuts.append (CutRect((0,0), (width, height)))
+        # Add any accessories (windows etc.)
+        for feature in self.features:
+            cuts.extend(feature.get_cuts())
+            if self.outer_type == "cuts":
+                new_cuts = feature.get_outers_cuts()
+                if new_cuts != None:
+                    cuts.extend(new_cuts)
+        return cuts
+
         
-class ApexWall(Wall):
+class WallApex(Wall):
     def __init__ (self, width, roof_height, wall_height):
         super().__init__(width, roof_height)
         self.width = width
@@ -164,7 +188,7 @@ class ApexWall(Wall):
 
 
 # Standard rectangle - inherits most methods
-class RectWall(Wall):
+class WallRect(Wall):
     def __init__ (self, width, height):
         super().__init__(width, height)
         self.width = width
@@ -173,17 +197,7 @@ class RectWall(Wall):
     # Return all cuts as tuples shapestype followed by dimensions
     # Start from 0,0
     def get_cuts (self):
-        cuts = []
-        # frame as rectangle
-        cuts.append (CutRect((0,0), (self.width, self.height)))
-        # Add any accessories (windows etc.)
-        for feature in self.features:
-            cuts.extend(feature.get_cuts())
-            if self.outer_type == "cuts":
-                new_cuts = feature.get_outers_cuts()
-                if new_cuts != None:
-                    cuts.extend(new_cuts)
-        return cuts
+        return self.get_cuts_rect()
     
     def get_etches (self):
         # First apply textures
@@ -222,8 +236,9 @@ class RectWall(Wall):
 # Note setting depth, then querying depth may result in different value (same with width)
 # Height difference is not stored - just used in calculation
 # Overlap is the distance to extend the roof by, not the actual distance it sticks out from the width of the building
-class RoofWall (RectWall):
-    def __init__ (self, depth, width, height_difference, type, right_overlap, left_overlap, front_overlap, rear_overlap):
+# Perhaps remove this class - replace with children of wall class
+class Roof (Wall):
+    def __init__ (self, type, width, depth, height_difference, right_overlap, left_overlap, front_overlap, rear_overlap):
         roof_depth = depth + front_overlap + rear_overlap
         roof_width = width # Most likely this will be replaced
         if type == "flat":
@@ -234,4 +249,50 @@ class RoofWall (RectWall):
         # As that will ensure any texture goes the right way
         super().__init__(roof_depth, roof_width)
         self.type = "roof"
+
+
+class RoofApexLeft(Wall):
+    def __init__ (self, width, depth, height_difference, overlaps):
+        self.roof_width = width+overlaps["rear"]+overlaps["front"]
+        # provided depth is flat, so adjust for height difference
+        self.roof_depth = math.sqrt (depth **2 + height_difference **2) + overlaps["right"]
+        # roof_depth translates into wall height for when outputting (width, height)
+        super().__init__(self.roof_width, self.roof_depth)
+        
+    # Cuts are standard rectangle
+    def get_cuts (self):
+        return self.get_cuts_rect()
     
+    # Currently returns empty list - plain roof
+    def get_etches (self):
+        return []
+        
+class RoofApexRight(Wall):
+    def __init__ (self, width, depth, height_difference, overlaps):
+        self.roof_width = width+overlaps["rear"]+overlaps["front"]
+        # provided depth is flat, so adjust for height difference
+        self.roof_depth = math.sqrt (depth **2 + height_difference **2) + overlaps["left"]
+        # roof_depth translates into wall height for when outputting (width, height)
+        super().__init__(self.roof_width, self.roof_depth)
+        
+    def get_cuts (self):
+        return self.get_cuts_rect()
+    
+    # Currently returns empty list - plain roof
+    def get_etches (self):
+        return []
+
+class RoofFlat(Wall):
+    def __init__ (self, width, depth, height_difference, overlaps):
+        self.roof_width = width+overlaps["rear"]+overlaps["front"]
+        # provided depth is flat, so adjust for height difference
+        self.roof_depth = math.sqrt (depth **2 + height_difference **2) + overlaps["right"] + overlaps["left"]
+        # roof_depth translates into wall height for when outputting (width, height)
+        super().__init__(self.roof_width, self.roof_depth)
+        
+    def get_cuts (self):
+        return self.get_cuts_rect()
+    
+    # Currently returns empty list - plain roof
+    def get_etches (self):
+        return []

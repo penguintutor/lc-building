@@ -9,8 +9,7 @@
       "width": 1180, 
       "wall_height": 1864,
       "roof_height": 2122,
-      "roof_depth": 1882,
-      "roof_width": 1342 
+      "roof_depth": 1882
     },
   "typical": 
     {
@@ -23,15 +22,15 @@
     },
   "walls":
     [
-      ["ApexWall", ["width", "roof_height", "wall_height"]],
-      ["RectWall", ["depth", "wall_height"]],
-      ["ApexWall", ["width", "roof_height", "wall_height"]],
-      ["RectWall", ["depth", "wall_height"]]
+      ["WallApex", ["width", "roof_height", "wall_height"]],
+      ["WallRect", ["depth", "wall_height"]],
+      ["WallApex", ["width", "roof_height", "wall_height"]],
+      ["WallRect", ["depth", "wall_height"]]
     ],
   "roofs":
     [
-      "ApexRoof", 
-      "ApexRoof"
+      ["RoofApexLeft", ["depth", "width/2", "roof_height-wall_height"]],
+      ["RoofApexRight", ["depth", "width/2", "roof_height-wall_height"]]
     ],
   "options":
     [
