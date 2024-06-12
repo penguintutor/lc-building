@@ -6,9 +6,8 @@
 import math
 from texture import *
 from feature import *
-from interlocking import *
+from interlocking import Interlocking
 from laser import *
-from operator import attrgetter
 
 def get_angle (line):
     dx = line[1][0] - line[0][0]
@@ -85,10 +84,18 @@ class Wall():
         self.wood_etch = wood_etch
 
     # Add a feature - such as a window
-    def add_feature (self, startpos, size, cuts=[], etches=[], outers=[]):
+    # cuts, etches and outers should all be lists
+    # If not set to None then change to [] avoid dangerous default
+    def add_feature (self, startpos, size, cuts=None, etches=None, outers=None):
         # feature number will be next number
         # Will return that assuming that this is successful
         feature_num = len(self.features)
+        if cuts == None:
+            cuts = []
+        if etches == None:
+            etches = []
+        if outers == None:
+            outers = []
         self.features.append(Feature(startpos, size, cuts, etches, outers))
         # If want to handle settings can do so here
         # Eg. support textures
@@ -96,7 +103,10 @@ class Wall():
     
     # add any interlock rules for the edges
     # edges are number from 0 (top left) in clockwise direction
-    def add_interlocking (self, step, edge, primary, parameters={}):
+    # parameters should be a dictionary if supplied
+    def add_interlocking (self, step, edge, primary, parameters=None):
+        if parameters==None:
+            parameters = {}
         self.il.append(Interlocking(step, edge, primary, parameters))
             
     # This is later stage in get_etches

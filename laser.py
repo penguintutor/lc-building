@@ -258,10 +258,12 @@ class OuterLine(Outer):
     
     # Returns as a cut object
     def get_cut(self):
-        return CutLine(*self.get_args(), self.io)
+        args = self.get_args()
+        return CutLine(args[0], args[1], self.io)
     
     def get_etch(self):
-        return EtchLine(*self.get_args(), self.io)
+        args = self.get_args()
+        return EtchLine(args[0], args[1], self.io)
     
 class OuterRect(Outer):
     def __init__(self, start, size, internal_offset=(0,0)):
@@ -274,10 +276,12 @@ class OuterRect(Outer):
     
     # Returns as a cut object
     def get_cut(self):
-        return CutRect(*self.get_args(), self.io)
+        args = self.get_args()
+        return CutRect(args[0], args[1], self.io)
     
     def get_etch(self):
-        return EtchRect(*self.get_args(), self.io)
+        args = self.get_args()
+        return EtchRect(args[0], args[1], self.io)
 
         
 class OuterPolygon(Outer):

@@ -17,11 +17,14 @@ class Interlocking():
     # set once then use for all interlocking calculations
     material_thickness = 0
     
-    def __init__ (self, step, edge, primary, parameters={}):
+    # Note parameters if supplied should be a dictionary
+    def __init__ (self, step, edge, primary, parameters=None):
         self.step = step         # Size of a single interlock step
         self.edge = edge         # Edge number on wall this is contained in
         self.primary = primary   # Is this "primary" or "secondary"
-        self.parameters = parameters         # Any additional settings
+        self.parameters = {}
+        if parameters != None:
+            self.parameters = parameters         # Any additional settings
         # get start position (0 if not defined)
         # also used to sort
         # note should never have multiple interlocking objects
@@ -57,7 +60,6 @@ class Interlocking():
             rev_line = [line[1],line[0]]
             line = rev_line
         
-        current_segment_start = line_start
         # Get length of line from original to end of last segment
         line_dist = self._get_distance (line_start, line[1])
         # If there is end and less then line_dist then use that instead
@@ -92,7 +94,7 @@ class Interlocking():
                 new_segments.append(*line)
                 return new_segments
             # Add to new segments
-            new_segments.append((line[0], newpos))
+            new_segments.append([line[0], newpos])
             new_line = (newpos, line[1])
         
         # Now can start adding segments
@@ -174,7 +176,7 @@ class Interlocking():
             if newstarty >= line[1][1]:
                 return True
         else:
-            if newstary < line[1][1]:
+            if newstarty < line[1][1]:
                 return True
         return False
     

@@ -22,7 +22,7 @@ class SVGOut():
             start_rect = cut.get_start_pixels(self.offset)
             rect_size = cut.get_size_pixels()
             self.dwg.add(self.dwg.rect(start_rect, rect_size, stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
-        elif (etch.get_type() == "polygon"):
+        elif (cut.get_type() == "polygon"):
             new_points = cut.get_points_pixels(self.offset)
             self.dwg.add(self.dwg.polygon(new_points, stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
         
