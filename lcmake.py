@@ -7,6 +7,7 @@ from scale import *
 from svgout import *
 from buildingtemplate import *
 from featuretemplate import *
+from interlocking import *
 
 # Same stroke width for all as used for laser
 stroke_width = 1
@@ -29,7 +30,7 @@ building.load_file(building_datafile)
 # If using a template then use the following
 # building.set_all_data(building_template.get_data())
 
-# Get all the values from 
+# Get the parameters and settings
 bdata = building.get_values()
 
 wood_height = 150
@@ -75,10 +76,8 @@ door_size = (800, 1800)
 # Feature etches have to be defined explicitly 
 # including vertical wood effect
 
-
-
-scale = "OO"
-#scale = "G"
+#scale = "OO"
+scale = "G"
 
 
 # Dummy EtchLine entry allowing us to set parameters for all EtchLines
@@ -91,7 +90,7 @@ grid_width = 3
 # Start position
 offset = [0, 0]
 # spacing is distance beteen objects (eg. walls) when exported to SVG
-spacing = 10
+spacing = 50
 num_objects = 0
 current_height = 0 # Only need for height to track which piece needs most space
 
@@ -100,10 +99,15 @@ current_height = 0 # Only need for height to track which piece needs most space
 doc_size_mm = (200, 200)
 
 sc = Scale(scale)
-# Create laser class so pass objects / settings for laser parent
-laser = Laser("master", (0,0))
+
 # Pass scale instance to laser class
-laser.set_scale_object(sc)
+Laser.sc = sc
+# Use scale to apply reverse scale to actual material_thickness
+material_thickness = bdata["material_thickness"]
+scale_material = sc.reverse_scale_convert(material_thickness)
+# Create global interlocking to update class variable
+#global_interlock = Interlocking(scale_material, -1, "primary")
+Interlocking.material_thickness = scale_material
 
 svgsettings = {}
 svgsettings['docsize'] = sc.mms_to_pixels(doc_size_mm)
@@ -134,7 +138,23 @@ for texture in building.get_textures():
 for feature in building.get_features():
     walls[feature["wall"]].add_feature(feature["parameters"]["pos"], (feature["parameters"]["width"], feature["parameters"]["height"]),
                                        feature["cuts"], feature["etches"], feature["outers"])
-
+    
+# if setting is ignore interlocking then ignore any entries (wall will have il=[])
+# otherwise add
+for il in building.get_interlocking():
+    # Add both primary and secondary for each entry
+    # parameters are optional (defines start and end positions of interlocking section)
+    # These are the optional parameters which are appended
+    parameter_keys = ["start", "end"]
+    # if tags exist then use that if not then don't include
+    parameters = {}
+    for this_key in parameter_keys:
+        if this_key in il.keys():
+            parameters[this_key] = il[this_key]
+    walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", parameters)
+    walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", parameters)
+    
+    
    
 # Create output
 for wall in walls:

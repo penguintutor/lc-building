@@ -112,6 +112,9 @@ class BuildingData ():
     def get_walls(self):
         return self.data["walls"]
     
+    def get_interlocking(self):
+        return self.data["interlocking"]
+    
     # Returns roofs after parsing tokens
     def get_roofs(self):
         roof_data = []
@@ -122,9 +125,13 @@ class BuildingData ():
     def get_textures(self):
         return self.data["textures"]
     
-    # Returns as a copy of the parameters
+    # Returns as a copy of the parameters and settings
     def get_values(self):
-        return self.data["parameters"].copy()
+        values = self.data["parameters"].copy()
+        # If any settings then add those
+        if "settings" in self.data.keys():
+            values.update(self.data["settings"])
+        return values
 
     def get_features(self):
         return self.data["features"]

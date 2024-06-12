@@ -4,6 +4,7 @@ from scale import *
 from laser import *
 from buildingtemplate import *
 from featuretemplate import *
+from interlocking import *
 
 class TestWall(unittest.TestCase):
     
@@ -11,15 +12,14 @@ class TestWall(unittest.TestCase):
         # Test parameters
         depth = 1826
         height = 1864
-        test_wall = RectWall(depth, height)
+        test_wall = WallRect(depth, height)
         cuts = test_wall.get_cuts()
         self.assertEqual(cuts[0].get_type(), "rect")
-        
         
     def test_wall_maxsize(self):
         depth = 1826
         height = 1864
-        test_wall = RectWall(depth, height)
+        test_wall = WallRect(depth, height)
         max_size = test_wall.get_maxsize()
         self.assertEqual(max_size[0], depth)
         self.assertEqual(max_size[1], height)
@@ -86,8 +86,8 @@ class TestTemplate(unittest.TestCase):
         self.assertEqual(data["name"], "Apex shed")
         self.assertEqual(data["defaults"]["depth"], 1826)
         self.assertEqual(data["typical"]["wood_height"], 150)
-        self.assertEqual(data["walls"][0][0], "ApexWall")
-        self.assertEqual(data["roofs"][0], "ApexRoof")
+        self.assertEqual(data["walls"][0][0], "WallApex")
+        self.assertEqual(data["roofs"][0][0], "RoofApexLeft")
         self.assertEqual(data["options"][0], "door_shed_1")
         self.assertEqual(data["options"][1], "window_shed_1")
         
@@ -131,5 +131,47 @@ class TestTemplate(unittest.TestCase):
         self.assertEqual(output, 207.0)
     
     
+# Interlocking is based on lines in clockwise direction
+# Primary go outwards from start to end
+# Secondary to inwards from end to start
+class TestInterlocking(unittest.TestCase):   
+    
+    def test_get_angle(self):
+        # Create Interlocking with step 100, edge 0, primary
+        il = Interlocking (100, 0, "primary")
+        angle = get_angle(((0, 5), (0, 10)))
+        self.assertEqual(angle, 0)
+        angle = get_angle(((5, 0), (10, 0)))
+        self.assertEqual(angle, 270)
+        angle = get_angle(((0,0), (5,5)))
+        self.assertEqual(angle, 315)
+        angle = get_angle(((0,0), (-5,5)))
+        self.assertEqual(angle, 45)
+        angle = get_angle(((5,0), (-5,0)))
+        self.assertEqual(angle, 90)
+        
+    def test_line_interlocking_primary_1(self):
+        # Primary so start at beginning of line
+        il = Interlocking (100, 1, "primary")
+        # Vertical line from bottom to top
+        line = [(0,1000), (0, 0)]
+        # Appears that this is repeating args - but the line could actually be a segment
+        # of a longer line
+        segments = il.add_interlock_line (line[0], line[1], line)
+        expected_output = [((0, 1000), (0, 900)), ((0, 900), (0, 900)), ((0, 900), (0, 800)), ((0, 800), (0, 800)), ((0, 800), (0, 700)), ((0, 700), (0, 700)), ((0, 700), (0, 600)), ((0, 600), (0, 600)), ((0, 600), (0, 500)), ((0, 500), (0, 500)), ((0, 500), (0, 400)), ((0, 400), (0, 400)), ((0, 400), (0, 300)), ((0, 300), (0, 300)), ((0, 300), (0, 200)), ((0, 200), (0, 200)), ((0, 200), (0, 100)), ((0, 100), (0, 0))]
+        self.assertEqual(segments, expected_output)
+        
+    def test_line_interlocking_secondary_1(self):
+        # Secondary so start at end of line
+        il = Interlocking (100, 1, "secondary")
+        # Vertical line from top to bottom
+        line = [(100, 0), (100, 1000)]
+        # Appears that this is repeating args - but the line could actually be a segment
+        # of a longer line
+        segments = il.add_interlock_line (line[0], line[1], line)
+        expected_output = [((0, 1000), (0, 900)), ((0, 900), (0, 900)), ((0, 900), (0, 800)), ((0, 800), (0, 800)), ((0, 800), (0, 700)), ((0, 700), (0, 700)), ((0, 700), (0, 600)), ((0, 600), (0, 600)), ((0, 600), (0, 500)), ((0, 500), (0, 500)), ((0, 500), (0, 400)), ((0, 400), (0, 400)), ((0, 400), (0, 300)), ((0, 300), (0, 300)), ((0, 300), (0, 200)), ((0, 200), (0, 200)), ((0, 200), (0, 100)), ((0, 100), (0, 0))]
+        self.assertEqual(segments, expected_output)
+        
+        
 if __name__ == '__main__':
     unittest.main()

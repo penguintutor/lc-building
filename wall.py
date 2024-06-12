@@ -6,7 +6,27 @@
 import math
 from texture import *
 from feature import *
+from interlocking import *
 from laser import *
+from operator import attrgetter
+
+def get_angle (line):
+    dx = line[1][0] - line[0][0]
+    dy = line[1][1] - line[0][1]
+    theta = math.atan2(dy, dx)
+    angle = math.degrees(theta)  
+    if angle < 0:
+        angle = 360 + angle
+    return angle
+
+# Work out if mainly in x direction or mainly in y
+# based on angle of line
+def get_mainly_xy (line):
+    angle = get_angle (line)
+    if angle <= 45 or (angle >=135 and angle <=225) or angle >= 315:
+        return "x"
+    else:
+        return "y"
 
 # Texture is generated as part of get_etch,
 # This means that if a feature is added as long as it
@@ -16,6 +36,10 @@ from laser import *
 # Textures are currently created in walls - may make sense to pull this into a
 # separate texture generator class in future
 
+# Interlocking is applied to sides that it is associated with.
+# Interlocking starts at bottom left and works along the line
+# As such all lines need to be in direction away from bottom left
+
 # Abstract class - normally use RectWall / ApexWall etc
 # scale is divisor to convert from standard to scale size (eg. 76.2 for OO)
 class Wall():
@@ -23,7 +47,8 @@ class Wall():
         self.max_width = width
         self.max_height = height
         self.material = "smooth"
-        self.features = []
+        self.features = []        # Features for this wall
+        self.il = []              # Interlocking - one for each type of interlock (can have multiple per edge)
         # by default are a wall, or could be roof
         self.type = "wall"
         # default to "cuts" - can be "etches"
@@ -60,9 +85,6 @@ class Wall():
         self.wood_etch = wood_etch
 
     # Add a feature - such as a window
-    # Values are startx, starty, endx, endy
-    ##### Settings is likely to be deprecated - previous feature commented out
-    ##### Settings is dict of settings eg. {"windowtype":"rect"} for basic rectangle window
     def add_feature (self, startpos, size, cuts=[], etches=[], outers=[]):
         # feature number will be next number
         # Will return that assuming that this is successful
@@ -71,6 +93,11 @@ class Wall():
         # If want to handle settings can do so here
         # Eg. support textures
         return feature_num
+    
+    # add any interlock rules for the edges
+    # edges are number from 0 (top left) in clockwise direction
+    def add_interlocking (self, step, edge, primary, parameters={}):
+        self.il.append(Interlocking(step, edge, primary, parameters))
             
     # This is later stage in get_etches
     def _texture_to_etches(self, textures):
@@ -82,10 +109,23 @@ class Wall():
             # Each texture can have one or more etches
             etches.extend(texture.get_etches())
         return etches
-            
+        
+        
+    def _rect_to_edges (self, width, height):
+        # lines are list of start / end - convert to CutLines later
+        # Start is 0, 0 (as this is the wall)
+        # Edges start with top left point and got clockwise
+        return [
+            [(0,0), (width, 0)],
+            [(width,0), (width, height)],
+            [(width, height), (0, height)],
+            [(0, height), (0,0)]
+            ]
+        
 
-    # Get cuts if rectangular wall
+    # Get cuts if a rectangular walls
     def get_cuts_rect (self):
+        cut_lines = []
         # If width & height defined use those
         # otherwise use max_width & max_height
         if hasattr(self, "width"):
@@ -96,16 +136,65 @@ class Wall():
             height = self.height
         else:
             height = self.max_height
+        # If wall does not have interlocking
+        if self.il == []:
+            return self._get_cuts_rect_only(width, height)
+        # otherwise we convert to lines then handle interlocking
+        cut_edges = self._rect_to_edges(width, height)
+        # Add interlocking each edge at a time
+        for i in range(0, len(cut_edges)):
+            # Do any interlocks apply to this edge if so apply interlocks
+            # copy edge into list for applying transformations
+            this_edge_segments = [cut_edges[i]]
+            start_line = this_edge_segments[0][0]
+            end_line = this_edge_segments[0][1]
+            edge_ils = []
+            for il in self.il:
+                if il.get_edge() == i:
+                    # todo add interlocks to this edge
+                    edge_ils.append(il)
+            # Now sort into order to apply
+            # Must not overlap, but only check startpos rather than end
+            if edge_ils != []:
+                sorted_ils = sorted(edge_ils)
+                # Now apply each interlocking in turn
+                for this_ils in sorted_ils:
+                    # remove last segment to perform transformations on it
+                    remaining_edge_segment = this_edge_segments.pop()
+                    # Then add any returned segments back onto the list
+                    this_edge_segments.extend(this_ils.add_interlock_line(start_line, end_line, remaining_edge_segment))
+                # Convert to line objects
+                for this_segment in this_edge_segments:
+                    cut_lines.append(CutLine(this_segment[0], this_segment[1]))
+            else:
+                # otherwise just append his one edge
+                cut_lines.append(CutLine(cut_edges[i][0], cut_edges[i][1]))
+        # Add cuts from features
+        feature_cuts = self._get_cuts_features()
+        if feature_cuts != None:
+            cut_lines.extend(feature_cuts)
+        return cut_lines
+        
+    def _get_cuts_features (self):
+        feature_cuts = []
+        for feature in self.features:
+            feature_cuts.extend(feature.get_cuts())
+            if self.outer_type == "cuts":
+                new_cuts = feature.get_outers_cuts()
+                if new_cuts != None:
+                    feature_cuts.extend(new_cuts)
+        return feature_cuts
+
+    # Get cuts if rectangular wall
+    # And confirmed not interlocking
+    def _get_cuts_rect_only (self, width, height):
         cuts = []
         # frame as rectangle
         cuts.append (CutRect((0,0), (width, height)))
         # Add any accessories (windows etc.)
-        for feature in self.features:
-            cuts.extend(feature.get_cuts())
-            if self.outer_type == "cuts":
-                new_cuts = feature.get_outers_cuts()
-                if new_cuts != None:
-                    cuts.extend(new_cuts)
+        feature_cuts = self._get_cuts_features()
+        if feature_cuts != None:
+            cuts.extend(feature_cuts)
         return cuts
 
         
@@ -119,23 +208,57 @@ class WallApex(Wall):
 
     # Return all cuts as tuples shapestype followed by dimensions
     # Start from 0,0
+    # edges are numbered from top centre going clockwise
     def get_cuts (self):
-        cuts = []
-        #top centre to left
-        cuts.append (CutLine((self.width/2, 0), (0, self.roof_height-self.wall_height)))
-        cuts.append (CutLine((self.width/2, 0), (self.width, self.roof_height-self.wall_height)))
-        # left
-        cuts.append (CutLine((0, self.roof_height-self.wall_height), (0, self.roof_height)))
-        # right
-        cuts.append (CutLine((self.width, self.roof_height-self.wall_height), (self.width, self.roof_height)))
-        cuts.append (CutLine((0, self.roof_height), (self.width, self.roof_height)))
+        cuts = []          # First create each line in cuts list
+        cut_lines = []     # Then when add interlocking turn into cut_lines
+        # top to centre
+        cuts.append ([(0, self.roof_height-self.wall_height), (self.width/2, 0)])
+        # top centre to right
+        cuts.append ([(self.width/2, 0), (self.width, self.roof_height-self.wall_height)])
+        #right
+        cuts.append ([(self.width, self.roof_height-self.wall_height), (self.width, self.roof_height)])
+        #bottom
+        cuts.append ([(self.width, self.roof_height), (0, self.roof_height)])
+        #left
+        cuts.append ([(0, self.roof_height), (0, self.roof_height-self.wall_height)])
+        # Apply any interlocks to each of the edges
+        for i in range(0, len(cuts)):
+            # Do any interlocks apply to this edge if so apply interlocks
+            # copy edge into list for applying transformations
+            this_edge_segments = [cuts[i]]
+            start_line = this_edge_segments[0][0]
+            end_line = this_edge_segments[0][1]
+            edge_ils = []
+            for il in self.il:
+                if il.get_edge() == i:
+                    # todo add interlocks to this edge
+                    edge_ils.append(il)
+            # Now sort into order to apply
+            # Must not overlap, but only check startpos rather than end
+            if edge_ils != []:
+                sorted_ils = sorted(edge_ils)
+                # Now apply each interlocking in turn
+                for this_ils in sorted_ils:
+                    # remove last segment to perform transformations on it
+                    remaining_edge_segment = this_edge_segments.pop()
+                    # Then add any returned segments back onto the list
+                    this_edge_segments.extend(this_ils.add_interlock_line(start_line, end_line, remaining_edge_segment))
+                # Convert to line objects
+                for this_segment in this_edge_segments:
+                    cut_lines.append(CutLine(this_segment[0], this_segment[1]))
+            # If not interlocking on this line then append here
+            else:
+                cut_lines.append(CutLine(start_line, end_line))
+                    
         # Add any accessories (windows etc.)
         for feature in self.features:
-            cuts.extend(feature.get_cuts())
+            cut_lines.extend(feature.get_cuts())
             if self.outer_type == "cuts":
-                cuts.extend(feature.get_outers_cuts())
-        return cuts
+                cut_lines.extend(feature.get_outers_cuts())
+        return cut_lines
     
+    # Apply the etches to the wall
     def get_etches (self):
         textures = []
         if self.material == "wood":
@@ -150,6 +273,8 @@ class WallApex(Wall):
                     break
                 # Add a rectangle
                 textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch), direction="horizontal"))
+                # Subtract the etch thickness
+                y_pos -= self.wood_etch
                 
             # Continue to top of apex
             # Start by calculating angle of roof
@@ -172,7 +297,7 @@ class WallApex(Wall):
                     direction = "horizontal"
                     ))
                 
-                y_pos -= self.wood_height
+                y_pos -= (self.wood_height + self.wood_etch)
                 if y_pos < self.wood_height / 4:
                     break
                 
@@ -214,6 +339,8 @@ class WallRect(Wall):
                     break
                 # Add a rectangle
                 textures.append (RectTexture((0, y_pos - self.wood_etch), (self.width, self.wood_etch), direction="horizontal"))
+                # Subtract the etch distance
+                y_pos -= self.wood_etch
         # Apply transformation to sketches
         etches = self._texture_to_etches(textures)
         # Add any features
@@ -223,9 +350,7 @@ class WallRect(Wall):
                 etches.extend(feature.get_outers_etches())
         return etches
 
-# Roof wall is used for a roof - like a wall
-# In future may need to handle different, but for now it's sale as a RectWall
-# Actually implemented as a wall
+# Roofs are a type of wall
 # For type = "apex" then roof is half of shed - but width is still width of building
 # Type can be flat (actually still sloping, but one whole roof)
 # Or apex (two identical apex segments - create two instances if you want it printed twice)
@@ -236,20 +361,6 @@ class WallRect(Wall):
 # Note setting depth, then querying depth may result in different value (same with width)
 # Height difference is not stored - just used in calculation
 # Overlap is the distance to extend the roof by, not the actual distance it sticks out from the width of the building
-# Perhaps remove this class - replace with children of wall class
-class Roof (Wall):
-    def __init__ (self, type, width, depth, height_difference, right_overlap, left_overlap, front_overlap, rear_overlap):
-        roof_depth = depth + front_overlap + rear_overlap
-        roof_width = width # Most likely this will be replaced
-        if type == "flat":
-            roof_width = math.sqrt (width ** 2 + height_difference **2) + right_overlap + left_overlap
-        if type == "apex":
-            roof_width = math.sqrt ((width / 2) ** 2 + height_difference **2) + ((right_overlap + left_overlap)/2)
-        # Although init is for width, height enter as depth, width
-        # As that will ensure any texture goes the right way
-        super().__init__(roof_depth, roof_width)
-        self.type = "roof"
-
 
 class RoofApexLeft(Wall):
     def __init__ (self, width, depth, height_difference, overlaps):

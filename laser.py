@@ -226,7 +226,7 @@ class EtchPolygon(Etch):
     def get_points_offset(self, offset):
         new_points = []
         for point in self.get_points():
-            new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
+            new_points.append([(offset[0]+point[0]),(offset[1]+point[1])])
         return new_points
     
     # Offset is applied to all points
@@ -294,5 +294,4 @@ class OuterPolygon(Outer):
     
     def get_etch(self):
         return EtchPolygon(self.get_args(), self.io)
-
 

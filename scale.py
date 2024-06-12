@@ -13,7 +13,7 @@ class Scale():
         'F': 20.3,
         '1': 32,    # Gauge 1one
         '3': 22.6,  # Gauge 3 (full size equivelant of G)
-        '16': 19    # 16mm scale
+        '16': 19    # 16mm scale 
         }
 
     mm_to_pixel_factor = 3.8
@@ -45,6 +45,13 @@ class Scale():
     def scale_convert(self, mm_value):
         scale_mm = mm_value / self.scales[self.scale]
         return scale_mm
+    
+    # Does the opposite of scale convert - use when you need to keep
+    # exact size (eg. material thickness) - apply this then when it's
+    # scaled normally then it's back to normal - some losses due to rounding
+    # Still apply the mm_to_pixel separately
+    def reverse_scale_convert(self, mm_value):
+        return mm_value * self.scales[self.scale]
     
     # Normally use after converting to scale mm to convert to pixel size for SVG file
     # Preferable than using mm in svg due to problems with translation with some apps
