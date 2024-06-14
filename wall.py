@@ -10,24 +10,6 @@ from interlocking import Interlocking
 from laser import *
 from helpers import *
 
-# def get_angle (line):
-#     dx = line[1][0] - line[0][0]
-#     dy = line[1][1] - line[0][1]
-#     theta = math.atan2(dy, dx)
-#     angle = math.degrees(theta)  
-#     if angle < 0:
-#         angle = 360 + angle
-#     return angle
-
-# Work out if mainly in x direction or mainly in y
-# based on angle of line
-def get_mainly_xy (line):
-    angle = get_angle (line)
-    if angle <= 45 or (angle >=135 and angle <=225) or angle >= 315:
-        return "x"
-    else:
-        return "y"
-
 # Texture is generated as part of get_etch,
 # This means that if a feature is added as long as it
 # is before get etch, then that part will be removed from
@@ -43,6 +25,9 @@ def get_mainly_xy (line):
 # Abstract class - normally use RectWall / ApexWall etc
 # scale is divisor to convert from standard to scale size (eg. 76.2 for OO)
 class Wall():
+    
+    settings = {}
+    
     def __init__ (self, width, height):
         self.max_width = width
         self.max_height = height
@@ -53,7 +38,8 @@ class Wall():
         self.type = "wall"
         # default to "cuts" - can be "etches"
         # todo move this to a setting that can be changed by the user
-        self.outer_type = "cuts"
+        # outertype now moved to class variable settings
+        #self.outer_type = "cuts"
         
     def get_outers (self):
         outers = []
@@ -190,7 +176,7 @@ class Wall():
         feature_cuts = []
         for feature in self.features:
             feature_cuts.extend(feature.get_cuts())
-            if self.outer_type == "cuts":
+            if self.settings["outertype"] == "cuts":
                 new_cuts = feature.get_outers_cuts()
                 if new_cuts != None:
                     feature_cuts.extend(new_cuts)
@@ -265,7 +251,7 @@ class WallApex(Wall):
         # Add any accessories (windows etc.)
         for feature in self.features:
             cut_lines.extend(feature.get_cuts())
-            if self.outer_type == "cuts":
+            if self.settings["outertype"] == "cuts":
                 cut_lines.extend(feature.get_outers_cuts())
         return cut_lines
     
@@ -317,7 +303,7 @@ class WallApex(Wall):
         # Add any features
         for feature in self.features:
             etches.extend(feature.get_etches())
-            if self.outer_type == "etches":
+            if self.settings["outertype"] == "etch":
                 etches.extend(feature.get_outers_etches())
         return etches
 
@@ -357,7 +343,7 @@ class WallRect(Wall):
         # Add any features
         for feature in self.features:
             etches.extend(feature.get_etches())
-            if self.outer_type == "etches":
+            if self.settings["outertype"] == "etch":
                 etches.extend(feature.get_outers_etches())
         return etches
 

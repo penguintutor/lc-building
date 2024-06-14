@@ -1,17 +1,6 @@
 import math
 from helpers import *
 
-# def get_angle (line):
-#     dx = line[1][0] - line[0][0]
-#     dy = line[1][1] - line[0][1]
-#     theta = math.atan2(dy, dx)
-#     # subtract 90degs due to relative start pos
-#     angle = math.degrees(theta) - 90  
-#     if angle < 0:
-#         angle = 360 + angle
-#     return angle
-
-
 class Interlocking():
     
     # Use class variable for material_thickness

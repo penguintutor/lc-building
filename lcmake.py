@@ -78,8 +78,8 @@ door_size = (800, 1800)
 # Feature etches have to be defined explicitly 
 # including vertical wood effect
 
-#scale = "OO"
-scale = "G"
+scale = "OO"
+#scale = "G"
 
 
 # Dummy EtchLine entry allowing us to set parameters for all EtchLines
@@ -110,6 +110,8 @@ scale_material = sc.reverse_scale_convert(material_thickness)
 # Create global interlocking to update class variable
 #global_interlock = Interlocking(scale_material, -1, "primary")
 Interlocking.material_thickness = scale_material
+
+Wall.settings["outertype"] = bdata["outertype"]
 
 svgsettings = {}
 svgsettings['docsize'] = sc.mms_to_pixels(doc_size_mm)

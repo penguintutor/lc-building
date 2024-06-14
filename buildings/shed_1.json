@@ -17,9 +17,9 @@
     },
     "settings":
       {
-        "outertype": "cut",
+        "outertype": "etch",
         "interlocking": "true",
-        "material_thickness": 3
+        "material_thickness": 2
       },
   "walls":
     [
