@@ -12,12 +12,3 @@ def get_angle (line):
     if angle >= 360:
         angle -= 360
     return angle
-
-# Work out if mainly in x direction or mainly in y
-# based on angle of line
-def get_mainly_xy (line):
-    angle = get_angle (line)
-    if angle <= 45 or (angle >=135 and angle <=225) or angle >= 315:
-        return "x"
-    else:
-        return "y"

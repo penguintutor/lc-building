@@ -34,6 +34,8 @@ building.load_file(building_datafile)
 
 # Get the parameters and settings
 bdata = building.get_values()
+# Where parameters apply globally use directly in this code
+# Otherwise pass to appropriate classes
 
 wood_height = 150
 # Width of a wood etch line (boundry between wood)
@@ -144,19 +146,20 @@ for feature in building.get_features():
                                        feature["cuts"], feature["etches"], feature["outers"])
     
 # if setting is ignore interlocking then ignore any entries (wall will have il=[])
-# otherwise add
-for il in building.get_interlocking():
-    # Add both primary and secondary for each entry
-    # parameters are optional (defines start and end positions of interlocking section)
-    # These are the optional parameters which are appended
-    parameter_keys = ["start", "end"]
-    # if tags exist then use that if not then don't include
-    parameters = {}
-    for this_key in parameter_keys:
-        if this_key in il.keys():
-            parameters[this_key] = il[this_key]
-    walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", parameters)
-    walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", parameters)
+if bdata['interlocking'].lower() == "true":
+    # otherwise add
+    for il in building.get_interlocking():
+        # Add both primary and secondary for each entry
+        # parameters are optional (defines start and end positions of interlocking section)
+        # These are the optional parameters which are appended
+        parameter_keys = ["start", "end"]
+        # if tags exist then use that if not then don't include
+        parameters = {}
+        for this_key in parameter_keys:
+            if this_key in il.keys():
+                parameters[this_key] = il[this_key]
+        walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", parameters)
+        walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", parameters)
     
     
    
