@@ -8,15 +8,16 @@ from texture import *
 from feature import *
 from interlocking import Interlocking
 from laser import *
+from helpers import *
 
-def get_angle (line):
-    dx = line[1][0] - line[0][0]
-    dy = line[1][1] - line[0][1]
-    theta = math.atan2(dy, dx)
-    angle = math.degrees(theta)  
-    if angle < 0:
-        angle = 360 + angle
-    return angle
+# def get_angle (line):
+#     dx = line[1][0] - line[0][0]
+#     dy = line[1][1] - line[0][1]
+#     theta = math.atan2(dy, dx)
+#     angle = math.degrees(theta)  
+#     if angle < 0:
+#         angle = 360 + angle
+#     return angle
 
 # Work out if mainly in x direction or mainly in y
 # based on angle of line

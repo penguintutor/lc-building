@@ -5,6 +5,7 @@ from laser import *
 from buildingtemplate import *
 from featuretemplate import *
 from interlocking import *
+from helpers import *
 
 class TestWall(unittest.TestCase):
     
@@ -136,42 +137,63 @@ class TestTemplate(unittest.TestCase):
 # Secondary to inwards from end to start
 class TestInterlocking(unittest.TestCase):   
     
-    def test_get_angle(self):
-        # Create Interlocking with step 100, edge 0, primary
-        il = Interlocking (100, 0, "primary")
-        angle = get_angle(((0, 5), (0, 10)))
-        self.assertEqual(angle, 0)
-        angle = get_angle(((5, 0), (10, 0)))
-        self.assertEqual(angle, 270)
-        angle = get_angle(((0,0), (5,5)))
-        self.assertEqual(angle, 315)
-        angle = get_angle(((0,0), (-5,5)))
-        self.assertEqual(angle, 45)
-        angle = get_angle(((5,0), (-5,0)))
-        self.assertEqual(angle, 90)
         
     def test_line_interlocking_primary_1(self):
         # Primary so start at beginning of line
+        Interlocking.material_thickness = 10
         il = Interlocking (100, 1, "primary")
         # Vertical line from bottom to top
         line = [(0,1000), (0, 0)]
         # Appears that this is repeating args - but the line could actually be a segment
         # of a longer line
         segments = il.add_interlock_line (line[0], line[1], line)
-        expected_output = [((0, 1000), (0, 900)), ((0, 900), (0, 900)), ((0, 900), (0, 800)), ((0, 800), (0, 800)), ((0, 800), (0, 700)), ((0, 700), (0, 700)), ((0, 700), (0, 600)), ((0, 600), (0, 600)), ((0, 600), (0, 500)), ((0, 500), (0, 500)), ((0, 500), (0, 400)), ((0, 400), (0, 400)), ((0, 400), (0, 300)), ((0, 300), (0, 300)), ((0, 300), (0, 200)), ((0, 200), (0, 200)), ((0, 200), (0, 100)), ((0, 100), (0, 0))]
+        expected_output = [((0, 1000), (0, 900)), ((0, 900), (-10, 900)), ((-10, 900), (-9, 800)), ((-9, 800), (0, 800)), ((0, 800), (0, 700)), ((0, 700), (-10, 700)), ((-10, 700), (-9, 600)), ((-9, 600), (0, 600)), ((0, 600), (0, 500)), ((0, 500), (-10, 500)), ((-10, 500), (-9, 400)), ((-9, 400), (0, 400)), ((0, 400), (0, 300)), ((0, 300), (-10, 300)), ((-10, 300), (-9, 200)), ((-9, 200), (0, 200)), ((0, 200), (0, 100)), ((0, 100), (0, 0))]
         self.assertEqual(segments, expected_output)
         
     def test_line_interlocking_secondary_1(self):
         # Secondary so start at end of line
         il = Interlocking (100, 1, "secondary")
+        Interlocking.material_thickness = 20
         # Vertical line from top to bottom
         line = [(100, 0), (100, 1000)]
         # Appears that this is repeating args - but the line could actually be a segment
         # of a longer line
         segments = il.add_interlock_line (line[0], line[1], line)
-        expected_output = [((0, 1000), (0, 900)), ((0, 900), (0, 900)), ((0, 900), (0, 800)), ((0, 800), (0, 800)), ((0, 800), (0, 700)), ((0, 700), (0, 700)), ((0, 700), (0, 600)), ((0, 600), (0, 600)), ((0, 600), (0, 500)), ((0, 500), (0, 500)), ((0, 500), (0, 400)), ((0, 400), (0, 400)), ((0, 400), (0, 300)), ((0, 300), (0, 300)), ((0, 300), (0, 200)), ((0, 200), (0, 200)), ((0, 200), (0, 100)), ((0, 100), (0, 0))]
+        expected_output = [((100, 1000), (100, 900)), ((100, 900), (80, 900)), ((80, 900), (80, 800)), ((80, 800), (100, 800)), ((100, 800), (100, 700)), ((100, 700), (80, 700)), ((80, 700), (80, 600)), ((80, 600), (100, 600)), ((100, 600), (100, 500)), ((100, 500), (80, 500)), ((80, 500), (80, 400)), ((80, 400), (100, 400)), ((100, 400), (100, 300)), ((100, 300), (80, 300)), ((80, 300), (80, 200)), ((80, 200), (100, 200)), ((100, 200), (100, 100)), ((100, 100), (100, 0))]
         self.assertEqual(segments, expected_output)
         
+    # Horizontal line
+    def test_line_horizontal_primary_1(self):
+        Interlocking.material_thickness = 8
+        # Primary so start at beginning of line
+        il = Interlocking (10, 1, "primary")
+        # From left to right
+        line = [(0,0), (60, 0)]
+        # Appears that this is repeating args - but the line could actually be a segment
+        # of a longer line
+        segments = il.add_interlock_line (line[0], line[1], line)
+        expected_output = [((0, 0), (10, 0)), ((10, 0), (10, -8)), ((10, -8), (20, -7)), ((20, -7), (20, 0)), ((20, 0), (30, 0)), ((30, 0), (30, -8)), ((30, -8), (40, -7)), ((40, -7), (40, 0)), ((40, 0), (50, 0)), ((50, 0), (60, 0))]
+        self.assertEqual(segments, expected_output)
+        
+# helper functions
+class TestHelpers(unittest.TestCase):   
+    
+    def test_get_angles(self):
+        # Horizontal line (left to right)
+        angle = get_angle([[0, 0], [100, 0]])
+        self.assertEqual(angle, 90)
+        # Horizontal line (right to left)
+        angle = get_angle([[50, 50], [0, 50]])
+        self.assertEqual(angle, 270)
+        # Vertical line upwards
+        angle = get_angle([[200, 1000], [200, 100]])
+        self.assertEqual(angle, 180)
+        # Vertical line downwards
+        angle = get_angle([[20, 20], [20, 200]])
+        self.assertEqual(angle, 0)
+        
+        
+
         
 if __name__ == '__main__':
     unittest.main()

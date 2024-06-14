@@ -22,6 +22,8 @@ building_template = BuildingTemplate()
 building_template.load_template("templates/building_shed_apex_1.json")
 
 building_datafile = "buildings/shed_1.json"
+# Example datafile for test purposes 
+#building_datafile = "buildings/test_1.json"
 
 building = BuildingData()
 building.load_file(building_datafile)

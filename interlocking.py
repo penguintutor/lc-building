@@ -1,14 +1,15 @@
 import math
+from helpers import *
 
-def get_angle (line):
-    dx = line[1][0] - line[0][0]
-    dy = line[1][1] - line[0][1]
-    theta = math.atan2(dy, dx)
-    # subtract 90degs due to relative start pos
-    angle = math.degrees(theta) - 90  
-    if angle < 0:
-        angle = 360 + angle
-    return angle
+# def get_angle (line):
+#     dx = line[1][0] - line[0][0]
+#     dy = line[1][1] - line[0][1]
+#     theta = math.atan2(dy, dx)
+#     # subtract 90degs due to relative start pos
+#     angle = math.degrees(theta) - 90  
+#     if angle < 0:
+#         angle = 360 + angle
+#     return angle
 
 
 class Interlocking():
@@ -78,7 +79,7 @@ class Interlocking():
                 # set start as next segment
                 newpos = self._add_distance_to_points (line_start, self.start, angle)
                 #Create new segment to this position
-                new_segments.append([line[0], newpos])
+                new_segments.append((line[0], newpos))
                 # Update start on current_segment
                 #current_segment_start = newpos
                 new_line = (newpos, line[1])
@@ -94,7 +95,7 @@ class Interlocking():
                 new_segments.append(*line)
                 return new_segments
             # Add to new segments
-            new_segments.append([line[0], newpos])
+            new_segments.append((line[0], newpos))
             new_line = (newpos, line[1])
         
         # Now can start adding segments
@@ -109,7 +110,7 @@ class Interlocking():
 
     # max line should be last distance for line (eg. - 1 step from end)
     def add_interlock_segment (self, line_start, line, max_line):
-        new_segments = []
+        new_segments = [] 
         # Check we have enough space for Indent 
         angle = get_angle (line)
         # Next tab is 2 x tab position and will be where the next tab starts if applicable (not this tab)
