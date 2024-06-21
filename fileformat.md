@@ -52,43 +52,45 @@ A outer would normally be set as lines - not as a polygon as don't want to be fi
 ## Walls 
 
 For walls the values can all be entered as strings including tokens (eg. value names from parameters / defaults). Can include simple calculations (eg. adding values , dividing by 2)
-Parameters depend upon wall type
-* WallRect - rectangular wall
-    * width
-    * wall_height
-* WallApex
-    * width
-    * roof_height
-    * wall_height
-* Wall sloping (TBC) Rectangular wall, but with slight slope (eg. for flat roof to drain off)
 
-In future may add custom wall (eg. WallPoly). Note if that's case then all lines must be
-defined in a clockwise direction
+Wall is made up of points of a polygon. 
+Convention is to start top left (where not top left - eg. apex then left takes priority). Then go clockwise. This makes it easier to identify the edge number.
+
+First entry is name for the wall (for user), followed by a list of lines to define edges)
 
 
 ## Roofs
 
 Roofs are added separately in the building file, but will then be treated as if they were a wall.
 
-* type
-    * RoofFlat Covers full roof
-        * Typically full width / height of building
-        * requires height_difference for some kind of slope 
-    * RoofApexLeft / ApexRight (from middle of front to left / right)
-    * RoofApexFront / ApexRear (from middle of side to front / rear)
-    * RoofPoly (TBC - allow sloping on one side - eg. Apex emerging from existing roof)
-
-* dimensions lists
-    * width (distance across top of roof) - possibly depth if apex at front/rear
-    * depth (distance from top to front of roof) - possibly width if apex at front/rear
-    * height-difference (roof height top - roof height bottom)
+* need to manually compensate for any differences to roof - eg. add extra to allow for slope
+compared to flat (eg. math.sqrt (depth **2 + height_difference **2)). Rather than using this easier to 
+add a small factor to ensure long enough - eg add 20% (0.2)
     
 Dimensions are based on the space covered if projected to ground
 eg. for a pitched roof it would be from centre of wall to outside of wall
 
 
-## Textures 
-Can be applied to walls / roofs. The wall it applies to is set by using the wall index number, which is based on list position across all walls (roofs appended to end of walls)
+## Textures
+Can be applied to walls / roofs.
+
+* type (eg. wood / brick)
+* wall (wall it applies to)
+* area polygon (optional) - defines constraints - otherwise defaults to entire wall
+  - if defined then should be fully contained within polygon of the wall
+  
+
+When texture is applied it starts from bottom left and keep applying upwards.
+
+
+## Features 
+Features include doors and windows. Typically there area will be excluded from wall textures.
+Then can contain cuts (always cut), etches (always etches) or outers (etch / cut depending on the outertype setting).These can be defined as line, rects, or polygon. 
+
+Has a pos which indicates start point (top left) and all inner features are relative to that. Assuming bounding box is a rectangle then uses width, height to create a rectangle as the exclusion area. Alternatives use "exclude" followed by polygon for exclusion area (in which case width / height are ignored). If polygon is used then points should be relative to the pos
+
+All values in features must be in mm (does not support tokens at the moment)
+
 
 
 ## Interlocking
@@ -96,25 +98,25 @@ If enabled in settings - otherwise ignore (eg. very small may not work with inte
 Needs to be applied to both sides of a joint, one side is primary (starts with protruding) other is secondary
 Wall edges are referred to by number starting with top left.
 For rect (eg. right is 1, left is 3) or apex (eg. right is 2, left is 4)
-* primary: [wall, edge]
-* secondary: [wall, edge]
+* primary: [wall, edge, rev]
+* secondary: [wall, edge, rev]
 * start: [primary, secondary] - or single entry for same (more common)
 * end: [primary, secondary] - or single entry
 * step: size of step
-Start and End positions are relative to start of edge for primary - and end of edge for secondary. Eg. starts bottom left on primary (start of line) then equivalent is end of line (bottom right) on secondary. If lines do not match (eg. one has half wall) then needs to relative to current wall edge.
+Start and End positions are relative to start of edge for primary - and end of edge for secondary. Eg. starts bottom left on primary (start of line) then equivalent is end of line (bottom right) on secondary. If lines do not match (eg. one has half wall) then needs to relative to current wall edge (better still subdivide walls so they do match).
+
+Reverse option indicates that the interlocking should be in the reverse direction of the edge.
+ie. if primary then would start from distant end, if secondary would start from near end. To set to
+revers direction use "reverse"
 
 If start or end positions not included then applies to end of wall
-Must not overlap with other interlocking if multiple applied to same edge.
-Doing so may error, or may result in interlocking not lining up.
 If last interlock is < end + 2 * step then ends early - only perform fixed step size
 
 If not specified using start and not 0 then step is + 1 position from the start (so as not to encroach on bottom etc.)
 If provide then start should consider what will happen on other wall (eg. 90 degs), but can be used to establish future cut positions
 eg. set to +brick +1/2 mortar - to place cut in centre of mortar
 
-Recommend that side with primary is left side, so starts at bottom. Also recommend that an edge has either primary
-and secondary, but not both. It should be possible to have one primary and one secondary depending upon start and end positions, but unpredictable results if more than one of one type. Recommend that is avoided.
-
+Only one interlocking can be applied per edge, if attempt multiple then only one will be used (most likely last one, but not guarenteed).
 
 
 ## Options (templates only)

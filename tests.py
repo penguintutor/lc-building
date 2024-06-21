@@ -6,6 +6,7 @@ from buildingtemplate import *
 from featuretemplate import *
 from interlocking import *
 from helpers import *
+from texture import *
 
 class TestWall(unittest.TestCase):
     
@@ -13,14 +14,14 @@ class TestWall(unittest.TestCase):
         # Test parameters
         depth = 1826
         height = 1864
-        test_wall = WallRect(depth, height)
+        test_wall = Wall("Wall test add", [(0,0),(depth,0),(depth,height),(0,height),(0,0)])
         cuts = test_wall.get_cuts()
-        self.assertEqual(cuts[0].get_type(), "rect")
+        self.assertEqual(cuts[0].get_type(), "line")
         
     def test_wall_maxsize(self):
         depth = 1826
         height = 1864
-        test_wall = WallRect(depth, height)
+        test_wall = Wall("Wall test maxsize", [(0,0),(depth,0),(depth,height),(0,height),(0,0)])
         max_size = test_wall.get_maxsize()
         self.assertEqual(max_size[0], depth)
         self.assertEqual(max_size[1], height)
@@ -76,6 +77,7 @@ class TestScale(unittest.TestCase):
         
         
 # Based on example template - test loading file etc.
+## Note based on old template - needs to be updated when template is updated
 class TestTemplate(unittest.TestCase):   
     
     def test_load_file(self):
@@ -147,7 +149,7 @@ class TestInterlocking(unittest.TestCase):
         # Appears that this is repeating args - but the line could actually be a segment
         # of a longer line
         segments = il.add_interlock_line (line[0], line[1], line)
-        expected_output = [((0, 1000), (0, 900)), ((0, 900), (-10, 900)), ((-10, 900), (-9, 800)), ((-9, 800), (0, 800)), ((0, 800), (0, 700)), ((0, 700), (-10, 700)), ((-10, 700), (-9, 600)), ((-9, 600), (0, 600)), ((0, 600), (0, 500)), ((0, 500), (-10, 500)), ((-10, 500), (-9, 400)), ((-9, 400), (0, 400)), ((0, 400), (0, 300)), ((0, 300), (-10, 300)), ((-10, 300), (-9, 200)), ((-9, 200), (0, 200)), ((0, 200), (0, 100)), ((0, 100), (0, 0))]
+        expected_output = [((0, 1000), (0, 900)), ((0, 900), (-10, 900)), ((-10, 900), (-10, 800)), ((-10, 800), (0, 800)), ((0, 800), (0, 700)), ((0, 700), (-10, 700)), ((-10, 700), (-10, 600)), ((-10, 600), (0, 600)), ((0, 600), (0, 500)), ((0, 500), (-10, 500)), ((-10, 500), (-10, 400)), ((-10, 400), (0, 400)), ((0, 400), (0, 300)), ((0, 300), (-10, 300)), ((-10, 300), (-10, 200)), ((-10, 200), (0, 200)), ((0, 200), (0, 100)), ((0, 100), (0, 0))]
         self.assertEqual(segments, expected_output)
         
     def test_line_interlocking_secondary_1(self):
@@ -172,9 +174,122 @@ class TestInterlocking(unittest.TestCase):
         # Appears that this is repeating args - but the line could actually be a segment
         # of a longer line
         segments = il.add_interlock_line (line[0], line[1], line)
-        expected_output = [((0, 0), (10, 0)), ((10, 0), (10, -8)), ((10, -8), (20, -7)), ((20, -7), (20, 0)), ((20, 0), (30, 0)), ((30, 0), (30, -8)), ((30, -8), (40, -7)), ((40, -7), (40, 0)), ((40, 0), (50, 0)), ((50, 0), (60, 0))]
+        expected_output = [((0, 0), (10, 0)), ((10, 0), (10, -8)), ((10, -8), (20, -8)), ((20, -8), (20, 0)), ((20, 0), (30, 0)), ((30, 0), (30, -8)), ((30, -8), (40, -8)), ((40, -8), (40, 0)), ((40, 0), (50, 0)), ((50, 0), (60, 0))]
+
         self.assertEqual(segments, expected_output)
+
+# Texture
+class TestTexture(unittest.TestCase):
+    
+    def test_horizontal_line_extend_right(self):
+        depth = 200
+        height = 180
+        texture = Texture([(0,0),(depth,0),(depth,height),(0,height),(0,0)])
+        lines = texture._line([1, 20],[2000,20])
+        self.assertEqual (lines[0][0][0], 1)
+        self.assertEqual (lines[0][0][1], 20)
+        self.assertEqual (lines[0][1][0], 199)
+        self.assertEqual (lines[0][1][1], 20)
         
+    def test_horizontal_line_extend_left(self):
+        depth = 200
+        height = 180
+        texture = Texture([(20,0),(depth,0),(depth,height),(20,height),(20,0)])
+        lines = texture._line([1, 49],[100,49])
+        self.assertEqual (lines[0][0][0], 21)
+        self.assertEqual (lines[0][0][1], 49)
+        self.assertEqual (lines[0][1][0], 100)
+        self.assertEqual (lines[0][1][1], 49)
+
+    def test_horizontal_line_inside(self):
+        depth = 200
+        height = 180
+        texture = Texture([(0,0),(depth,0),(depth,height),(0,height),(0,0)])
+        lines = texture._line([1, 1],[150, 1])
+        self.assertEqual (lines[0][0][0], 1)
+        self.assertEqual (lines[0][0][1], 1)
+        self.assertEqual (lines[0][1][0], 150)
+        self.assertEqual (lines[0][1][1], 1)
+
+    def test_vertical_line_extend_above(self):
+        depth = 200
+        height = 180
+        texture = Texture([(0,20),(depth,20),(depth,height+20),(0,height+20),(0,20)])
+        lines = texture._line([1, 100],[1,5])
+        self.assertEqual (lines[0][0][0], 1)
+        self.assertEqual (lines[0][0][1], 100)
+        self.assertEqual (lines[0][1][0], 1)
+        self.assertEqual (lines[0][1][1], 21)
+
+    def test_vertical_line_extend_below(self):
+        depth = 200
+        height = 180
+        texture = Texture([(0,0),(depth,0),(depth,height),(0,height),(0,0)])
+        lines = texture._line([41, 225],[41,100])
+        self.assertEqual (lines[0][0][0], 41)
+        self.assertEqual (lines[0][0][1], 179)
+        self.assertEqual (lines[0][1][0], 41)
+        self.assertEqual (lines[0][1][1], 100)
+
+    def test_vertical_line_inside(self):
+        depth = 200
+        height = 180
+        texture = Texture([(0,0),(depth,0),(depth,height),(0,height),(0,0)])
+        lines = texture._line([150, 177],[150,10])
+        self.assertEqual (lines[0][0][0], 150)
+        self.assertEqual (lines[0][0][1], 177)
+        self.assertEqual (lines[0][1][0], 150)
+        self.assertEqual (lines[0][1][1], 10)
+
+
+    def test_angle_line_both(self):
+        depth = 200
+        height = 200
+        texture = Texture([(0,0),(depth,0),(depth,height),(0,height),(0,0)])
+        lines = texture._line([100, 220],[220,100])
+        self.assertEqual (lines[0][0][0], 121)
+        self.assertEqual (lines[0][0][1], 199)
+        self.assertEqual (lines[0][1][0], 199)
+        self.assertEqual (lines[0][1][1], 121)
+
+
+    # Tests line is split where interacting with edges of polygon
+    def test_line_polygon_split(self):
+        # Texture is two apex
+        texture = Texture([(0,20),(20,0),(40,20),(60,0),(80,20),(80,120),(0,120), (0,20)])
+        lines = texture._line([0, 10],[200,10])
+        self.assertEqual (lines[0][0][0], 11)
+        self.assertEqual (lines[0][0][1], 10)
+        self.assertEqual (lines[0][1][0], 29)
+        self.assertEqual (lines[0][1][1], 10)
+        self.assertEqual (lines[1][0][0], 51)
+        self.assertEqual (lines[1][0][1], 10)
+        self.assertEqual (lines[1][1][0], 69)
+        self.assertEqual (lines[1][1][1], 10)
+
+
+
+    # Tests line is split where interacting with edges of polygon
+    # 3 peaks
+    def test_line_polygon_split_2(self):
+        # Texture is 3 apex
+        texture = Texture([(0,20),(20,0),(40,20),(60,0),(80,20),(100,0), (120,20),(120,120),(0,120), (0,20)])
+        lines = texture._line([0, 10],[200,10])
+        self.assertEqual (lines[0][0][0], 11)
+        self.assertEqual (lines[0][0][1], 10)
+        self.assertEqual (lines[0][1][0], 29)
+        self.assertEqual (lines[0][1][1], 10)
+        self.assertEqual (lines[1][0][0], 51)
+        self.assertEqual (lines[1][0][1], 10)
+        self.assertEqual (lines[1][1][0], 69)
+        self.assertEqual (lines[1][1][1], 10)
+        # Test for final section
+        self.assertEqual (lines[2][0][0], 91)
+        self.assertEqual (lines[2][0][1], 10)
+        self.assertEqual (lines[2][1][0], 109)
+        self.assertEqual (lines[2][1][1], 10)
+
+
 # helper functions
 class TestHelpers(unittest.TestCase):   
     
@@ -191,7 +306,7 @@ class TestHelpers(unittest.TestCase):
         # Vertical line downwards
         angle = get_angle([[20, 20], [20, 200]])
         self.assertEqual(angle, 0)
-        
+     
         
 
         

@@ -109,8 +109,12 @@ class BuildingData ():
     def get_typical(self):
         return self.data["typical"]
     
+    # Get wall information processing tokens
     def get_walls(self):
-        return self.data["walls"]
+        wall_data = []
+        for wall in self.data["walls"]:
+            wall_data.append((wall[0], self.process_multiple_tokens(wall[1])))
+        return wall_data
     
     def get_interlocking(self):
         return self.data["interlocking"]

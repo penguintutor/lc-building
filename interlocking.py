@@ -8,10 +8,13 @@ class Interlocking():
     material_thickness = 0
     
     # Note parameters if supplied should be a dictionary
-    def __init__ (self, step, edge, primary, parameters=None):
+    def __init__ (self, step, edge, primary, reverse="", parameters=None):
         self.step = step         # Size of a single interlock step
         self.edge = edge         # Edge number on wall this is contained in
         self.primary = primary   # Is this "primary" or "secondary"
+        self.reverse = False
+        if reverse == "reverse":   # Set to "reverse" to reverse direction
+            self.reverse = True
         self.parameters = {}
         if parameters != None:
             self.parameters = parameters         # Any additional settings
@@ -44,14 +47,15 @@ class Interlocking():
         # direction of the returned segments, but not neccessary if using lines which
         # if what we are doing here (also need to invert direction of tabs
         
-        # If not primary then reverse direction of entire line then treat the same
-        if self.primary != "primary":
+        # If not primary and not reverse then reverse direction of entire line then treat the same
+        # also if secondary and not reverse
+        if (self.primary == "primary" and self.reverse == True) or (self.primary != "primary" and self.reverse != True) :
             line_start = line_end
             rev_line = [line[1],line[0]]
             line = rev_line
         
         # Get length of line from original to end of last segment
-        line_dist = self._get_distance (line_start, line[1])
+        line_dist = get_distance (line_start, line[1])
         # If there is end and less then line_dist then use that instead
         if self.end != None and self.end < line_dist:
             line_dist = self.end
@@ -64,9 +68,9 @@ class Interlocking():
         # if not then add space for a step before we start the next segment
         if self.start != 0:
             # If not already passed self.start then use that
-            if (self._get_distance (line_start, line[0]) < self.start):
+            if (get_distance (line_start, line[0]) < self.start):
                 # set start as next segment
-                newpos = self._add_distance_to_points (line_start, self.start, angle)
+                newpos = add_distance_to_points (line_start, self.start, angle)
                 #Create new segment to this position
                 new_segments.append((line[0], newpos))
                 # Update start on current_segment
@@ -78,8 +82,8 @@ class Interlocking():
         else:
             # If no start add self.step
             # get new x,y
-            newpos = self._add_distance_to_points (line[0], self.step, angle)
-            if self._check_distance (line_start, newpos, line_dist) < 1:
+            newpos = add_distance_to_points (line[0], self.step, angle)
+            if check_distance (line_start, newpos, line_dist) < 1:
                 # not enough space add last segment to new segments and return
                 new_segments.append(*line)
                 return new_segments
@@ -103,16 +107,19 @@ class Interlocking():
         # Check we have enough space for Indent 
         angle = get_angle (line)
         # Next tab is 2 x tab position and will be where the next tab starts if applicable (not this tab)
-        nexttab = self._add_distance_to_points (line[0], self.step * 2, angle)
-        if self._check_distance (line_start, nexttab, max_line) < 0:
+        nexttab = add_distance_to_points (line[0], self.step * 2, angle)
+        if check_distance (line_start, nexttab, max_line) < 0:
             return [line]
-        endtab = self._add_distance_to_points (line[0], self.step, angle)
-        # confirmed we have space so add next segment - turn by -90 degrees
-        seg_angle = angle+90
-        starttab = self._add_distance_to_points (line[0], Interlocking.material_thickness, seg_angle)
+        endtab = add_distance_to_points (line[0], self.step, angle)
+        # confirmed we have space so add next segment - turn by +/-90 degrees
+        if self.reverse != True:
+            seg_angle = angle+90
+        else:
+            seg_angle = angle-90
+        starttab = add_distance_to_points (line[0], Interlocking.material_thickness, seg_angle)
         new_segments.append((line[0], starttab))
         # next segment is back to normal angle
-        toptab = self._add_distance_to_points (starttab, self.step, angle)
+        toptab = add_distance_to_points (starttab, self.step, angle)
         new_segments.append((starttab, toptab))
         # Now back to endtab already calculated
         new_segments.append((toptab, endtab))
@@ -121,31 +128,7 @@ class Interlocking():
         # now call again with next step
         new_segments.extend(self.add_interlock_segment (line_start, (nexttab, line[1]), max_line))
         return new_segments
-        
-        
-        
 
-       
-    # Returns x, y of next step based on angle
-    #def _get_next_step (self, line, distance, angle):
-    #    newstartx = line[0][0] + distance * math.cos(angle)
-    #    newstarty = line[0][1] + distance * math.sin(angle)
-    #    return (newstartx, newstarty)
-    
-    def _get_distance (self, start, end):
-        return math.hypot (end[0]-start[0], end[1]-start[1])
-    
-    # Adds a distance to an existing point and based on angle work out
-    # new x and y co-ordinates
-    def _add_distance_to_points (self, start, distance, angle):
-        newx = int(start[0] + (distance * math.sin(math.radians(angle))))
-        newy = int(start[1] + (distance * math.cos(math.radians(angle))))
-        return (newx, newy)
-    
-    # Check that start to end is less than (-difference), greater than (+difference), same as (0) max_dist
-    def _check_distance (self, start, end, max_dist):
-        distance = self._get_distance(start, end)
-        return max_dist - distance
     
     # are new positions passed the end of the line
     #replaced by _reached_end which looks at distance from start

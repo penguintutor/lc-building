@@ -4,6 +4,8 @@
 # if it needs to be removed because of other features
 
 from laser import *
+from helpers import *
+from shapely import Point, Polygon, LineString
 
 # Texture needs to be applied with direction either vertical or horizontal
 # Could have diagonal elements (eg. polygon representing stone), but still define
@@ -16,14 +18,10 @@ from laser import *
 # Wall should handle conversion to pixels
 
 class Texture():
-    # 4 points needed to create a bounding rectangle
-    # used for quick collission detection 
-    def __init__ (self, min_x, min_y, max_x, max_y, direction="horizontal"):
-        self.min_x = min_x
-        self.min_y = min_y
-        self.max_x = max_x
-        self.max_y = max_y
-        self.direction = direction
+    def __init__ (self, points, style=None):
+        self.points = points
+        # Convert points to a polygon
+        self.polygon = Polygon(points)
         self.disable = False   # Allows to disable completely if not required
         self.exclude = []      # Exclude is defined as (minx, miny, endx, endy)
         
@@ -31,7 +29,7 @@ class Texture():
     # Ensure this is only called once per instance
     # Normally textures only exist during export so isn't normally
     # a problem
-    def exclude_etch(self, startx, starty, endx, endy):
+    def _old_exclude_etch(self, points):
         # check if collide if so add to exclusions
         # First look if texture totally enclosed (if so then remove completely)
         # Eg. Brick within a window position
@@ -52,50 +50,95 @@ class Texture():
             self.exclude.append((startx, starty, endx, endy))
     
     
-# must be parallel top and bottom
-# Provide 4 points starting top left going clockwise
-class TrapezoidTexture(Texture):
-    def __init__ (self, points, direction="horizontal"):
-        # calc max bounding box
-        # start with first point and then look for larger / smaller as required
-        min_x = points[0][0]
-        max_x = points[0][0]
-        min_y = points[0][1]
-        max_y = points[0][1]
-        for point in points:
-            if point[0] < min_x:
-                min_x = point[0]
-            if point[0] > max_x:
-                max_x = point[0]
-            if point[1] < min_y:
-                min_y = point[1]
-            if point[1] > max_y:
-                max_y = point[1]
-        super().__init__ (min_x, min_y, max_x, max_y, direction)
-        self.points = points
+    def get_etches(self):
+        pass
+    
+    
+    # Break task into small functions, these are multistep operations
+    # Mostly these are horizontal and vertical lines representing joins between materials
+    # such as wood joints and / or motar for bricks
+    # Eg for a line call _line
+    # This calls _line_zone to ensure that it is within the bounds of the wall
+    # then calls _line_feature to remove any parts of line that may be in a feature
+    # Each of these returns a list as it maybe that the line needs to be subdivided
+    
+    
+    def _line(self, start, end):
+        segments = self._line_zone ((start, end))
+        if segments == []:
+            return []
+        final_lines = []
+        #for segment in segments:
+        #    final_lines.extend(self._line_features(segment))
+        #return final_lines
+        return segments
+            
         
+    # Get lines within wall (or texture zone if that is defined instead)
+    # Note that there are many ways that this could be optomised, but based on usage (ie. typical builing size)
+    # this is efficient enough
+    def _line_zone(self, line):
+        return_lines = []
+        # Get angle if needed later
+        angle = get_angle(line)
+        # Is start of the line within the wall
+        start_point = Point(line[0])
+        end_point = Point(line[1])
+        # If start is outside the zone, then increment until it is within the zone
+        while not start_point.within(self.polygon):
+            # Increase start_point until within zone or reach end
+            new_pos = add_distance_to_points ((start_point.x,start_point.y), 1, angle)
+            start_point = Point(*new_pos)
+            # If reach end of zone line not within zone
+            if start_point.x > self.polygon.bounds[2] or start_point.y < self.polygon.bounds[1]:
+                return []
+        # Now check the end_pos
+        while not end_point.within(self.polygon):
+            # Decrease end_point until within zone or go out of bounds
+            new_pos = add_distance_to_points ((end_point.x,end_point.y), -1, angle)
+            end_point = Point(*new_pos)
+            # Should complete before we get here, but this ensures we exit if we don't
+            if end_point.x < self.polygon.bounds[0] or end_point.y > self.polygon.bounds[3]:
+                return []
+
+        # Start and end is within the zone (wall)
+        # Does it cross any of the lines of the zone - in which case need to split into different parts
+        # Convert the points into a lineString and poly to lines so can test for intersecting
+        line_string = LineString([start_point, end_point])
+        poly_as_lines = LineString(self.polygon.boundary.coords)
+        
+        new_pos = (end_point.x, end_point.y)
+        while line_string.intersects(poly_as_lines):
+            # start from end of line_string until no longer intersects
+            new_pos = add_distance_to_points (new_pos, -1, angle)
+            line_string = LineString([start_point, new_pos])
+            # Should complete before we get here, but this ensures we exit if we don't
+            if new_pos[0] < self.polygon.bounds[0] or new_pos[1] > self.polygon.bounds[3]:
+                return []
+        # Add this line to the return
+        return_lines.append(([start_point.x, start_point.y],new_pos))
+        # If new_pos is unchanged, then just one line, but if not then we've created a segment
+        # so add another segment for the rest of the line and try again
+        if new_pos[0] != end_point.x or new_pos[1] != end_point.y:
+            # Extend new_pos and use that as start of next line, use the original end_point as the end of the line
+            new_start_pos = add_distance_to_points (new_pos, 1, angle)
+            next_segments = self._line_zone((new_start_pos, (end_point.x, end_point.y)))
+            if next_segments != []:
+                return_lines.extend(next_segments)
+        return return_lines
+            
+        
+        
+        
+    def _line_features(self, line):
+        return line
+    
+    
+    
     
     # Return a list even if only one element
-    def get_etches(self):
-        if self.exclude == True:
-            return None
-        # convert to polygon
-        # Add start to end
-        new_points = self.points.copy()
-        new_points.append(self.points[0])
-        return [EtchPolygon(new_points)]
-    
-    
-# start is x, y - dimension w, l
-# Do not use negative dimensions - start must be top left
-class RectTexture(Texture):
-    def __init__ (self, start_pos, dimension, direction="horizontal"):
-        super().__init__(start_pos[0], start_pos[1], start_pos[0]+dimension[0], start_pos[1]+dimension[1], direction)
-        self.start_pos = start_pos
-        self.dimension = dimension
-    
-    # Return a list even if only one element
-    def get_etches(self):
+    # Old version
+    def get_etches_rect(self):
         if self.exclude == True:
             return None
         if len(self.exclude) == 0:

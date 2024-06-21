@@ -13,6 +13,10 @@ On Debian / Ubuntu use
 
     sudo apt install python3-svgwrite
     
+Module Python Shapely
+
+    sudo apt install python3-shapely
+    
     
 ## Running the code
 Currently configs are all in the lcmake.py file

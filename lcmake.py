@@ -1,7 +1,6 @@
 import svgwrite
 from laser import *
 from wall import *
-from wallfactory import *
 from buildingdata import *
 from scale import *
 from svgout import *
@@ -16,7 +15,7 @@ etch_stroke = svgwrite.rgb(30, 30, 30, '%')
 # don't show filled in - use fill in laser cutter
 etch_fill = "none"
 
-filename = "testoutput.svg"
+filename = "output/g-shed-apex-1.svg"
 
 building_template = BuildingTemplate()
 building_template.load_template("templates/building_shed_apex_1.json")
@@ -80,8 +79,8 @@ door_size = (800, 1800)
 # Feature etches have to be defined explicitly 
 # including vertical wood effect
 
-scale = "OO"
-#scale = "G"
+#scale = "OO"
+scale = "G"
 
 
 # Dummy EtchLine entry allowing us to set parameters for all EtchLines
@@ -100,7 +99,7 @@ current_height = 0 # Only need for height to track which piece needs most space
 
 # Approx 200 x 200mm in pixels
 # Eg. size of a small laser cutter / 3D printer
-doc_size_mm = (200, 200)
+doc_size_mm = (300, 300)
 
 sc = Scale(scale)
 
@@ -124,25 +123,39 @@ svgsettings["etchfill"] = etch_fill
 svgsettings["etchaspolygon"] = etch_as_polygon
 svg = SVGOut(filename, svgsettings)
 
-wf = WallFactory()
+#wf = WallFactory()
 
 walls = []
 for wall in building.get_walls():
     # Convert from string values to values from bdata
     wall_values = []
-    for value in wall[1]:
-        wall_values.append(bdata[value])
-    walls.append(wf.create_wall(wall[0], wall_values))
+    #for value in wall[1]:
+    #    wall_values.append(bdata[value])
+    #print (f"{wall_values}")
+    walls.append(Wall(wall[0], wall[1]))
     
 # Add roofs (loads differently but afterwards is handled as a wall)
 for roof in building.get_roofs():
-    walls.append(wf.create_wall(roof[0], (*roof[1], building.get_roof_overlap())))
+    walls.append(Wall(roof[0], roof[1]))
 
 for texture in building.get_textures():
     walls[texture["wall"]].add_texture(texture["type"], texture["settings"] )
     
 for feature in building.get_features():
-    walls[feature["wall"]].add_feature(feature["parameters"]["pos"], (feature["parameters"]["width"], feature["parameters"]["height"]),
+    # Features takes a polygon, but may be represented as more basic rectangle.
+    pos = feature["parameters"]["pos"]
+    polygon = []
+    # If no points provided then convert rectangle into a polygon
+    if ("exclude" in feature["parameters"].keys()):
+        # For each point then make relative to the pos
+        for this_point in feature["parameters"]["exclude"]:
+            polygon.append((this_point[0]+pos[0], this_point[1]+pos[1]))
+    else:
+        width = feature["parameters"]["width"]
+        height = feature["parameters"]["height"]
+        polygon = rect_to_polygon(pos, width, height)
+        
+    walls[feature["wall"]].add_feature(pos, polygon,
                                        feature["cuts"], feature["etches"], feature["outers"])
     
 # if setting is ignore interlocking then ignore any entries (wall will have il=[])
@@ -158,8 +171,14 @@ if bdata['interlocking'].lower() == "true":
         for this_key in parameter_keys:
             if this_key in il.keys():
                 parameters[this_key] = il[this_key]
-        walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", parameters)
-        walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", parameters)
+        reverse = ""
+        if len(il["primary"]) > 2:
+            reverse = il["primary"][2]
+        walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, parameters)
+        reverse = ""
+        if len(il["secondary"]) > 2:
+            reverse = il["secondary"][2]
+        walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
     
     
    

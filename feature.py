@@ -11,12 +11,11 @@ from laserfactory import *
 class Feature():
     lf = LaserFactory()
     # x, y is top left
-    # max is bottom right - forms rectangle to exclude
-    def __init__ (self, startpos, size, cuts=[], etches=[], outers=[]):
+    # points is a polygon to represent exclude areas
+    def __init__ (self, startpos, points, cuts=[], etches=[], outers=[]):
         self.min_x = startpos[0]
         self.min_y = startpos[1]
-        self.max_x = startpos[0]+size[0]
-        self.max_y = startpos[1]+size[1]
+        self.points = points
         # Cuts needs to be converted into laser cut objects
         self.cuts = []
         for cut in cuts:
