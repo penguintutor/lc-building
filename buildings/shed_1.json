@@ -90,7 +90,35 @@
             "wood_height": 150,
             "wood_etch": 10
           }
+        },
+        {
+        "type": "wood",
+        "wall": 1,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        },
+        {
+        "type": "wood",
+        "wall": 2,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        },
+        {
+        "type": "wood",
+        "wall": 3,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
         }
+
     ],
   "interlocking":
     [

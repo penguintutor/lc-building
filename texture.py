@@ -7,23 +7,22 @@ from laser import *
 from helpers import *
 from shapely import Point, Polygon, LineString
 
-# Texture needs to be applied with direction either vertical or horizontal
-# Could have diagonal elements (eg. polygon representing stone), but still define
-# by horizontal or vertical
-# When it overlaps a features then the entire texture will be broken at that point as it
-# doesn't make sense to have half a texture - eg. half a morter between brick and window
-# If defined as horizontal then it is broken full across y and if vertical then fully across x
 
 # Only work in mm
 # Wall should handle conversion to pixels
 
 class Texture():
-    def __init__ (self, points, style=None):
+    def __init__ (self, points, style="", settings=None):
         self.points = points
+        self.style = style
+        if settings != None:
+            self.settings = settings
+        else:
+            self.settings = {}
         # Convert points to a polygon
         self.polygon = Polygon(points)
         self.disable = False   # Allows to disable completely if not required
-        self.exclude = []      # Exclude is defined as (minx, miny, endx, endy)
+        self.excludes = []     # Excludes is replaced each time get_etches is called to ensure always updated
         
     # Areas to exclude for the output
     # Ensure this is only called once per instance
@@ -49,17 +48,56 @@ class Texture():
               (starty <= self.max_y and endy > self.max_y)):
             self.exclude.append((startx, starty, endx, endy))
     
+    # Returns the texture as etches
+    # excludes is a list of polygons for areas to exclude texture from
+    # ie. Features - doors windows etc.
+    def get_etches(self, excludes=[]):
+        # Update excludes so that this is applied across the texture
+        self.excludes = excludes
+        
+        # Call appropriate texture generator based on style
+        if self.style == "horizontal_wood" or self.style=="wood":
+            return self._get_etches_horizontal_wood()
+        else:
+            return []
     
-    def get_etches(self):
-        pass
+    
+    # Returns horizontal etch lines representing a wood texture
+    def _get_etches_horizontal_wood(self):
+        lines = []
+        etches = []
+        etch_width = self.settings["wood_etch"]
+        wood_height = self.settings["wood_height"]
+        
+        min_x = self.polygon.bounds[0]+1
+        max_x = self.polygon.bounds[2]-1
+        min_y = self.polygon.bounds[1]+1
+        max_y = self.polygon.bounds[3]-1
+        
+        min_wood_size = wood_height / 2
+        
+        # Generate horizontal lines across full width of wall
+        # Starting bottom left
+        current_y = self.polygon.bounds[3]-1
+        while current_y > min_y:
+            current_y -= (wood_height + etch_width)
+            # If less than 1/2 wood size left then stop
+            if current_y < min_y + min_wood_size:
+                break
+            lines.extend(self._line([min_x, current_y],[max_x, current_y]))
+
+        for line in lines:
+            etches.append(EtchLine(line[0], line[1], etch_width=etch_width))
+        return etches
     
     
-    # Break task into small functions, these are multistep operations
+    # Break task into small functions, these are multiste            etches.append(EtchLine(line[0], line[1], etch_width=etch_width))p operations
     # Mostly these are horizontal and vertical lines representing joins between materials
     # such as wood joints and / or motar for bricks
     # Eg for a line call _line
     # This calls _line_zone to ensure that it is within the bounds of the wall
-    # then calls _line_feature to remove any parts of line that may be in a feature
+    # then calls _line_exclude_all to remove any parts of line that may be in a feature
+    # which in turns handles each line against each polygon
     # Each of these returns a list as it maybe that the line needs to be subdivided
     
     
@@ -68,10 +106,11 @@ class Texture():
         if segments == []:
             return []
         final_lines = []
-        #for segment in segments:
-        #    final_lines.extend(self._line_features(segment))
-        #return final_lines
-        return segments
+        for segment in segments:
+            sub_lines = self._line_exclude_all(segment)
+            if sub_lines != []:
+                final_lines.extend(sub_lines)
+        return final_lines
             
         
     # Get lines within wall (or texture zone if that is defined instead)
@@ -127,18 +166,90 @@ class Texture():
                 return_lines.extend(next_segments)
         return return_lines
             
+    # Check if the line needs to be excluded, or subdivided due to exclusion areas (features)    
+    def _line_exclude_all(self, line):
+        # convert excludes into Polygons
+        exclude_poly = []
+        for exclude in self.excludes:
+            exclude_poly.append(Polygon(exclude))
+            
+        # Convert line to list of lines (so can apply multiple segments to each exclude)
+        segments = [line]
+            
+        # Check a poly at a time against all segments
+        # Then update segments with any remaining / subdivided
+        # then repeat for next polygon
+        for poly in exclude_poly:
+            new_segments = []
+            for this_segment in segments:
+                returned_segments = self._line_exclude_poly(this_segment, poly)
+                if returned_segments != []:
+                    new_segments.extend(returned_segments)
+            # If new segments empty, then fully exclude line so return
+            if new_segments == []:
+                return []
+            else:
+                segments = new_segments.copy()
+        return segments
         
-        
-        
-    def _line_features(self, line):
-        return line
+
+    # Check for one line (or line segment) against poly
+    # If fully exclude then return empty list
+    # If not exclude return line
+    # Otherwise subdivide
+    ## todo not fully tested for splitting multiple segments 
+    def _line_exclude_poly(self, line, poly):
+        this_line = [*line]
+        line_string = LineString (this_line)
+        # If not intersection then return original line
+        if not poly.intersects(line_string):
+            return [this_line]
+        # if completely within an exclude then return empty
+        if poly.contains(line_string):
+            return []
+        # Need to shorten subdivide. Start at beginning of line
+        # If beginning of the line is in the zone then increase until it is outside of the zone
+        angle = get_angle(this_line)
+        start_point = Point(this_line[0])
+        end_point = Point(this_line[1])
+        while start_point.within(poly) or start_point.intersects(poly):
+            new_pos = add_distance_to_points((start_point.x,start_point.y), 1, angle)
+            start_point = Point(*new_pos)
+            # No need for sanity check as already established that it is not completely within
+            # exclude area from earlier check, so this will always complete when start is outside of zone
+        this_line[0] = [start_point.x, start_point.y]
+        # Are we no longer intersecting - in which case we can return new line
+        line_string = LineString(this_line)
+        if not poly.intersects(line_string):
+            return [this_line]
+        # Also try shortening from end point
+        while end_point.within(poly) or end_point.intersects(poly):
+            new_pos = add_distance_to_points((end_point.x,end_point.y), -1, angle)
+            end_point = Point(*new_pos)
+            # No need for sanity check as already established that it is not completely within
+            # exclude area from earlier check, so this will always complete when start is outside of zone
+        this_line[1] = [end_point.x, end_point.y]
+        # Are we no longer intersecting - in which case we can return new line
+        line_string = LineString(this_line)
+        # If reach here then start and end are not in exclude zone, but line does pass through exclude zone
+        # So find first point that is in exclude zone and split at that point
+        new_point = Point(this_line[0])
+        while not new_point.within(poly):
+            new_pos = add_distance_to_points((new_point.x,new_point.y), 1, angle)
+            new_point = Point(*new_pos)
+        # end of first segment is now new point -1
+        end_segment = add_distance_to_points((new_point.x,new_point.y), -1, angle)
+        return_line = [[this_line[0],end_segment]]
+        # Use new_point as start of next segment and repeat whole process again recursively
+        next_segments = self._line_exclude_poly([[new_point.x,new_point.y],this_line[1]], poly)
+        if next_segments != []:
+            return_line.extend(next_segments)
+        return return_line
     
-    
-    
-    
+
     # Return a list even if only one element
     # Old version
-    def get_etches_rect(self):
+    def _old_get_etches_rect(self):
         if self.exclude == True:
             return None
         if len(self.exclude) == 0:

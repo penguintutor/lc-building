@@ -34,8 +34,9 @@ class Wall():
         #self.max_width = width
         #self.max_height = height
         self.material = "smooth"
-        self.features = []        # Features for this wall
         self.il = []              # Interlocking - only one allowed per edge, but multiple allowed on a wall
+        self.textures = []        # Typically one texture per wall, but can have multiple if zones used - must not overlap
+        self.features = []        # Features for this wall
         # by default are a wall, or could be roof
         self.type = "wall"
 
@@ -80,8 +81,7 @@ class Wall():
     
     # Implement this at the Wall level
     def get_etches (self):
-        etches = []
-        #Todo - handle textures
+        etches = self._texture_to_etches()
         # Add cuts from features
         feature_etches = self._get_etches_features()
         if feature_etches != None:
@@ -108,16 +108,18 @@ class Wall():
     def get_maxheight (self):
         return self.polygon.bounds[3] - self.polygon.bounds[1]
        
-    def add_texture (self, type, settings):
-        #if type == "wood":
-        #    self.add_wood_etch(settings["wood_height"], settings["wood_etch"])
-        pass
+    def add_texture (self, type, area, settings):
+        # If no area / zone provided then use wall
+        if area == []:
+            area = self.points
+        self.textures.append(Texture(area, type, settings))
+
        
 
     # Add a feature - such as a window
     # cuts, etches and outers should all be lists
     # If not set to None then change to [] avoid dangerous default
-    def add_feature (self, startpos, size, cuts=None, etches=None, outers=None):
+    def add_feature (self, startpos, points, cuts=None, etches=None, outers=None):
         # feature number will be next number
         # Will return that assuming that this is successful
         feature_num = len(self.features)
@@ -127,7 +129,7 @@ class Wall():
             etches = []
         if outers == None:
             outers = []
-        self.features.append(Feature(startpos, size, cuts, etches, outers))
+        self.features.append(Feature(startpos, points, cuts, etches, outers))
         # If want to handle settings can do so here
         # Eg. support textures
         return feature_num
@@ -141,14 +143,14 @@ class Wall():
         self.il.append(Interlocking(step, edge, primary, reverse, parameters))
             
     # This is later stage in get_etches
-    def _texture_to_etches(self, textures):
+    def _texture_to_etches(self):
         etches = []
-        for texture in textures:
-            # First apply any features exclude areas to textures
-            for feature in self.features:
-                texture.exclude_etch(*feature.get_area())
+        exclude_areas = []
+        for feature in self.features:
+            exclude_areas.append(feature.get_points())
+        for texture in self.textures:
             # Each texture can have one or more etches
-            etches.extend(texture.get_etches())
+            etches.extend(texture.get_etches(exclude_areas))
         return etches
         
 

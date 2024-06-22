@@ -78,7 +78,7 @@ Can be applied to walls / roofs.
 * wall (wall it applies to)
 * area polygon (optional) - defines constraints - otherwise defaults to entire wall
   - if defined then should be fully contained within polygon of the wall
-  
+* settings. Dict specific to type eg. wood_height / wood_etch  
 
 When texture is applied it starts from bottom left and keep applying upwards.
 

@@ -129,9 +129,6 @@ walls = []
 for wall in building.get_walls():
     # Convert from string values to values from bdata
     wall_values = []
-    #for value in wall[1]:
-    #    wall_values.append(bdata[value])
-    #print (f"{wall_values}")
     walls.append(Wall(wall[0], wall[1]))
     
 # Add roofs (loads differently but afterwards is handled as a wall)
@@ -139,7 +136,11 @@ for roof in building.get_roofs():
     walls.append(Wall(roof[0], roof[1]))
 
 for texture in building.get_textures():
-    walls[texture["wall"]].add_texture(texture["type"], texture["settings"] )
+    # If not area then default to entire wall
+    area = []
+    if 'area' in texture:
+        area = texture['area']
+    walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"] )
     
 for feature in building.get_features():
     # Features takes a polygon, but may be represented as more basic rectangle.

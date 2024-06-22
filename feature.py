@@ -49,8 +49,11 @@ class Feature():
             cut.set_internal_offset((self.min_x, self.min_y))
         
     # Get area to exclude
-    def get_area (self):
-        return (self.min_x, self.min_y, self.max_x, self.max_y)
+    #def get_area (self):
+    #    return (self.min_x, self.min_y, self.max_x, self.max_y)
+    
+    def get_points (self):
+        return self.points
         
     # Creates cuts based around simple rectangle.
     # cut out for the entire window / door etc. no sills eg. shed window
