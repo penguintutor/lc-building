@@ -23,31 +23,7 @@ class Texture():
         self.polygon = Polygon(points)
         self.disable = False   # Allows to disable completely if not required
         self.excludes = []     # Excludes is replaced each time get_etches is called to ensure always updated
-        
-    # Areas to exclude for the output
-    # Ensure this is only called once per instance
-    # Normally textures only exist during export so isn't normally
-    # a problem
-    def _old_exclude_etch(self, points):
-        # check if collide if so add to exclusions
-        # First look if texture totally enclosed (if so then remove completely)
-        # Eg. Brick within a window position
-        if (self.min_x >= startx and self.min_y >= starty and self.max_x <= endx and self.max_y <= endy):
-            # completely disable this part of the texture
-            self.disable = True
-            # Add to exclude (although most likely not required)
-            self.exclude.append(startx, starty, endx, endy)
-        # If not fully contained then does it overlap (ie. either start or end of exclude is
-        # within the rect of the texture
-        elif (startx >= self.min_x and startx <= self.max_x and
-              (starty <= self.min_y and endy >= self.min_y) or
-              (starty <= self.max_y and endy > self.max_y)):
-            self.exclude.append((startx, starty, endx, endy))
-        elif (endx >= self.min_x and endx <= self.min_x and
-              (starty <= self.min_y and endy >= self.min_y) or
-              (starty <= self.max_y and endy > self.max_y)):
-            self.exclude.append((startx, starty, endx, endy))
-    
+            
     # Returns the texture as etches
     # excludes is a list of polygons for areas to exclude texture from
     # ie. Features - doors windows etc.
@@ -58,6 +34,8 @@ class Texture():
         # Call appropriate texture generator based on style
         if self.style == "horizontal_wood" or self.style=="wood":
             return self._get_etches_horizontal_wood()
+        elif self.style == "brick":
+            return self._get_etches_bricks()
         else:
             return []
     
@@ -68,24 +46,64 @@ class Texture():
         etches = []
         etch_width = self.settings["wood_etch"]
         wood_height = self.settings["wood_height"]
-        
         min_x = self.polygon.bounds[0]+1
         max_x = self.polygon.bounds[2]-1
         min_y = self.polygon.bounds[1]+1
         max_y = self.polygon.bounds[3]-1
-        
-        min_wood_size = wood_height / 2
-        
+        min_wood_size = wood_height / 4
         # Generate horizontal lines across full width of wall
         # Starting bottom left
         current_y = self.polygon.bounds[3]-1
         while current_y > min_y:
             current_y -= (wood_height + etch_width)
-            # If less than 1/2 wood size left then stop
+            # If less than 1/4 wood size left then stop
             if current_y < min_y + min_wood_size:
                 break
             lines.extend(self._line([min_x, current_y],[max_x, current_y]))
-
+        for line in lines:
+            etches.append(EtchLine(line[0], line[1], etch_width=etch_width))
+        return etches
+    
+    # Returns brick texture
+    # typical brick is 215mm x 65mm (x 102.5mm depth) with 10mm motar
+    def _get_etches_bricks(self):
+        lines = []
+        etches = []
+        etch_width = self.settings["brick_etch"]
+        brick_height = self.settings["brick_height"]
+        brick_width = self.settings["brick_width"]
+        min_x = self.polygon.bounds[0]+1
+        max_x = self.polygon.bounds[2]-1
+        min_y = self.polygon.bounds[1]+1
+        max_y = self.polygon.bounds[3]-1
+        min_brick_width = brick_width / 2
+        min_brick_height = brick_height / 4
+        # Generate horizontal lines across full width of wall
+        # Starting bottom left
+        current_y = self.polygon.bounds[3]-1
+        current_x = min_x
+        # row alternate between 0 and 1 (0 - start full brick, 1 - start 1/2 brick)
+        row = 0
+        half_etch = etch_width / 2    # half of the etch width, need to use this multiple times 
+        # One row at a time - create individual brick markers then add line across top
+        while current_y > min_y:
+            current_x = min_x
+            if row == 0:
+                current_x += brick_width
+            else:
+                current_x += brick_width / 2
+            #  short lines for end of each brick
+            while current_x < max_x:
+                # Draw vertical line
+                lines.extend(self._line([current_x, current_y - half_etch], [current_x, current_y-(brick_height+half_etch)]))
+                current_x += brick_width + etch_width
+                if current_x + min_brick_width > max_x:
+                    break
+            # flip row between odd and even (full brick vs half brick)
+            row = 1 - row
+            current_y -= (brick_height + etch_width)
+            lines.extend(self._line([min_x, current_y],[max_x, current_y]))
+        
         for line in lines:
             etches.append(EtchLine(line[0], line[1], etch_width=etch_width))
         return etches
@@ -245,58 +263,4 @@ class Texture():
         if next_segments != []:
             return_line.extend(next_segments)
         return return_line
-    
-
-    # Return a list even if only one element
-    # Old version
-    def _old_get_etches_rect(self):
-        if self.exclude == True:
-            return None
-        if len(self.exclude) == 0:
-        # If no exclusions then just return a single rectangle
-            #return [("rect", (self.start_pos[0], self.start_pos[1]), (self.dimension[0], self.dimension[1]))]
-            return [EtchRect((self.start_pos[0], self.start_pos[1]), (self.dimension[0], self.dimension[1]))]
-        # Handle partial exclusion
-        rects = []
-        if self.direction == "horizontal":
-            # Get sorted list of exclusions by x
-            sorted_list = sorted(self.exclude, key=lambda sortkey: sortkey[0])
-            current_x = self.start_pos[0]
-            for this_exclude in sorted_list:
-                # If left rectangle width = 0 then skip to next
-                if this_exclude[0] <= current_x:
-                    current_x = this_exclude[2]
-                    continue
-                # create rect from current pos to this exclude
-                #rects.append(("rect", (current_x, self.start_pos[1]), (this_exclude[0]-current_x, self.dimension[1])))
-                rects.append(EtchRect((current_x, self.start_pos[1]), (this_exclude[0]-current_x, self.dimension[1])))
-                # Set current pos to end of exclude
-                current_x = this_exclude[2]
-            # if not reached end of wall then add final rectangle
-            if current_x < self.start_pos[0] + self.dimension[0]:
-                #rects.append(("rect", (current_x, self.start_pos[1]), (self.dimension[0]-current_x, self.dimension[1])))
-                rects.append(EtchRect ((current_x, self.start_pos[1]), (self.dimension[0]-current_x, self.dimension[1])))
-        if self.direction == "vertical":
-            # Get sorted list of exclusions by y
-            sorted_list = sorted(self.exclude, key=lambda sortkey: sortkey[1])
-            current_y = self.start_pos[1]
-            for this_exclude in sorted_list:
-                # If left rectangle width = 0 then skip to next
-                if this_exclude[1] <= current_y:
-                    current_y = this_exclude[3]
-                    continue
-                # create rect from current pos to this exclude
-                #rects.append(("rect", (self.start_pos[0], current_y ), (self.dimension[1], this_exclude[1]-current_y)))
-                rects.append(EtchRect ((self.start_pos[0], current_y ), (self.dimension[1], this_exclude[1]-current_y)))
-                # Set current pos to end of exclude
-                current_y = this_exclude[3]
-            # if not reached end of wall then add final rectangle
-            if current_y < self.start_pos[1] + self.dimension[1]:
-                #rects.append(("rect", (self.start_pos[0], current_y), (self.dimension[1], self.dimension[1]-current_y)))
-                rects.append(EtchRect ((self.start_pos[0], current_y), (self.dimension[1], self.dimension[1]-current_y)))
-        
-        return rects
-                
-            
-        
     

@@ -1,0 +1,17 @@
+Front 16 bricks wide by 28 bricks high
+Side 14 bricks wide by 28 bricks + 12 bricks to apex
+
+215 x 65 with 10mm motar (depth 102.5 = 1/2 length)
+
+
+Front width 16 * 215 + 14 * 10 = 3580 mm
+Front height 28 * 65 + 26 * 10 = 2080 mm
+
+side depth 14 * 215 + 12 * 10 = 3130 mm
+apex height = 40 * 65 + 38 * 10 = 2980 mm
+
+door is 7.5 bricks from left (1662)
+door is 23 bricks high (1705)
+door is 4 bricks wide (880)
+For the door - the outers and etches are all offset by 50mm from the inside
+this indicates a 50mm door frame

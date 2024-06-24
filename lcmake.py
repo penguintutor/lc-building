@@ -15,12 +15,13 @@ etch_stroke = svgwrite.rgb(30, 30, 30, '%')
 # don't show filled in - use fill in laser cutter
 etch_fill = "none"
 
-filename = "output/g-shed-apex-1.svg"
+filename = "output/g-weigh_bridge-1.svg"
 
-building_template = BuildingTemplate()
-building_template.load_template("templates/building_shed_apex_1.json")
+#building_template = BuildingTemplate()
+#building_template.load_template("templates/building_shed_apex_1.json")
 
-building_datafile = "buildings/shed_1.json"
+#building_datafile = "buildings/shed_1.json"
+building_datafile = "buildings/weigh_bridge_1.json"
 # Example datafile for test purposes 
 #building_datafile = "buildings/test_1.json"
 
@@ -35,11 +36,6 @@ building.load_file(building_datafile)
 bdata = building.get_values()
 # Where parameters apply globally use directly in this code
 # Otherwise pass to appropriate classes
-
-wood_height = 150
-# Width of a wood etch line (boundry between wood)
-wood_etch = 10
-
 
 # Setting option (if set then a line is returned as a polygon based on etch_line_width
 # Normally want as True as Lightburn will not allow lines as etches (recommended)
@@ -61,18 +57,9 @@ etch_line_width = 10
 # cuts and etches are relative to the wall (or feature within feature)
 # But may want to include relative to door_pos etc.
 
-# Example window (wall 0)
-window_pos = (713, 50)
-window_size = (400, 555)
-window_cuts = []
-window_etches = []
-
-hinge_size = (300, 50)
-
-# Example door (wall 2)
-door_pos = (190, 322)
-door_size = (800, 1800)
-
+# If set to percent then gives percentage complete as generate each wall
+#(note does not take into consideration that some have textures and some don't)
+progress = "percent"
 
 # Shed door has cut 3 sides (ie. door is to the floor)
 
@@ -97,9 +84,8 @@ spacing = 50
 num_objects = 0
 current_height = 0 # Only need for height to track which piece needs most space
 
-# Approx 200 x 200mm in pixels
 # Eg. size of a small laser cutter / 3D printer
-doc_size_mm = (300, 300)
+doc_size_mm = (600, 600)
 
 sc = Scale(scale)
 
@@ -184,6 +170,9 @@ if bdata['interlocking'].lower() == "true":
     
    
 # Create output
+# Track wall number for simple progress chart
+num_walls = len(walls)
+wall_num = 0
 for wall in walls:
     # Is this modulo grid_width if so then start next line
     # Will match on first one - which will add spacing
@@ -212,5 +201,8 @@ for wall in walls:
     svg.set_offset(offset)
     if num_objectsect_size[1] > current_height :
         current_height = num_objectsect_size[1]
+    wall_num += 1
+    if (progress == "percent"):
+        print (f"{round((wall_num/num_walls) * 100)} % complete")
             
 svg.save()

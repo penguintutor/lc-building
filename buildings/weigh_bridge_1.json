@@ -1,0 +1,217 @@
+{
+  "name": "Weigh bridge",
+  "type": "industry",
+  "subtype": "small",
+  "description": "Weigh bridge building at Winchcombe station",
+  "parameters": 
+    {
+      "depth": 3130, 
+      "width": 3580, 
+      "wall_height": 2080,
+      "side_wall_height": 2085,
+      "roof_height": 2980,
+      "roof_depth": 1882,
+      "roof_right_overlap": 100,
+      "roof_left_overlap": 100,
+      "roof_front_overlap": 50,
+      "roof_rear_overlap": 50
+    },
+    "settings":
+      {
+        "outertype": "cuts",
+        "interlocking": "true",
+        "material_thickness": 3
+      },
+  "walls":
+    [
+      ["Front with window", [
+          ["0","0"],
+          ["width", "0"],
+          ["width", "wall_height"],
+          ["0", "wall_height"],
+          ["0","0"]
+          ]
+      ],
+      ["Apex left with door", [
+          ["0", "roof_height - wall_height"],
+          ["depth / 2", "0"],
+          ["depth", "roof_height - wall_height"],
+          ["depth", "roof_height"],
+          ["0", "roof_height"],
+          ["0", "roof_height - wall_height"]
+          ]
+      ],
+      ["Rear with no windows", [
+          ["0","0"],
+          ["width", "0"],
+          ["width", "wall_height"],
+          ["0", "wall_height"],
+          ["0","0"]
+          ]
+      ],
+      ["Apex right no windows", [
+          ["0", "roof_height - wall_height"],
+          ["depth / 2", "0"],
+          ["depth", "roof_height - wall_height"],
+          ["depth", "roof_height"],
+          ["0", "roof_height"],
+          ["0", "roof_height - wall_height"]
+          ]
+      ]
+    ],
+  "roofs":
+    [
+      ["Roof front", [
+          ["0", "0"],
+          ["width + roof_left_overlap + roof_right_overlap", "0"],
+          ["width + roof_left_overlap + roof_right_overlap", "depth / 2 + depth * 0.2 + roof_front_overlap"],
+          ["0", "depth / 2 + depth * 0.2 + roof_front_overlap"],
+          ["0", "0"]
+          ]
+      ],
+      ["Roof rear", [
+          ["0", "0"],
+          ["width + roof_left_overlap + roof_right_overlap", "0"],
+          ["width + roof_left_overlap + roof_right_overlap", "depth / 2 + depth * 0.2 + roof_rear_overlap"],
+          ["0", "depth / 2 + depth * 0.2 + roof_rear_overlap"],
+          ["0", "0"]
+          ]
+      ]
+      
+      
+    ],
+  "textures":
+    [
+        {
+        "type": "brick",
+        "wall": 0,
+        "settings":
+          {
+            "brick_height": 65,
+            "brick_width": 103,
+            "brick_etch": 10
+          }
+        },
+        {
+        "type": "brick",
+        "wall": 1,
+        "settings":
+          {
+            "brick_height": 65,
+            "brick_width": 103,
+            "brick_etch": 10
+          }
+        },
+        {
+        "type": "brick",
+        "wall": 2,
+        "settings":
+          {
+            "brick_height": 65,
+            "brick_width": 103,
+            "brick_etch": 10
+          }
+        },
+        {
+        "type": "brick",
+        "wall": 3,
+        "settings":
+          {
+            "brick_height": 65,
+            "brick_width": 103,
+            "brick_etch": 10
+          }
+        }
+
+    ],
+  "interlocking":
+    [
+      {
+      "primary": [1, 4],
+	  "secondary": [0, 1],
+	  "step": 75,
+	  "start": 70
+      },
+      {
+      "primary": [1, 2, "reverse"],
+	  "secondary": [2, 3, "reverse"],
+	  "step": 75,
+	  "start": 70
+      },
+      {
+      "primary": [3, 4],
+	  "secondary": [2, 1],
+	  "step": 75,
+	  "start": 70
+      },
+      {
+      "primary": [3, 2, "reverse"],
+	  "secondary": [0, 3, "reverse"],
+	  "step": 75,
+	  "start": 70
+      }
+    ],
+  "features":
+    [
+      {
+      "type": "window",
+	  "template": "window_shed_1",
+	  "wall": 0,
+	  "parameters": 
+        {
+          "width": 400, 
+          "height": 555, 
+          "pos": [715, 50]
+        },
+      "cuts":
+        [
+          ["rect", [[0, 0], [400, 555]]]
+        ],
+      "etches":
+        [
+          []
+        ],
+      "outers":
+        [
+          []
+        ]
+      },
+      {
+      	"type": "door",
+        "template": "door_small_1",
+        "wall": 1,
+        "parameters": 
+	    {
+          "width": 880,
+          "height": 1705,
+          "pos": [1662, 1275]
+        },
+      "settings":
+        {
+          "outertype": "cut"
+        },
+      "outers":
+        [
+          ["line", [[50, 1705], [50, 50]]],
+          ["line", [[50, 50], [830, 50]]],
+          ["line", [[830, 50], [830, 1705]]]
+        ],
+      "cuts":
+        [
+
+        ],
+      "etches":
+        [
+          ["line", [[150, 150], [730, 150]]],
+          ["line", [[730, 150], [730, 1605]]],
+          ["line", [[730, 1605], [150, 1605]]],
+          ["line", [[150, 1605], [150, 150]]],
+          ["line", [[155, 880], [725, 880]]],
+          ["line", [[155, 1072], [725, 1072]]]
+            
+        ]
+      }
+    ]
+}
+
+
