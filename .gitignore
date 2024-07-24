@@ -1,6 +1,8 @@
 # Testing file
 testoutput.svg
 *.lbrn2
+# Ignore ouput files
+output/*
 
 
 
