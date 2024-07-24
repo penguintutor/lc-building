@@ -91,6 +91,13 @@ Has a pos which indicates start point (top left) and all inner features are rela
 
 All values in features must be in mm (does not support tokens at the moment)
 
+Etches have optional parameter strength, which indicates how much to burn by setting different colours. The actual amount of burn is set in laser cutter software.
+
+Etch 
+* type (eg. line)
+* list with start & end, or points
+* strength (optional)
+
 
 
 ## Interlocking
@@ -121,5 +128,5 @@ Only one interlocking can be applied per edge, if attempt multiple then only one
 
 ## Options (templates only)
 
-Typical features that may be added. Can be overridden allowing any feature, but setups default list of suggestions.
+Typical features that may be added. Can be overridden allowing any feature, but setup a default list of suggestions.
 

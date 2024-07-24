@@ -27,25 +27,27 @@ class SVGOut():
             self.dwg.add(self.dwg.polygon(new_points, stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
         
     def add_etch(self, etch):
+        # Get strength from the etch object
+        strength = etch.get_strength()
         # Special case for line etch as software tools not allow, plus need to add width
         if (etch.get_type() == "line"):
             # Check if etch_as_polygon set (in which case get polygon instead of line)
             if self.settings['etchaspolygon'] == True:
                 new_points = etch.get_polygon_pixels(self.offset)
-                self.dwg.add(self.dwg.polygon(new_points, stroke=self.settings['etchstroke'], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
+                self.dwg.add(self.dwg.polygon(new_points, stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
             # Otherwise treat as line
             else:
                 # start_etch is modified start
                 start_line = etch.get_start_pixels(self.offset)
                 end_line = etch.get_end_pixels(self.offset)
-                self.dwg.add(self.dwg.line(start_line, end_line, stroke=self.settings['etchstroke'], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
+                self.dwg.add(self.dwg.line(start_line, end_line, stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
         elif (etch.get_type() == "rect"):
             start_rect = etch.get_start_pixels(self.offset)
             rect_size = etch.get_size_pixels()
-            self.dwg.add(self.dwg.rect(start_rect, rect_size, stroke=self.settings['etchstroke'], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
+            self.dwg.add(self.dwg.rect(start_rect, rect_size, stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
         elif (etch.get_type() == "polygon"):
             new_points = etch.get_points_pixels(self.offset)
-            self.dwg.add(self.dwg.polygon(new_points, stroke=self.settings['etchstroke'], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
+            self.dwg.add(self.dwg.polygon(new_points, stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
 
     def save(self):
         self.dwg.save()

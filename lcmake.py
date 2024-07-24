@@ -10,8 +10,24 @@ from interlocking import *
 
 # Same stroke width for all as used for laser
 stroke_width = 1
-cut_stroke = svgwrite.rgb(0, 0, 0, '%')
+cut_stroke = svgwrite.rgb(100, 0, 0, '%')
+# Etch stroke now replaced with etch_strokes which has 0 to 9 different strengths
+# 0 = very faint, 9 = very dark
+# Allows different etches for different features
+# Default is 5 - approx 50%
 etch_stroke = svgwrite.rgb(30, 30, 30, '%')
+etch_strokes = [
+    svgwrite.rgb(100, 100, 100, '%'),
+    svgwrite.rgb(90, 90, 90, '%'),
+    svgwrite.rgb(80, 80, 80, '%'),
+    svgwrite.rgb(70, 70, 70, '%'),
+    svgwrite.rgb(60, 60, 60, '%'),
+    svgwrite.rgb(50, 50, 50, '%'),
+    svgwrite.rgb(40, 40, 40, '%'),
+    svgwrite.rgb(30, 30, 30, '%'),
+    svgwrite.rgb(20, 20, 20, '%'),
+    svgwrite.rgb(10, 10, 10, '%')
+    ]
 # don't show filled in - use fill in laser cutter
 etch_fill = "none"
 
@@ -104,7 +120,7 @@ svgsettings = {}
 svgsettings['docsize'] = sc.mms_to_pixels(doc_size_mm)
 svgsettings["strokewidth"] = stroke_width
 svgsettings["cutstroke"] = cut_stroke
-svgsettings["etchstroke"] = etch_stroke
+svgsettings["etchstrokes"] = etch_strokes
 svgsettings["etchfill"] = etch_fill
 svgsettings["etchaspolygon"] = etch_as_polygon
 svg = SVGOut(filename, svgsettings)

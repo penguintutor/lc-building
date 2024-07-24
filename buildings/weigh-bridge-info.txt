@@ -1,6 +1,7 @@
 Front 16 bricks wide by 28 bricks high
 Side 14 bricks wide by 28 bricks + 12 bricks to apex
 
+Typical brick
 215 x 65 with 10mm motar (depth 102.5 = 1/2 length)
 
 
@@ -15,3 +16,29 @@ door is 23 bricks high (1705)
 door is 4 bricks wide (880)
 For the door - the outers and etches are all offset by 50mm from the inside
 this indicates a 50mm door frame
+
+
+Window - does not currently include the arch (or overhang of the sill)
+Window 5 bricks from left = 1075 + 40
+6 bricks from top = 390 + 50
+Width 8 bricks = 1720 + 70 
+Height 15 bricks (to bottom of sill) = 975 + 140
+
+
+
+Total width = 1790
+2 x 100 = 200 - outside main windo
+6 x 200 = 1200 - glass width
+3 x 35 = 105 - between glass width
+2 x 142 = 284 - between sets of windows
+
+
+Vertical - add up to 1115
+
+Top 95
+Glass 230 - 690
+between glass 35 - 70
+bottom 130
+sill 130
+= 1165
+

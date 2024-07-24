@@ -110,18 +110,26 @@ class Etch(Laser):
     def __init__(self, type, internal_offset):
         super().__init__(type, internal_offset)
         
+    def get_strength(self):
+        return self.strength
+        
+        
 # Start and end are tuples
 class EtchLine(Etch):
     # Default etch width if none others set on individual class
     # Used by etch lines only, but can be accessed by all instances
     global_etch_width = 10
-    def __init__(self, start, end, internal_offset=(0,0), etch_width=None):
+    def __init__(self, start, end, internal_offset=(0,0), strength=5, etch_width=None):
+        self.strength = strength
         self.start = start
         self.end = end
         # how wide to cut (cannot have line as lightburn doesn't like it)
         # If set to None (default) then look at class variable global_etch_width
         self.etch_width = etch_width
         super().__init__("line", internal_offset)
+        
+    def __str__(self):
+        return f'Etch {self.type} from {self.start} to {self.end} io {self.io}'
         
     def get_start(self):
         return (self.start[0]+self.io[0], self.start[1]+self.io[1])
@@ -192,7 +200,8 @@ class EtchLine(Etch):
         return new_points
         
 class EtchRect(Etch):
-    def __init__(self, start, size, internal_offset=(0,0)):
+    def __init__(self, start, size, internal_offset=(0,0), strength=5):
+        self.strength = strength
         self.start = start
         self.size = size
         super().__init__("rect", internal_offset)
@@ -213,7 +222,8 @@ class EtchRect(Etch):
         return Laser.sc.convert(self.size)
         
 class EtchPolygon(Etch):
-    def __init__(self, points, internal_offset=(0,0)):
+    def __init__(self, points, internal_offset=(0,0), strength=5):
+        self.strength = strength
         self.points = points
         super().__init__("polygon", internal_offset)
         
@@ -241,6 +251,7 @@ class EtchPolygon(Etch):
 # Outer can be either cut or edge
 # Determined when generating, so convert to appropriate type when required
 # Outer must have a get_args method that allows creation of cut / edge
+# TODO - If etch current default to 5, need to make configurable
 class Outer(Laser):
     def __init__(self, type, internal_offset):
         super().__init__(type, internal_offset)
@@ -248,7 +259,8 @@ class Outer(Laser):
     # Unable to use laserfactory due to circular imports
     # implement get_cut / get_etch in each of the child classes
 class OuterLine(Outer):
-    def __init__(self, start, end, internal_offset=(0,0)):
+    def __init__(self, start, end, internal_offset=(0,0), strength=5):
+        self.strength = strength
         self.start = start
         self.end = end
         super().__init__("line", internal_offset)
@@ -263,10 +275,11 @@ class OuterLine(Outer):
     
     def get_etch(self):
         args = self.get_args()
-        return EtchLine(args[0], args[1], self.io)
+        return EtchLine(args[0], args[1], self.io, strength)
     
 class OuterRect(Outer):
-    def __init__(self, start, size, internal_offset=(0,0)):
+    def __init__(self, start, size, internal_offset=(0,0), strength=5):
+        self.strength = strength
         self.start = start
         self.size = size
         super().__init__("rect", internal_offset)
@@ -285,7 +298,8 @@ class OuterRect(Outer):
 
         
 class OuterPolygon(Outer):
-    def __init__(self, points, internal_offset=(0,0)):
+    def __init__(self, points, internal_offset=(0,0), strength=5):
+        self.strength = strength
         self.points = points
         super().__init__("polygon", internal_offset)
         

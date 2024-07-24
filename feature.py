@@ -27,7 +27,12 @@ class Feature():
         for etch in etches:
             if etch == []:
                 break
-            self.etches.append(Feature.lf.create_etch(etch[0], etch[1], (self.min_x, self.min_y)))
+            # strength is etch [2] - optional
+            # etch should have parameter offset before strength, so if strength set offset to (0,0)
+            if len(etch)>2:
+                self.etches.append(Feature.lf.create_etch(etch[0], etch[1], (self.min_x, self.min_y), etch[2]))
+            else:
+                self.etches.append(Feature.lf.create_etch(etch[0], etch[1], (self.min_x, self.min_y)))
         self.outers = []
         for outer in outers:
             if outer == []:
