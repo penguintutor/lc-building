@@ -10,24 +10,61 @@ from interlocking import *
 
 # Same stroke width for all as used for laser
 stroke_width = 1
-cut_stroke = svgwrite.rgb(100, 0, 0, '%')
+# Use below for red stroke
+#cut_stroke = svgwrite.rgb(100, 0, 0, '%')
+# Use this for black stroke
+cut_stroke = svgwrite.rgb(0, 0, 0, '%')
 # Etch stroke now replaced with etch_strokes which has 0 to 9 different strengths
 # 0 = very faint, 9 = very dark
 # Allows different etches for different features
 # Default is 5 - approx 50%
-etch_stroke = svgwrite.rgb(30, 30, 30, '%')
+#etch_stroke = svgwrite.rgb(30, 30, 30, '%')
+#etch_stroke = svgwrite.rgb(0, 160, 255)
+# Needs to be separate to engrave deep for line
+# instead of fill
+etch_stroke = svgwrite.rgb(255, 0, 0)
+# 10 strokes, but 0 = completely white
+# Typically use 3 to 7 (5 is default)
+# Use following for grey (does not work with Lightburn)
+#etch_strokes = [
+#    svgwrite.rgb(100, 100, 100, '%'),
+#    svgwrite.rgb(90, 90, 90, '%'),
+#    svgwrite.rgb(80, 80, 80, '%'),
+#    svgwrite.rgb(70, 70, 70, '%'),
+#    svgwrite.rgb(60, 60, 60, '%'),
+#    svgwrite.rgb(50, 50, 50, '%'),
+#    svgwrite.rgb(40, 40, 40, '%'),
+#    svgwrite.rgb(30, 30, 30, '%'),
+#    svgwrite.rgb(20, 20, 20, '%'),
+#    svgwrite.rgb(10, 10, 10, '%')
+#    ]
+# Following based on lightburn colours 10 to 19
+#etch_strokes = [
+#    svgwrite.rgb(60, 0, 0, '%'),	#10
+#    svgwrite.rgb(0, 60, 0, '%'),	#11
+#    svgwrite.rgb(60, 60, 0, '%'),	#12
+#    svgwrite.rgb(75, 50, 0, '%'),	#13
+#    svgwrite.rgb(0, 60, 100, '%'),	#14
+#    svgwrite.rgb(60, 0, 60, '%'),	#15
+#    svgwrite.rgb(80, 80, 80, '%'),	#16
+#    svgwrite.rgb(49, 53, 73, '%'), 	#17
+#    svgwrite.rgb(73, 47, 52, '%'),	#18
+#    svgwrite.rgb(29, 43, 89, '%')	#19
+#    ]
+# Lightburn colours from 10 to 19 - darker to lighter
 etch_strokes = [
-    svgwrite.rgb(100, 100, 100, '%'),
-    svgwrite.rgb(90, 90, 90, '%'),
-    svgwrite.rgb(80, 80, 80, '%'),
-    svgwrite.rgb(70, 70, 70, '%'),
-    svgwrite.rgb(60, 60, 60, '%'),
-    svgwrite.rgb(50, 50, 50, '%'),
-    svgwrite.rgb(40, 40, 40, '%'),
-    svgwrite.rgb(30, 30, 30, '%'),
-    svgwrite.rgb(20, 20, 20, '%'),
-    svgwrite.rgb(10, 10, 10, '%')
+    svgwrite.rgb(160, 0, 0),		#10
+    svgwrite.rgb(0, 160, 0),		#11
+    svgwrite.rgb(160, 160, 0),		#12
+    svgwrite.rgb(192, 128, 0),		#13
+    svgwrite.rgb(0, 160, 255),		#14
+    svgwrite.rgb(160, 0, 160),		#15
+    svgwrite.rgb(128, 128, 128),	#16
+    svgwrite.rgb(125, 135, 185),	#17
+    svgwrite.rgb(187, 119, 132),	#18
+    svgwrite.rgb(74, 111, 227)		#19
     ]
+
 # don't show filled in - use fill in laser cutter
 etch_fill = "none"
 

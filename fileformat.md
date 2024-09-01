@@ -114,7 +114,7 @@ Start and End positions are relative to start of edge for primary - and end of e
 
 Reverse option indicates that the interlocking should be in the reverse direction of the edge.
 ie. if primary then would start from distant end, if secondary would start from near end. To set to
-revers direction use "reverse"
+reverse direction use "reverse"
 
 If start or end positions not included then applies to end of wall
 If last interlock is < end + 2 * step then ends early - only perform fixed step size
