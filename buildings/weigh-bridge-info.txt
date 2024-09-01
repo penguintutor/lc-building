@@ -40,5 +40,8 @@ Glass 230 - 690
 between glass 35 - 70
 bottom 130
 sill 130
-= 1165
+= 1115
+
+Top of sill = 985, 26mm per etch layer
+strenth
 
