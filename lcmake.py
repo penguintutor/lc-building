@@ -19,9 +19,6 @@ cut_stroke = svgwrite.rgb(0, 0, 0, '%')
 # Allows different etches for different features
 # Default is 5 - approx 50%
 #etch_stroke = svgwrite.rgb(30, 30, 30, '%')
-#etch_stroke = svgwrite.rgb(0, 160, 255)
-# Needs to be separate to engrave deep for line
-# instead of fill
 etch_stroke = svgwrite.rgb(255, 0, 0)
 # 10 strokes, but 0 = completely white
 # Typically use 3 to 7 (5 is default)
@@ -38,19 +35,7 @@ etch_stroke = svgwrite.rgb(255, 0, 0)
 #    svgwrite.rgb(20, 20, 20, '%'),
 #    svgwrite.rgb(10, 10, 10, '%')
 #    ]
-# Following based on lightburn colours 10 to 19
-#etch_strokes = [
-#    svgwrite.rgb(60, 0, 0, '%'),	#10
-#    svgwrite.rgb(0, 60, 0, '%'),	#11
-#    svgwrite.rgb(60, 60, 0, '%'),	#12
-#    svgwrite.rgb(75, 50, 0, '%'),	#13
-#    svgwrite.rgb(0, 60, 100, '%'),	#14
-#    svgwrite.rgb(60, 0, 60, '%'),	#15
-#    svgwrite.rgb(80, 80, 80, '%'),	#16
-#    svgwrite.rgb(49, 53, 73, '%'), 	#17
-#    svgwrite.rgb(73, 47, 52, '%'),	#18
-#    svgwrite.rgb(29, 43, 89, '%')	#19
-#    ]
+
 # Lightburn colours from 10 to 19 - darker to lighter
 etch_strokes = [
     svgwrite.rgb(160, 0, 0),		#10

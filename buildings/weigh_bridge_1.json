@@ -121,8 +121,27 @@
             "brick_width": 103,
             "brick_etch": 10
           }
+        },
+        {
+        "type": "tile",
+        "wall": 4,
+        "settings":
+          {
+            "tile_height": 120,
+            "tile_width": 300,
+            "tile_etch": 7
+          }
+        },
+        {
+        "type": "tile",
+        "wall": 5,
+        "settings":
+          {
+            "tile_height": 120,
+            "tile_width": 300,
+            "tile_etch": 7
+          }
         }
-
     ],
   "interlocking":
     [

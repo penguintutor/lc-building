@@ -36,6 +36,8 @@ class Texture():
             return self._get_etches_horizontal_wood()
         elif self.style == "brick":
             return self._get_etches_bricks()
+        elif self.style == "tile":
+            return self._get_etches_tiles()
         else:
             return []
     
@@ -64,20 +66,34 @@ class Texture():
             etches.append(EtchLine(line[0], line[1], etch_width=etch_width))
         return etches
     
+    
     # Returns brick texture
     # typical brick is 215mm x 65mm (x 102.5mm depth) with 10mm motar
     def _get_etches_bricks(self):
-        lines = []
-        etches = []
         etch_width = self.settings["brick_etch"]
         brick_height = self.settings["brick_height"]
         brick_width = self.settings["brick_width"]
+        return self._get_etches_rects(etch_width, brick_height, brick_width)
+    
+    # Return tile texture - regular rectangular tiles (eg. slate)
+    # Like bricks but larger and possibly thinner etch
+    def _get_etches_tiles(self):
+        etch_width = self.settings["tile_etch"]
+        tile_height = self.settings["tile_height"]
+        tile_width = self.settings["tile_width"]
+        return self._get_etches_rects(etch_width, tile_height, tile_width)
+    
+    # Returns rect used for bricks / rect tiles (known as tiles)
+    def _get_etches_rects(self, etch_width, rect_height, rect_width):
+        lines = []
+        etches = []
+        
         min_x = self.polygon.bounds[0]+1
         max_x = self.polygon.bounds[2]-1
         min_y = self.polygon.bounds[1]+1
         max_y = self.polygon.bounds[3]-1
-        min_brick_width = brick_width / 2
-        min_brick_height = brick_height / 4
+        min_rect_width = rect_width / 2
+        min_rect_height = rect_height / 4
         # Generate horizontal lines across full width of wall
         # Starting bottom left
         current_y = self.polygon.bounds[3]-1
@@ -89,19 +105,19 @@ class Texture():
         while current_y > min_y:
             current_x = min_x
             if row == 0:
-                current_x += brick_width
+                current_x += rect_width
             else:
-                current_x += brick_width / 2
+                current_x += rect_width / 2
             #  short lines for end of each brick
             while current_x < max_x:
                 # Draw vertical line
-                lines.extend(self._line([current_x, current_y - half_etch], [current_x, current_y-(brick_height+half_etch)]))
-                current_x += brick_width + etch_width
-                if current_x + min_brick_width > max_x:
+                lines.extend(self._line([current_x, current_y - half_etch], [current_x, current_y-(rect_height+half_etch)]))
+                current_x += rect_width + etch_width
+                if current_x + min_rect_width > max_x:
                     break
-            # flip row between odd and even (full brick vs half brick)
+            # flip row between odd and even (eg full brick vs half brick)
             row = 1 - row
-            current_y -= (brick_height + etch_width)
+            current_y -= (rect_height + etch_width)
             lines.extend(self._line([min_x, current_y],[max_x, current_y]))
         
         for line in lines:
