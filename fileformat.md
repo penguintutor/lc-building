@@ -91,7 +91,7 @@ Has a pos which indicates start point (top left) and all inner features are rela
 
 All values in features must be in mm (does not support tokens at the moment)
 
-Etches have optional parameter strength, which indicates how much to burn by setting different colours. The actual amount of burn is set in laser cutter software.
+Etches have optional parameter strength, which indicates how much to burn by setting different colours. Value is 0 to 9, with 0 being lightest and 9 being darkest. The actual amount of burn is set in laser cutter software and/or settings. Without value then defaults to 5
 
 Etch 
 * type (eg. line)
