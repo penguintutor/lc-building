@@ -1,3 +1,4 @@
+# LC make takes an existing building and generates the image files
 import svgwrite
 from laser import *
 from wall import *
@@ -7,51 +8,11 @@ from svgout import *
 from buildingtemplate import *
 from featuretemplate import *
 from interlocking import *
+from config import Config
 
-# Same stroke width for all as used for laser
-stroke_width = 1
-# Use below for red stroke
-#cut_stroke = svgwrite.rgb(100, 0, 0, '%')
-# Use this for black stroke
-cut_stroke = svgwrite.rgb(0, 0, 0, '%')
-# Etch stroke now replaced with etch_strokes which has 0 to 9 different strengths
-# 0 = very faint, 9 = very dark
-# Allows different etches for different features
-# Default is 5 - approx 50%
-#etch_stroke = svgwrite.rgb(30, 30, 30, '%')
-etch_stroke = svgwrite.rgb(255, 0, 0)
-# 10 strokes, but 0 = completely white
-# Typically use 3 to 7 (5 is default)
-# Use following for grey (does not work with Lightburn)
-#etch_strokes = [
-#    svgwrite.rgb(100, 100, 100, '%'),
-#    svgwrite.rgb(90, 90, 90, '%'),
-#    svgwrite.rgb(80, 80, 80, '%'),
-#    svgwrite.rgb(70, 70, 70, '%'),
-#    svgwrite.rgb(60, 60, 60, '%'),
-#    svgwrite.rgb(50, 50, 50, '%'),
-#    svgwrite.rgb(40, 40, 40, '%'),
-#    svgwrite.rgb(30, 30, 30, '%'),
-#    svgwrite.rgb(20, 20, 20, '%'),
-#    svgwrite.rgb(10, 10, 10, '%')
-#    ]
 
-# Lightburn colours from 10 to 19 - darker to lighter
-etch_strokes = [
-    svgwrite.rgb(160, 0, 0),		#10
-    svgwrite.rgb(0, 160, 0),		#11
-    svgwrite.rgb(160, 160, 0),		#12
-    svgwrite.rgb(192, 128, 0),		#13
-    svgwrite.rgb(0, 160, 255),		#14
-    svgwrite.rgb(160, 0, 160),		#15
-    svgwrite.rgb(128, 128, 128),	#16
-    svgwrite.rgb(125, 135, 185),	#17
-    svgwrite.rgb(187, 119, 132),	#18
-    svgwrite.rgb(74, 111, 227)		#19
-    ]
+config = Config()
 
-# don't show filled in - use fill in laser cutter
-etch_fill = "none"
 
 filename = "output/g-weigh_bridge-1.svg"
 
@@ -75,15 +36,6 @@ bdata = building.get_values()
 # Where parameters apply globally use directly in this code
 # Otherwise pass to appropriate classes
 
-# Setting option (if set then a line is returned as a polygon based on etch_line_width
-# Normally want as True as Lightburn will not allow lines as etches (recommended)
-# If you prefer to edit as a line (eg. ink InkScape) then you can set to False
-# Note that the co-ordinates will be centre of the line so will be extended in all directions
-# This may have implications for overlapping 
-etch_as_polygon = True
-# Set width of etch lines (eg. door outside)
-# If etch as polygon True then this value moust be set
-etch_line_width = 10
 
 # Feature positions are top left
 # Note y=0 is top of roof height 
@@ -108,11 +60,6 @@ progress = "percent"
 scale = "G"
 
 
-# Dummy EtchLine entry allowing us to set parameters for all EtchLines
-global_etch_line = EtchLine((0,0),(0,0))
-# Set width for all etch lines
-global_etch_line.set_global_width(etch_line_width)
-
 # Export in grid 3 wide
 grid_width = 3
 # Start position
@@ -132,22 +79,29 @@ Laser.sc = sc
 # Use scale to apply reverse scale to actual material_thickness
 material_thickness = bdata["material_thickness"]
 scale_material = sc.reverse_scale_convert(material_thickness)
-# Create global interlocking to update class variable
-#global_interlock = Interlocking(scale_material, -1, "primary")
+# Set material thickness for Interlocking (class variable)
 Interlocking.material_thickness = scale_material
+# Set default etchline width
+EtchLine.global_etch_width = config.etch_line_width
 
 Wall.settings["outertype"] = bdata["outertype"]
 
+# Convert configuration into SVG settings for output
 svgsettings = {}
-svgsettings['docsize'] = sc.mms_to_pixels(doc_size_mm)
-svgsettings["strokewidth"] = stroke_width
-svgsettings["cutstroke"] = cut_stroke
-svgsettings["etchstrokes"] = etch_strokes
-svgsettings["etchfill"] = etch_fill
-svgsettings["etchaspolygon"] = etch_as_polygon
-svg = SVGOut(filename, svgsettings)
 
-#wf = WallFactory()
+svgsettings['docsize'] = sc.mms_to_pixels(doc_size_mm)
+svgsettings["strokewidth"] = config.stroke_width
+svgsettings["cutstroke"] = svgwrite.rgb(*config.cut_stroke)
+
+# Convert config colors into svgwrite values
+etch_strokes = []
+for stroke_color in config.etch_strokes:
+    etch_strokes.append(svgwrite.rgb(*stroke_color))
+
+svgsettings["etchstrokes"] = etch_strokes
+svgsettings["etchfill"] = config.etch_fill
+svgsettings["etchaspolygon"] = config.etch_as_polygon
+svg = SVGOut(filename, svgsettings)
 
 walls = []
 for wall in building.get_walls():

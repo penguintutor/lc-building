@@ -7,6 +7,16 @@ from featuretemplate import *
 from interlocking import *
 from helpers import *
 from texture import *
+from config import Config
+
+# Test loading of config values
+# Just few example values tested
+class TestConfig(unittest.TestCase):
+    # May need to update if changing configuration - these are default settings
+    def test_config_read(self):
+        config = Config()
+        self.assertEqual(config.stroke_width, 1)
+        self.assertEqual(config.etch_strokes[0][1], 0)
 
 class TestWall(unittest.TestCase):
     
