@@ -89,6 +89,8 @@ Then can contain cuts (always cut), etches (always etches) or outers (etch / cut
 
 Has a pos which indicates start point (top left) and all inner features are relative to that. Assuming bounding box is a rectangle then uses width, height to create a rectangle as the exclusion area. Alternatives use "exclude" followed by polygon for exclusion area (in which case width / height are ignored). If polygon is used then points should be relative to the pos
 
+Any texture has to be defined explictly eg. as etches as would not normally apply a texture to a feature.
+
 All values in features must be in mm (does not support tokens at the moment)
 
 Etches have optional parameter strength, which indicates how much to burn by setting different colours. Value is 0 to 9, with 0 being lightest and 9 being darkest. The actual amount of burn is set in laser cutter software and/or settings. Without value then defaults to 5

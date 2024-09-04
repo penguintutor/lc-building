@@ -6,6 +6,5 @@ import config
 
 class Builder():
     
- 
     def __init__(self, config):
         self.config = config

@@ -36,25 +36,15 @@ bdata = building.get_values()
 # Where parameters apply globally use directly in this code
 # Otherwise pass to appropriate classes
 
-
 # Feature positions are top left
 # Note y=0 is top of roof height 
-
-# Features can have cuts and etches applied
-# either manually or using textures / settings etc.
-# cuts and etches can always be added to
-
-# cuts and etches are relative to the wall (or feature within feature)
-# But may want to include relative to door_pos etc.
 
 # If set to percent then gives percentage complete as generate each wall
 #(note does not take into consideration that some have textures and some don't)
 progress = "percent"
 
-# Shed door has cut 3 sides (ie. door is to the floor)
 
-# Feature etches have to be defined explicitly 
-# including vertical wood effect
+
 
 #scale = "OO"
 scale = "G"

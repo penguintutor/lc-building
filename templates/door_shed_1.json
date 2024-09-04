@@ -3,7 +3,7 @@
   "type": "Door",
   "subtype": "shed",
   "description": "Basic vertical wood door with etched hinges on right of door",
-  "comments": "Shed door etch on 3 sides as bottom is already cut. Door outside are in outers which will be cut or etch based on settings. Texture is manually included int he etches (first 4 entries). Hinges are from  right hand side.",
+  "comments": "Shed door has 3 sides as bottom is already cut. Door outside are in outers which will be cut or etch based on settings. Texture is manually included in the etches (first 4 entries). Hinges are from  right hand side.",
   "defaults": 
     {
       "width": 800, 
