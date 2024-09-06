@@ -2,21 +2,23 @@ import unittest
 from wall import *
 from scale import *
 from laser import *
+from buildingdata import *
 from buildingtemplate import *
 from featuretemplate import *
 from interlocking import *
 from helpers import *
 from texture import *
-from config import Config
+from config import LCConfig
+from builder import Builder
 
 # Test loading of config values
 # Just few example values tested
 class TestConfig(unittest.TestCase):
     # May need to update if changing configuration - these are default settings
     def test_config_read(self):
-        config = Config()
-        self.assertEqual(config.stroke_width, 1)
-        self.assertEqual(config.etch_strokes[0][1], 0)
+        self.config = LCConfig()
+        self.assertEqual(self.config.stroke_width, 1)
+        self.assertEqual(self.config.etch_strokes[0][1], 0)
 
 class TestWall(unittest.TestCase):
     
@@ -300,6 +302,26 @@ class TestTexture(unittest.TestCase):
         self.assertEqual (lines[2][1][1], 10)
 
 
+
+# Test the Builder class - along with subclasses that are read
+class TestBuilder(unittest.TestCase):
+    # Read data file, write it out, read it in and compare
+    def test_read_file(self):
+        config = LCConfig()
+        builder = Builder(config)
+        builder.load_file("tests/building1.json")
+        walls = builder.building.get_walls()
+        # Take first entry and see if it's expected
+        self.assertEqual (walls[0][0], 'Front with window')
+        # Now save as a new file
+        builder.save_file("tests/building1a.json")
+        # Create new builder object load and compare
+        builder1a = Builder(config)
+        builder1a.load_file("tests/building1a.json")
+        walls1a = builder1a.building.get_walls()
+        # Take first entry and see if it's expected
+        self.assertEqual (walls1a[0][0], 'Front with window')
+
 # helper functions
 class TestHelpers(unittest.TestCase):   
     
@@ -318,6 +340,8 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(angle, 0)
      
         
+
+
 
         
 if __name__ == '__main__':

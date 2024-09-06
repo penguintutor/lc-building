@@ -15,7 +15,7 @@ def is_number(s):
 class BuildingData ():
     def __init__ (self):
         self.data = {}
-        pass
+
     
     # Checks the appropriate parameters for a matching value_string then evaluate
     # Returns as string
@@ -70,11 +70,23 @@ class BuildingData ():
         return value
     
     # Load a data file
-    # Overrides all data
+    # Overrides all data in memory
     def load_file (self, filename):
+        # Keep reference to filename loaded
         self.filename = filename
         with open(filename, 'r') as datafile:
             self.data = json.load(datafile)
+            
+    
+    # Save current data to file
+    # Overwrites existing file
+    def save_file (self, filename):
+        # Updates filename with new filename
+        self.filename = filename
+        json_data = json.dumps(self.data)
+        with open(filename, 'w') as datafile:
+            datafile.write(json_data)
+            
     
     # Sets all the data entries - used when loading a template 
     # Overwrites all data

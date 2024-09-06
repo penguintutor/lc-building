@@ -8,10 +8,10 @@ from svgout import *
 from buildingtemplate import *
 from featuretemplate import *
 from interlocking import *
-from config import Config
+from config import LCConfig
 
 
-config = Config()
+config = LCConfig()
 
 
 filename = "output/g-weigh_bridge-1.svg"

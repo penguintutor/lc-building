@@ -2,7 +2,7 @@
 # In future the configuration will be moved to a config file
 # which will be accessed through this class
 
-class Config():
+class LCConfig():
     def __init__(self):
         # Same stroke width for all as used for laser
         self.stroke_width = 1
