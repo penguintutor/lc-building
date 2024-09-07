@@ -8,7 +8,7 @@ from svgout import *
 from buildingtemplate import *
 from featuretemplate import *
 from interlocking import *
-from config import LCConfig
+from lcconfig import LCConfig
 
 
 config = LCConfig()

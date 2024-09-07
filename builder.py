@@ -1,7 +1,7 @@
 # Used for reading, editing and saving buildings
 
 from buildingdata import *
-from config import LCConfig
+from lcconfig import LCConfig
 
 class Builder():
     def __init__(self, lcconfig):

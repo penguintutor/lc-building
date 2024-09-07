@@ -8,7 +8,7 @@ from featuretemplate import *
 from interlocking import *
 from helpers import *
 from texture import *
-from config import LCConfig
+from lcconfig import LCConfig
 from builder import Builder
 
 # Test loading of config values
