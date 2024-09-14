@@ -1,30 +1,23 @@
+import os
 from PySide2.QtCore import Qt, QCoreApplication, QUrl
-from PySide2.QtGui import QPixmap, QIcon, QPainter, QPen, QColor, QBrush, QFontMetrics
-from PySide2.QtWidgets import (
-    QMainWindow,
-    QPushButton,
-    QLabel,
-    QVBoxLayout,
-    QMenu,
-    QWidget,
-    QToolBar,
-    QStatusBar,
-    QTabWidget,
-    QFrame,
-    QAction
-)
 from PySide2.QtWebEngineWidgets import QWebEngineView
+from PySide2.QtCore import QObject
+from PySide2.QtUiTools import QUiLoader
 from builder import Builder
 from lcconfig import LCConfig
 from gconfig import GConfig
 
 
+loader = QUiLoader()
+basedir = os.path.dirname(__file__)
+
 app_title = "Building Designer"
 
-# Subclass QMainWindow as application main window
-class MainWindow(QMainWindow):
+class MainWindowUI(QObject):
     def __init__(self):
         super().__init__()
+        self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
+        self.ui.setWindowTitle(app_title)
         
         self.config = LCConfig()
         
@@ -35,24 +28,29 @@ class MainWindow(QMainWindow):
         # Uses screen 0 which is normally current screen but may not be
         # Only used to set default size so doesn't matter if it's on a different
         # screen, but not such a good experience
-        status['screensize'] = self.screen().size().toTuple()
+        status['screensize'] = self.ui.screen().size().toTuple()
         
         self.gconfig = GConfig(status)
         self.builder = Builder(self.config)
         
         # Set default screensize (even if going to maximise afterwards)
-        self.resize(*self.gconfig.default_screensize)
+        self.ui.resize(*self.gconfig.default_screensize)
         
         if self.gconfig.maximized == True:
             #self.setWindowState(Qt.WindowMaximized)
-            self.showMaximized()          
-            
+            self.ui.showMaximized()  
+      
+        self.ui.actionExit.triggered.connect(QCoreApplication.quit)
+        self.ui.actionVisit_Website.triggered.connect(self.visit_website)
         
-        self.setWindowTitle(app_title)
+        self.ui.show()
         
-        # Get screen size - allows to auto size the image if enabled
-        # Only looks at screen 0, may not be the screen this is running on
-        #screen_size = self.screen().size().toTuple()
+
+    def __old__(self):
+        super().__init__()
+        
+        # Set the directory for the files
+        self.basedir = os.path.dirname(__file__)
 
 
         # Actions
@@ -86,6 +84,7 @@ class MainWindow(QMainWindow):
     def visit_website(self, s):
         #Todo - open website
         #print("click", s)
+        print ("Opening Website - when implemented")
         pass
 
 

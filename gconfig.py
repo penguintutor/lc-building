@@ -9,7 +9,7 @@
 
 class GConfig():
     def __init__(self, status):
-        self.maximized = True
+        self.maximized = False
         self.default_screensize = [1000, 700]
         
         # Check to see if default screensize is a reasonable size for this screen

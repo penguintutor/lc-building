@@ -3,7 +3,7 @@
 # which will be accessed through this class
 
 class LCConfig():
-    def __init__(self):
+    def __init__(self): 
         # Same stroke width for all as used for laser
         self.stroke_width = 1
         # Black stroke used for cut
