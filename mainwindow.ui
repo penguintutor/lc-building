@@ -30,6 +30,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="copyWallButton">
+          <property name="text">
+           <string>Copy Wall</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="addFeatureButton">
           <property name="text">
            <string>Add Feature</string>
@@ -63,6 +70,12 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>500</height>
+           </size>
           </property>
           <property name="resizeAnchor">
            <enum>QGraphicsView::AnchorViewCenter</enum>
@@ -128,6 +141,31 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QTableWidget" name="tableWidget">
+          <property name="maximumSize">
+           <size>
+            <width>300</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <row>
+           <property name="text">
+            <string>Object Name</string>
+           </property>
+          </row>
+          <row>
+           <property name="text">
+            <string>Object Type</string>
+           </property>
+          </row>
+          <column>
+           <property name="text">
+            <string>Value</string>
+           </property>
+          </column>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -171,6 +209,10 @@
    </property>
   </action>
   <action name="actionVisit_Website">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../2colourpenguin.png</normaloff>../../../2colourpenguin.png</iconset>
+   </property>
    <property name="text">
     <string>Visit Website</string>
    </property>
