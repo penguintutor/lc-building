@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1023</width>
-    <height>720</height>
+    <height>1026</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -85,61 +85,225 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="viewButtonVLayout">
+       <layout class="QVBoxLayout" name="viewButtonVLayout" stretch="8,4">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
-         <widget class="QPushButton" name="frontViewButton">
-          <property name="text">
-           <string>Front View</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="rightViewButton">
-          <property name="text">
-           <string>Right View</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="rearViewButton">
-          <property name="text">
-           <string>Rear View</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="leftViewButton">
-          <property name="text">
-           <string>Left View</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="topViewButton">
-          <property name="text">
-           <string>Top View</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="bottomViewButton">
-          <property name="text">
-           <string>Bottom View</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
+         <widget class="QScrollArea" name="scrollArea">
+          <property name="maximumSize">
            <size>
-            <width>20</width>
-            <height>40</height>
+            <width>300</width>
+            <height>16777215</height>
            </size>
           </property>
-         </spacer>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>-851</y>
+             <width>278</width>
+             <height>1489</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="frontViewButton">
+              <property name="text">
+               <string>Front View</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>297</width>
+                <height>300</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="frontViewImageButton">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>resources/icon_front_01.svg</normaloff>resources/icon_front_01.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>200</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="spacingFrontViewLabel">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="rightViewButton">
+              <property name="text">
+               <string>Right View</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>300</width>
+                <height>300</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="rightViewImageButton">
+              <property name="icon">
+               <iconset>
+                <normaloff>resources/icon_right_01.svg</normaloff>resources/icon_right_01.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>200</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="rearViewButton">
+              <property name="text">
+               <string>Rear View</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="rearViewImageButton">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>resources/icon_rear_01.svg</normaloff>resources/icon_rear_01.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>200</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="leftViewButton">
+              <property name="text">
+               <string>Left View</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="leftViewImageButton">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>resources/icon_left_01.svg</normaloff>resources/icon_left_01.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>200</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="topViewButton">
+              <property name="text">
+               <string>Top View</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="topViewImageButton">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>resources/icon_top_01.svg</normaloff>resources/icon_top_01.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>200</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="bottomViewButton">
+              <property name="text">
+               <string>Bottom View</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="bottomViewImageButton">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>resources/icon_bottom_01.svg</normaloff>resources/icon_bottom_01.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>200</width>
+                <height>200</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
         </item>
         <item>
          <widget class="QTableWidget" name="tableWidget">
@@ -211,7 +375,7 @@
   <action name="actionVisit_Website">
    <property name="icon">
     <iconset>
-     <normaloff>../../../2colourpenguin.png</normaloff>../../../2colourpenguin.png</iconset>
+     <normaloff>resources/penguintutor-icon.png</normaloff>resources/penguintutor-icon.png</iconset>
    </property>
    <property name="text">
     <string>Visit Website</string>
