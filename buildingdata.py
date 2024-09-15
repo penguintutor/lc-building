@@ -149,9 +149,9 @@ class BuildingData ():
             # Basic error check for minimum number of parameters
             if (len(roof) < 2):
                 roof_data.append(("Error", [[0,0],[0,0],[0,0],[0,0]], "front"))
-            # View is optional parameter 2 (default to front)
+            # View is optional parameter 2 (default to top for roof)
             if (len(roof) < 3 or roof[2] not in allowed_views):
-                view = "front"
+                view = "top"
             else:
                 view = roof[2]
             roof_data.append((roof[0], self.process_multiple_tokens(roof[1]), view))
