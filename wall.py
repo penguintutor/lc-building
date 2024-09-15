@@ -27,10 +27,11 @@ class Wall():
     
     settings = {}
     
-    def __init__ (self, name, points):
+    def __init__ (self, name, points, view="front"):
         self.name = name
         self.points = points
         self.polygon = Polygon(points)
+        self.view = view
         #self.max_width = width
         #self.max_height = height
         self.material = "smooth"

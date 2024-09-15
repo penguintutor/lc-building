@@ -8,6 +8,9 @@ def is_number(s):
         return True
     except ValueError:
         return False
+    
+# Views must be one of these or default to front
+allowed_views = ["front", "right", "rear", "left", "top", "bottom"]
 
 # Create as an empty class with no data - all empty
 # This allows template to be loaded afterwards or for data to be
@@ -125,7 +128,15 @@ class BuildingData ():
     def get_walls(self):
         wall_data = []
         for wall in self.data["walls"]:
-            wall_data.append((wall[0], self.process_multiple_tokens(wall[1])))
+            # Basic error check for minimum number of parameters
+            if (len(wall) < 2):
+                wall_data.append (("Error", [[0,0],[0,0],[0,0],[0,0]], "front"))
+            # View is optional parameter 2 (default to front)
+            if (len(wall) < 3 or wall[2] not in allowed_views):
+                view = "front"
+            else:
+                view = wall[2]
+            wall_data.append((wall[0], self.process_multiple_tokens(wall[1]), view))
         return wall_data
     
     def get_interlocking(self):
@@ -135,7 +146,15 @@ class BuildingData ():
     def get_roofs(self):
         roof_data = []
         for roof in self.data["roofs"]:
-            roof_data.append((roof[0], self.process_multiple_tokens(roof[1])))
+            # Basic error check for minimum number of parameters
+            if (len(roof) < 2):
+                roof_data.append(("Error", [[0,0],[0,0],[0,0],[0,0]], "front"))
+            # View is optional parameter 2 (default to front)
+            if (len(roof) < 3 or roof[2] not in allowed_views):
+                view = "front"
+            else:
+                view = roof[2]
+            roof_data.append((roof[0], self.process_multiple_tokens(roof[1]), view))
         return roof_data
     
     def get_textures(self):
