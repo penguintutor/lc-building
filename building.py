@@ -1,23 +1,10 @@
 import sys
 import os
-from PySide2.QtWidgets import QApplication
-from PySide2.QtCore import QObject
-from PySide2.QtCore import Qt, QCoreApplication, QUrl
-from PySide2.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Qt, QCoreApplication, QUrl
+from PySide6.QtUiTools import QUiLoader
 from mainwindow import MainWindowUI
-
-
-
-
-#class MainUI(QObject):
-#    def __init__(self):
-#        super().__init__()
-#        self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
-#        self.ui.setWindowTitle("LC Building")
-#        self.ui.show()
-#        
-#        self.ui.actionExit.triggered.connect(QCoreApplication.quit)
-        
 
 
 class App(QApplication):
@@ -34,6 +21,6 @@ window = MainWindowUI()
 #ui = MainUI()
 
 #Start event loop
-app.exec_()
+app.exec()
 
 # Application end

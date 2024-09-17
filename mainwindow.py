@@ -1,8 +1,8 @@
 import os
-from PySide2.QtCore import Qt, QCoreApplication, QUrl
-from PySide2.QtWebEngineWidgets import QWebEngineView
-from PySide2.QtCore import QObject
-from PySide2.QtUiTools import QUiLoader
+from PySide6.QtCore import Qt, QCoreApplication, QUrl
+#from PySide6.QtWebEngineWidgets import QWebEngineView
+from PySide6.QtCore import QObject
+from PySide6.QtUiTools import QUiLoader
 from builder import Builder
 from lcconfig import LCConfig
 from gconfig import GConfig
