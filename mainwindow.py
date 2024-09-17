@@ -6,6 +6,7 @@ from PySide6.QtUiTools import QUiLoader
 from builder import Builder
 from lcconfig import LCConfig
 from gconfig import GConfig
+import webbrowser
 
 
 loader = QUiLoader()
@@ -37,55 +38,17 @@ class MainWindowUI(QObject):
         self.ui.resize(*self.gconfig.default_screensize)
         
         if self.gconfig.maximized == True:
-            #self.setWindowState(Qt.WindowMaximized)
             self.ui.showMaximized()  
       
         self.ui.actionExit.triggered.connect(QCoreApplication.quit)
         self.ui.actionVisit_Website.triggered.connect(self.visit_website)
         
-        self.ui.show()
-        
-
-    def __old__(self):
-        super().__init__()
-        
-        # Set the directory for the files
-        self.basedir = os.path.dirname(__file__)
-
-
-        # Actions
-        edit_action = QAction(QIcon(), "Edit", self)
-        edit_action.triggered.connect(self.edit_menu)
-        
-        quit_action = QAction(QIcon(), "Exit", self)
-        quit_action.triggered.connect(QCoreApplication.quit)
-        
-        penguin_action = QAction(QIcon("icon01.png"), "Visit website", self)
-        penguin_action.setStatusTip("Visit website")
-        penguin_action.triggered.connect(self.visit_website)
-
-        # Traditional pull-down menus
-        menu = self.menuBar()
-
-        file_menu = menu.addMenu("&File")
-        file_menu.addAction(quit_action)
-        
-        edit_menu = menu.addMenu("&Edit")
-        edit_menu.addAction(edit_action)
-           
-        help_menu = menu.addMenu("&Help")
-        help_menu.addAction(penguin_action)
-        
-        
-        self.show()
-        
+        self.ui.show()      
 
 
     def visit_website(self, s):
-        #Todo - open website
-        #print("click", s)
-        print ("Opening Website - when implemented")
-        pass
+        webbrowser.open("https://www.penguintutor.com/projects/laser-cut-buildings")
+
 
 
     def edit_menu(self):

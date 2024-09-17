@@ -7,22 +7,28 @@ More details will be provided as the code is developed further.
 
 
 ## Prerequisites
-Module Python svgwrite
+The following python modules are required
+* Pyside6
+* shapely
+* svgwrite
 
-On Debian / Ubuntu use
+At the time of writing this is not included in the standard repositories and so should be instaled through PIP.
+As a result of PEP 704 this normally needs to be done by creating a virtual environment. The following is the recomended method for use on Linux, including Ubuntu or Raspberry Pi.
 
-    sudo apt install python3-svgwrite
-    
-Module Python Shapely
-
-    sudo apt install python3-shapely
+    mkdir ~/venv
+    python -m venv ~/venv/pyside6
+    source ~/venv/pyside6/bin/activate
+    pip install pyside6
+    pip install shapely
+    pip install svgwrite
     
     
 ## Running the code
 Currently configs are all in the lcmake.py file
 After setting appropriate dimensions run
 
-    python3 lcmake.py 
+    source ~/venv/pyside6/bin/activate
+    python lcmake.py 
     
    
 ## Development tests
@@ -31,10 +37,10 @@ Tests are written using unittest
 
 Run using:
 
-    python3 -m unittest tests
+    python -m unittest tests
 or
 
-    python3 tests.py
+    python tests.py
     
 ## Limitations
 
