@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>icons/penguintutor.png</file>
+  </qresource>
+</RCC>
