@@ -2,6 +2,7 @@ import os
 from PySide6.QtCore import Qt, QCoreApplication, QUrl
 #from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtCore import QObject
+from PySide6.QtWidgets import QGraphicsScene
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
 from lcconfig import LCConfig
@@ -38,7 +39,18 @@ class MainWindowUI(QObject):
         self.ui.resize(*self.gconfig.default_screensize)
         
         if self.gconfig.maximized == True:
-            self.ui.showMaximized()  
+            self.ui.showMaximized()
+            
+        self.scene = QGraphicsScene()
+        self.scene.addText("Hello, world!")
+        
+        #addItem
+        #QGraphicsSvgItem
+        
+        
+        self.ui.graphicsView.setScene(self.scene)
+#view = QGraphicsView(scene)
+#view.show()
       
         self.ui.actionExit.triggered.connect(QCoreApplication.quit)
         self.ui.actionVisit_Website.triggered.connect(self.visit_website)
