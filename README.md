@@ -24,11 +24,24 @@ As a result of PEP 704 this normally needs to be done by creating a virtual envi
     
     
 ## Running the code
-Currently configs are all in the lcmake.py file
-After setting appropriate dimensions run
+
+
+### Command line lcmake file
+Currently configs are in the builings directory, but are referenced by hard coding in the lcmake.py file.
+This also needs a folder called output, if one does not already exist then it should be creaed.
+After configuring the above then run
+
+    python3 lcmake.py 
+
+
+### GUI version
+The Graphical User Interface version is under development. To see the current status you first need to enable
+Pyside 6 through a virtual machine. If using the same steps as mentioned above then use
+    
 
     source ~/venv/pyside6/bin/activate
-    python lcmake.py 
+    python3 building.py 
+
     
    
 ## Development tests
@@ -37,10 +50,10 @@ Tests are written using unittest
 
 Run using:
 
-    python -m unittest tests
+    python3 -m unittest tests
 or
 
-    python tests.py
+    python3 tests.py
     
 ## Limitations
 
@@ -72,4 +85,4 @@ taken into consideration.
 ### Limitations of small scales
 Small scales (smaller than HO/OO) may have problems when dealing with small
 size shapes. These may need to be edit in Inkscape before burning, or choose
-a "N friendly" template
+an "N friendly" template
