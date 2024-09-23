@@ -17,8 +17,6 @@ app = App(sys.argv)
 
 # Create a Qt widget - main window
 window = MainWindowUI()
-#window.show()  # Show the window
-#ui = MainUI()
 
 #Start event loop
 app.exec()

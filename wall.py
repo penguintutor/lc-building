@@ -31,7 +31,7 @@ class Wall():
         self.name = name
         self.points = points
         self.polygon = Polygon(points)
-        self.view = view
+        self.view = view          # Which side to view it on when in the GUI
         #self.max_width = width
         #self.max_height = height
         self.material = "smooth"
