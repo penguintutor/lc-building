@@ -1,5 +1,5 @@
 import os
-from PySide6.QtCore import Qt, QCoreApplication, QUrl
+from PySide6.QtCore import Qt, QCoreApplication, QUrl, QThreadPool, Signal
 #from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QGraphicsScene, QFileDialog
@@ -17,11 +17,19 @@ basedir = os.path.dirname(__file__)
 
 app_title = "Building Designer"
 
-allowed_views = ['front', 'right', 'left', 'rear', 'top', 'bottom']
-
 class MainWindowUI(QObject):
+    
+    load_complete_signal = Signal()
+    
     def __init__(self):
         super().__init__()
+        
+        # Threadpool to maintain responsiveness during load / export
+        self.threadpool = QThreadPool()
+        
+        # Connect signal handler
+        self.load_complete_signal.connect(self.load_complete)
+        
         self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
         
@@ -56,7 +64,7 @@ class MainWindowUI(QObject):
         
         # Create views ready for holding objects to view
         self.scenes = {}
-        for scene_name in allowed_views:
+        for scene_name in self.config.allowed_views:
             self.scenes[scene_name] = QGraphicsScene()
         
         # Default to front view
@@ -72,12 +80,38 @@ class MainWindowUI(QObject):
     def open_file_dialog(self):
         filename = QFileDialog.getOpenFileName(self.parent(), "Open building file", "", "Building file (*.json);;All (*.*)")
         print (f'Selected file {filename}')
+        # possibly check for valid file
+        if filename[0] == '':
+            print ("No filename specified")
+            return
+        self.new_filename = filename[0]
+        self.threadpool.start(self.file_open)
 
     def visit_website(self, s):
         webbrowser.open("https://www.penguintutor.com/projects/laser-cut-buildings")
 
-
-
     def edit_menu(self):
         pass
+    
+    def file_open(self):
+        # Prevent duplicate file opens (or saving when opening etc.)
+        self.disable_file_actions()
+        result = self.builder.load_file(self.new_filename)
+        if result[0] == False:
+            #Todo show error message
+            print (f"Error {result[1]}")
+        # update load complete message - even if failed as otherwise load is locked
+        self.load_complete_signal.emit()
+        
+    def load_complete(self):
+        # Reenable file actions
+        self.enable_file_actions()
+        print ("Updating GUI")
+        # Todo update views
 
+    # Whenever performing file action then disable other actions to prevent duplicates / conflicting
+    def disable_file_actions(self):
+        self.ui.actionOpen.setEnabled(False)
+        
+    def enable_file_actions(self):
+        self.ui.actionOpen.setEnabled(True)

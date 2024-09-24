@@ -11,11 +11,12 @@ class Builder():
         self.config = lcconfig
         
         # Create empty building data instance
-        self.building = BuildingData()
+        self.building = BuildingData(self.config)
 
     # Loads a new file overwriting all data
+    # Returns result of buildingdata load - (True/False, "Error string")
     def load_file(self, filename):
-        self.building.load_file(filename)
+        return self.building.load_file(filename)
         
     # Saves the file
     # Overwrites existing file

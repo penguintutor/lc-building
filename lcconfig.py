@@ -43,3 +43,6 @@ class LCConfig():
         # Set width of etch lines (eg. door outside)
         # If etch as polygon True then this value moust be set
         self.etch_line_width = 10
+        
+        # Views must be one of these or default to front
+        self.allowed_views = ["front", "right", "rear", "left", "top", "bottom"]

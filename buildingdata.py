@@ -1,6 +1,7 @@
 # Take template data and store in BuildingData
 import json
 import re
+from lcconfig import LCConfig
 
 def is_number(s):
     try:
@@ -10,14 +11,18 @@ def is_number(s):
         return False
     
 # Views must be one of these or default to front
-allowed_views = ["front", "right", "rear", "left", "top", "bottom"]
+#allowed_views = ["front", "right", "rear", "left", "top", "bottom"]
 
 # Create as an empty class with no data - all empty
 # This allows template to be loaded afterwards or for data to be
 # Added individually
 class BuildingData ():
-    def __init__ (self):
+    def __init__ (self, lcconfig=None):
         self.data = {}
+        if lcconfig == None:
+            self.config = LCConfig()
+        else:
+            self.config = lcconfig
 
     
     # Checks the appropriate parameters for a matching value_string then evaluate
@@ -74,11 +79,20 @@ class BuildingData ():
     
     # Load a data file
     # Overrides all data in memory
+    # Returns tuple - (True / False, "Error string")
     def load_file (self, filename):
         # Keep reference to filename loaded
         self.filename = filename
-        with open(filename, 'r') as datafile:
-            self.data = json.load(datafile)
+        try:
+            with open(filename, 'r') as datafile:
+                self.data = json.load(datafile)
+        except Exception as err:
+            #print (f"Error {err}")
+            return (False, err)
+        # Simple check did we get a name
+        if 'name' not in self.data.keys():
+            return (False, "Invalid data file")
+        return (True, "")
             
     
     # Save current data to file
@@ -132,7 +146,7 @@ class BuildingData ():
             if (len(wall) < 2):
                 wall_data.append (("Error", [[0,0],[0,0],[0,0],[0,0]], "front"))
             # View is optional parameter 2 (default to front)
-            if (len(wall) < 3 or wall[2] not in allowed_views):
+            if (len(wall) < 3 or wall[2] not in self.config.allowed_views):
                 view = "front"
             else:
                 view = wall[2]
