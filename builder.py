@@ -10,7 +10,7 @@ class Builder():
     def __init__(self, lcconfig):
         self.config = lcconfig
         
-        # Create empty building data instance
+        # Create empty building data instance - can load or edit
         self.building = BuildingData(self.config)
 
     # Loads a new file overwriting all data
@@ -25,4 +25,9 @@ class Builder():
         #Todo update building at this point
         self.building.save_file(filename)
         
+    #for wall in building.get_walls():
+        
+    
+        
+    
         

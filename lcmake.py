@@ -96,7 +96,6 @@ svg = SVGOut(filename, svgsettings)
 walls = []
 for wall in building.get_walls():
     # Convert from string values to values from bdata
-    wall_values = []
     walls.append(Wall(wall[0], wall[1], wall[2]))
     
 # Add roofs (loads differently but afterwards is handled as a wall)

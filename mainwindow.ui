@@ -105,7 +105,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>279</width>
+             <width>284</width>
              <height>1489</height>
             </rect>
            </property>
@@ -359,6 +359,7 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionAdd_Wall"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -398,7 +399,8 @@
   </widget>
   <action name="actionExit">
    <property name="icon">
-    <iconset theme="application-exit"/>
+    <iconset theme="application-exit">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -445,10 +447,16 @@
   </action>
   <action name="actionOpen">
    <property name="icon">
-    <iconset theme="document-open"/>
+    <iconset theme="document-open">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Open</string>
+   </property>
+  </action>
+  <action name="actionAdd_Wall">
+   <property name="text">
+    <string>Add Wall</string>
    </property>
   </action>
  </widget>
@@ -457,4 +465,3 @@
  </resources>
  <connections/>
 </ui>
-

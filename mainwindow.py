@@ -100,6 +100,8 @@ class MainWindowUI(QObject):
         if result[0] == False:
             #Todo show error message
             print (f"Error {result[1]}")
+        #print ("Building loaded")
+        #print (f"Builder contents\n{self.builder.building.data}")
         # update load complete message - even if failed as otherwise load is locked
         self.load_complete_signal.emit()
         

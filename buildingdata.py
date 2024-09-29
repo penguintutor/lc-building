@@ -138,6 +138,16 @@ class BuildingData ():
     def get_typical(self):
         return self.data["typical"]
     
+    # Get number of walls roofs or both
+    def num_walls(self):
+        return len(self.data["walls"])
+
+    def num_roofs(self):
+        return len(self.data["roofs"])
+  
+    def num_walls_roofs(self):
+        return self.num_walls() + self.num_roofs()
+    
     # Get wall information processing tokens
     def get_walls(self):
         wall_data = []
