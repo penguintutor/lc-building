@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QGraphicsScene, QFileDialog
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
+from svgview import SVGView
 from vobject import VObject
 from lcconfig import LCConfig
 from gconfig import GConfig
