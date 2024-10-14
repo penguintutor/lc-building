@@ -4,6 +4,7 @@
 
 
 from buildingdata import *
+from helpers import *
 from wall import Wall
 from texture import Texture
 from feature import Feature
@@ -51,30 +52,41 @@ class Builder():
     # After loading data this converts into builder objects
     # Deletes any existing entries
     def process_data(self):
+        
+        print ("\n\nBuilder processing data")
+        settings = self.building.get_settings()
+        if len(settings) > 0:
+            # Add settings to the class
+            for setting in settings.keys():
+                Wall.settings[setting] = settings[setting]
+        
+            print ("Settings loaded")
+        else:
+            print ("No settings")
+        
         self.walls = []
         all_walls = self.building.get_walls()
         for wall in all_walls:
+            print ("Loading Wall")
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2]))
         
         # Add roofs (loads differently but afterwards is handled as a wall)
         for roof in self.building.get_roofs():
-            print ("Roof {roof}")
+            print (f"Roof {roof}")
             self.walls.append(Wall(roof[0], roof[1], roof[2]))
-            
-        # ToDo
-        # Get textures and features from self.building
-        return
-        
             
         for texture in self.building.get_textures():
             # If not area then default to entire wall
             area = []
+            print (" Adding texture")
             if 'area' in texture:
                 area = texture['area']
             self.walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"] )
-            
+        
+
         for feature in self.building.get_features():
+            print ("Adding feature")
             # Features takes a polygon, but may be represented as more basic rectangle.
             pos = feature["parameters"]["pos"]
             polygon = []
@@ -91,27 +103,27 @@ class Builder():
             self.walls[feature["wall"]].add_feature(pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"])
             
-            # Although there is a setting to ignore interlocking still load it here to preserve
-            for il in self.building.get_interlocking():
-                # Add both primary and secondary for each entry
-                # parameters are optional (defines start and end positions of interlocking section)
-                # These are the optional parameters which are appended
-                parameter_keys = ["start", "end"]
-                # if tags exist then use that if not then don't include
-                parameters = {}
-                for this_key in parameter_keys:
-                    if this_key in il.keys():
-                        parameters[this_key] = il[this_key]
-                reverse = ""
-                if len(il["primary"]) > 2:
-                    reverse = il["primary"][2]
-                self.walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, parameters)
-                reverse = ""
-                if len(il["secondary"]) > 2:
-                    reverse = il["secondary"][2]
-                self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
+        print ("End feature")
+            
+        # Although there is a setting to ignore interlocking still load it here to preserve
+        for il in self.building.get_interlocking():
+            print ("Adding interlocking")
+            # Add both primary and secondary for each entry
+            # parameters are optional (defines start and end positions of interlocking section)
+            # These are the optional parameters which are appended
+            parameter_keys = ["start", "end"]
+            # if tags exist then use that if not then don't include
+            parameters = {}
+            for this_key in parameter_keys:
+                if this_key in il.keys():
+                    parameters[this_key] = il[this_key]
+            reverse = ""
+            if len(il["primary"]) > 2:
+                reverse = il["primary"][2]
+            self.walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, parameters)
+            reverse = ""
+            if len(il["secondary"]) > 2:
+                reverse = il["secondary"][2]
+            self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
     
-    
-        
-    
-        
+        print ("Builder processing data complete\n\n")

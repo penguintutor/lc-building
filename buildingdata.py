@@ -168,6 +168,9 @@ class BuildingData ():
         return wall_data
     
     def get_interlocking(self):
+        if (not "interlocking" in self.data):
+            print ("No interlocking")
+            return []
         return self.data["interlocking"]
     
     # Returns roofs after parsing tokens
@@ -206,6 +209,11 @@ class BuildingData ():
         if not "features" in self.data:
             return []
         return self.data["features"]
+    
+    def get_settings(self):
+        if not "settings" in self.data:
+            return []
+        return self.data["settings"]
     
     # Returns the roof overlap values as a dict
     def get_roof_overlap(self):

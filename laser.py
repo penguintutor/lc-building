@@ -118,7 +118,7 @@ class CutRect(Cut):
     def get_size_pixels(self):
         return Laser.sc.convert(self.size)
     
-    def get_size_pixels(self, zoom=None):
+    def get_size_pixels_screen(self, zoom=None):
         return Laser.zl.convert(self.size, zoom)
     
 class CutPolygon(Cut):

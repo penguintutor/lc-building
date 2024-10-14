@@ -57,9 +57,12 @@ class Wall():
             start_line = this_edge_segments[0][0]
             end_line = this_edge_segments[0][1]
             edge_ils = None
+            
+            print (f"Il {self.il}")
+            
             for il in self.il:
                 if il.get_edge() == i:
-                    # todo add interlocks to this edge
+                    # add interlocks to this edge
                     edge_ils = il
             # Now sort into order to apply
             # Must not overlap, but only check startpos rather than end

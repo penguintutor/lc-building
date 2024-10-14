@@ -38,5 +38,5 @@ class ViewScene():
             etches = wall.get_etches()
             if etches != None:
                 for etch in etches:
-                    self.obvj_views[len(self.obj_views)-1].add_etch(etch)
+                    self.obj_views[len(self.obj_views)-1].add_etch(etch)
             

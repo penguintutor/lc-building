@@ -4,6 +4,8 @@
 
 # Uses laser module and all classes (eg. cuts)
 from laser import *
+from PySide6.QtCore import QPointF
+from PySide6.QtGui import QPolygonF
 
 # Settings is a dict of different settings
 class ObjView():
@@ -23,12 +25,15 @@ class ObjView():
             end_line = cut.get_end_pixels_screen(self.offset)
             self.scene.addLine(*start_line, *end_line) #, stroke=self.settings['cutstroke'], stroke_width=self.settings['strokewidth'])
         elif (cut.get_type() == "rect"):
-            start_rect = cut.get_start_pixels(self.offset)
-            rect_size = cut.get_size_pixels()
-            self.scene.addRect(start_rect, rect_size) # , stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
+            start_rect = cut.get_start_pixels_screen(self.offset)
+            rect_size = cut.get_size_pixels_screen()
+            self.scene.addRect(*start_rect, *rect_size) # , stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
         elif (cut.get_type() == "polygon"):
-            new_points = cut.get_points_pixels(self.offset)
-            self.scene.addPolygon(new_points) #, stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
+            new_points = cut.get_points_pixels_screen(self.offset)
+            polygon = QPolygonF()
+            for point in new_points:
+                polygon.append(QPointF(*point))
+            self.scene.addPolygon(polygon) #, stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
         
     def add_etch(self, etch):
         # Get strength from the etch object
@@ -36,23 +41,28 @@ class ObjView():
         # Special case for line etch as software tools not allow, plus need to add width
         if (etch.get_type() == "line"):
             # Check if etch_as_polygon set (in which case get polygon instead of line)
-            if self.settings['etchaspolygon'] == True:
+            # Really intended for actual output (eg. because laser cutter requires polygon)
+            # May want to have different setting / pen size for display to screen
+            if self.settings.etch_as_polygon == True:
                 new_points = etch.get_polygon_pixels_screen(self.offset)
-                self.scene.addPolygon(new_points) # , stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
+                polygon = QPolygonF()
+                for point in new_points:
+                    polygon.append(QPointF(*point))
+                self.scene.addPolygon(polygon) # , stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
             # Otherwise treat as line
             else:
                 # start_etch is modified start
                 start_line = etch.get_start_pixels_screen(self.offset)
                 end_line = etch.get_end_pixels_screen(self.offset)
-                self.scene.addLine(start_line, end_line) #, stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
+                self.scene.addLine(*start_line, *end_line) #, stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
         elif (etch.get_type() == "rect"):
             start_rect = etch.get_start_pixels_screen(self.offset)
             rect_size = etch.get_size_pixels_screen()
-            self.scene.addRect(start_rect, rect_size)
+            self.scene.addRect(*start_rect, *rect_size)
             #, stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
         elif (etch.get_type() == "polygon"):
             new_points = etch.get_points_pixels_screen(self.offset)
-            self.scene.addPolygon(new_points) #, stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
-
-#    def save(self):
-#        self.dwg.save()
+            polygon = QPolygonF()
+            for point in new_points:
+                polygon.append(QPointF(*point))
+            self.scene.addPolygon(polygon) #, stroke=self.settings['etchstrokes'][strength], fill=self.settings['etchfill'], stroke_width=self.settings['strokewidth']))
