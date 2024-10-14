@@ -23,6 +23,7 @@ class ObjView():
             # get as pixels with offset added
             start_line = cut.get_start_pixels_screen(self.offset)
             end_line = cut.get_end_pixels_screen(self.offset)
+            #print (f"     Start line {start_line},  End line {end_line}")
             self.scene.addLine(*start_line, *end_line) #, stroke=self.settings['cutstroke'], stroke_width=self.settings['strokewidth'])
         elif (cut.get_type() == "rect"):
             start_rect = cut.get_start_pixels_screen(self.offset)

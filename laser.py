@@ -66,6 +66,9 @@ class CutLine(Cut):
         super().__init__("line", internal_offset)
 
 
+    def __str__(self):
+        return f'Cut {self.type} from {self.start} to {self.end} io {self.io}'
+
     # Get start value converted by scale and into pixels
     # If supplied offset is in pixels relative to start of object
     def get_start_pixels(self, offset=(0,0)):
@@ -101,6 +104,9 @@ class CutRect(Cut):
         self.start = start
         self.size = size
         super().__init__("rect", internal_offset)
+        
+    def __str__(self):
+        return f'Cut {self.type} from {self.start} size {self.size} io {self.io}'
           
     def get_start_pixels(self, offset=(0,0)):
         start_io = ([self.start[0]+self.io[0], self.start[1]+self.io[1]])

@@ -20,10 +20,10 @@ class ViewScene():
         self.add_walls()
         
     def add_walls(self):
-        print ("Add walls")
+        #print ("Add walls")
         # Get all the walls from builder
         walls = self.builder.get_walls_view(self.view_name)
-        print (f"Adding {len(walls)} walls")
+        #print (f"Adding {len(walls)} walls")
         for wall in walls:
             # Create objview to abstract out the drawing
             # Uses lasercutter config lcconfig - could have heirarchical in future - allow override for graphics display
@@ -32,8 +32,8 @@ class ViewScene():
             # Now draw them on the scene
             cuts = wall.get_cuts()
             for cut in cuts:
-                print (f"Adding cuts to {self.view_name}")
                 self.obj_views[len(self.obj_views)-1].add_cut(cut)
+ 
             # Get the etching
             etches = wall.get_etches()
             if etches != None:

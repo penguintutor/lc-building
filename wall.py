@@ -58,10 +58,11 @@ class Wall():
             end_line = this_edge_segments[0][1]
             edge_ils = None
             
-            print (f"Il {self.il}")
+            #print (f"Il {self.il}")
             
             for il in self.il:
                 if il.get_edge() == i:
+                    #print (f"Interlock on {i}")
                     # add interlocks to this edge
                     edge_ils = il
             # Now sort into order to apply
@@ -74,9 +75,11 @@ class Wall():
                 # Convert to line objects
                 for this_segment in this_edge_segments:
                     cut_lines.append(CutLine(this_segment[0], this_segment[1]))
+                    #print (f" Adding il segment {i} {this_segment[0]} , {this_segment[1]}")
             else:
                 # otherwise just append his one edge
                 cut_lines.append(CutLine(cut_edges[i][0], cut_edges[i][1]))
+                #print (f"  Adding normal edge {i} : {cut_edges[i][0]} , {cut_edges[i][1]}")
         # Add cuts from features
         feature_cuts = self._get_cuts_features()
         if feature_cuts != None:

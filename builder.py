@@ -43,9 +43,9 @@ class Builder():
         # Create temporary list of which walls to export
         view_walls = []
         for wall in self.walls:
-            print (f"Wall view {wall.view}")
+            #print (f"Wall view {wall.view}")
             if wall.view == view:
-                print ("Adding wall here ")
+                #print ("Adding wall here ")
                 view_walls.append(wall)
         return view_walls
         
@@ -60,33 +60,33 @@ class Builder():
             for setting in settings.keys():
                 Wall.settings[setting] = settings[setting]
         
-            print ("Settings loaded")
-        else:
-            print ("No settings")
+        #    print ("Settings loaded")
+        #else:
+        #    print ("No settings")
         
         self.walls = []
         all_walls = self.building.get_walls()
         for wall in all_walls:
-            print ("Loading Wall")
+        #    print ("Loading Wall")
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2]))
         
         # Add roofs (loads differently but afterwards is handled as a wall)
         for roof in self.building.get_roofs():
-            print (f"Roof {roof}")
+        #    print (f"Roof {roof}")
             self.walls.append(Wall(roof[0], roof[1], roof[2]))
             
         for texture in self.building.get_textures():
             # If not area then default to entire wall
             area = []
-            print (" Adding texture")
+        #    print (" Adding texture")
             if 'area' in texture:
                 area = texture['area']
             self.walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"] )
         
 
         for feature in self.building.get_features():
-            print ("Adding feature")
+        #    print ("Adding feature")
             # Features takes a polygon, but may be represented as more basic rectangle.
             pos = feature["parameters"]["pos"]
             polygon = []
@@ -103,11 +103,11 @@ class Builder():
             self.walls[feature["wall"]].add_feature(pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"])
             
-        print ("End feature")
+        #print ("End feature")
             
         # Although there is a setting to ignore interlocking still load it here to preserve
         for il in self.building.get_interlocking():
-            print ("Adding interlocking")
+        #    print ("Adding interlocking")
             # Add both primary and secondary for each entry
             # parameters are optional (defines start and end positions of interlocking section)
             # These are the optional parameters which are appended
