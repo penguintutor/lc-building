@@ -151,6 +151,10 @@ class BuildingData ():
     # Get wall information processing tokens
     def get_walls(self):
         wall_data = []
+        # No walls just return
+        if (not "walls" in self.data):
+            print ("No walls")
+            return[]
         for wall in self.data["walls"]:
             # Basic error check for minimum number of parameters
             if (len(wall) < 2):
@@ -169,12 +173,15 @@ class BuildingData ():
     # Returns roofs after parsing tokens
     def get_roofs(self):
         roof_data = []
+        if (not "roofs" in self.data):
+            print ("No roofs")
+            return []
         for roof in self.data["roofs"]:
             # Basic error check for minimum number of parameters
             if (len(roof) < 2):
                 roof_data.append(("Error", [[0,0],[0,0],[0,0],[0,0]], "front"))
             # View is optional parameter 2 (default to top for roof)
-            if (len(roof) < 3 or roof[2] not in allowed_views):
+            if (len(roof) < 3 or roof[2] not in self.config.allowed_views):
                 view = "top"
             else:
                 view = roof[2]
@@ -182,6 +189,9 @@ class BuildingData ():
         return roof_data
     
     def get_textures(self):
+        if (not "textures" in self.data):
+            print ("No textures")
+            return []
         return self.data["textures"]
     
     # Returns as a copy of the parameters and settings
@@ -193,6 +203,8 @@ class BuildingData ():
         return values
 
     def get_features(self):
+        if not "features" in self.data:
+            return []
         return self.data["features"]
     
     # Returns the roof overlap values as a dict

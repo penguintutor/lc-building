@@ -1,8 +1,9 @@
+# Handles conversion between mm and scale size
+# Has limited scale sizes (set using constructor)
 import sys
 
 
 class Scale():
-    
     
     scales = {
         'N': 148,      # Note that some of the objects are very small with N scale
@@ -18,6 +19,7 @@ class Scale():
 
     mm_to_pixel_factor = 3.8
     
+    # Scale can be a model railway from list "scales" or value (used for screen)
     # If not defined use default of OO - can change later
     def __init__ (self, scale='OO'):
         if (scale in self.scales):
@@ -28,6 +30,9 @@ class Scale():
             print (f"Invalid scale - {scale} is not supported")
             sys.exit("Need valid scale")
     
+    # set_scale used for outputting for SVG
+    # Uses scale "names"
+    # For graphics set_view_scale - allows 
     def set_scale (self, scale):
         if  (scale in self.scales.keys()):
             self.scale = scale

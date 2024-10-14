@@ -4,6 +4,10 @@
 
 
 from buildingdata import *
+from wall import Wall
+from texture import Texture
+from feature import Feature
+from interlocking import Interlocking
 from lcconfig import LCConfig
 
 class Builder():
@@ -15,13 +19,14 @@ class Builder():
         
         # Create instance of self.walls
         self.walls = []
+        self.process_data()
 
     # Loads a new file overwriting all data
     # Returns result of buildingdata load - (True/False, "Error string")
     def load_file(self, filename):
         result = self.building.load_file(filename)
         # If successfully load then clear existing data and regenerate
-        if result == True:
+        if result[0] == True:
             self.process_data()
         return result
         
@@ -34,27 +39,42 @@ class Builder():
         
     # Get the walls that match a certain view
     def get_walls_view(self, view):
-        pass
+        # Create temporary list of which walls to export
+        view_walls = []
+        for wall in self.walls:
+            print (f"Wall view {wall.view}")
+            if wall.view == view:
+                print ("Adding wall here ")
+                view_walls.append(wall)
+        return view_walls
         
     # After loading data this converts into builder objects
     # Deletes any existing entries
     def process_data(self):
         self.walls = []
-        for wall in building.get_self.walls():
+        all_walls = self.building.get_walls()
+        for wall in all_walls:
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2]))
+        
         # Add roofs (loads differently but afterwards is handled as a wall)
-        for roof in building.get_roofs():
+        for roof in self.building.get_roofs():
+            print ("Roof {roof}")
             self.walls.append(Wall(roof[0], roof[1], roof[2]))
             
-        for texture in building.get_textures():
+        # ToDo
+        # Get textures and features from self.building
+        return
+        
+            
+        for texture in self.building.get_textures():
             # If not area then default to entire wall
             area = []
             if 'area' in texture:
                 area = texture['area']
             self.walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"] )
             
-        for feature in building.get_features():
+        for feature in self.building.get_features():
             # Features takes a polygon, but may be represented as more basic rectangle.
             pos = feature["parameters"]["pos"]
             polygon = []
@@ -72,7 +92,7 @@ class Builder():
                                                feature["cuts"], feature["etches"], feature["outers"])
             
             # Although there is a setting to ignore interlocking still load it here to preserve
-            for il in building.get_interlocking():
+            for il in self.building.get_interlocking():
                 # Add both primary and secondary for each entry
                 # parameters are optional (defines start and end positions of interlocking section)
                 # These are the optional parameters which are appended

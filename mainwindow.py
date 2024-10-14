@@ -6,7 +6,8 @@ from PySide6.QtWidgets import QGraphicsScene, QFileDialog
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
-from svgview import SVGView
+#from svgview import SVGView
+from viewscene import ViewScene
 from vobject import VObject
 from lcconfig import LCConfig
 from gconfig import GConfig
@@ -63,10 +64,13 @@ class MainWindowUI(QObject):
         #self.image1 = QGraphicsSvgItem("resources/icon_front_01.svg")
         #self.scene.addItem(self.image1)
         
-        # Create views ready for holding objects to view
+        # Create scenes ready for holding objects to view
+        # Also create view scenes which are then used to draw the particular view on the scene
         self.scenes = {}
+        self.view_scenes = {}
         for scene_name in self.config.allowed_views:
             self.scenes[scene_name] = QGraphicsScene()
+            self.view_scenes[scene_name] = ViewScene(self.scenes[scene_name], self.builder, scene_name)
         
         # Default to front view
         self.ui.graphicsView.setScene(self.scenes['front'])
@@ -94,7 +98,9 @@ class MainWindowUI(QObject):
     def edit_menu(self):
         pass
     
+    # File open is called as a separate thread
     def file_open(self):
+        print ("Loading file {self.new_filename}")
         # Prevent duplicate file opens (or saving when opening etc.)
         self.disable_file_actions()
         result = self.builder.load_file(self.new_filename)
@@ -106,11 +112,13 @@ class MainWindowUI(QObject):
         # update load complete message - even if failed as otherwise load is locked
         self.load_complete_signal.emit()
         
+    # Called from load_complete_signal after a file has been loaded
     def load_complete(self):
         # Reenable file actions
         self.enable_file_actions()
         print ("Updating GUI")
         # Todo update views
+        self.update_all_views()
 
     # Whenever performing file action then disable other actions to prevent duplicates / conflicting
     def disable_file_actions(self):
@@ -118,3 +126,15 @@ class MainWindowUI(QObject):
         
     def enable_file_actions(self):
         self.ui.actionOpen.setEnabled(True)
+        
+    def update_all_views (self):
+        for scene_name in self.config.allowed_views:
+            self.update_view (scene_name)
+        
+    # Updates each of the views by updating the scene
+    def update_view (self, view_name):
+        print (f"Updating scene {view_name}")
+        self.view_scenes[view_name].update()
+        # Show the main screen
+        self.ui.graphicsView.show()
+        
