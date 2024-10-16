@@ -2,10 +2,11 @@
 # Based on scale, but applied to screen and allows easy change factor
 # All methods have optional scale_factor which overrides - some ignore if not relevant
 
-import sys
-
-
 class Zoom():
+    
+    # Standard levels when using zoom in / zoom out
+    # Smallest to biggest
+    zoom_levels = [100, 80, 70, 60, 50, 40, 30, 20, 10]
     
     mm_to_pixel_factor = 3.8
     
@@ -16,6 +17,39 @@ class Zoom():
     def set_zoom (self, scale_factor):
         self.scale_factor = scale_factor
     
+    # Move to next lower (or no change if zoom to furthest)
+    def zoom_out (self):
+        current_zoom = 0
+        num_levels = len(Zoom.zoom_levels)
+        # Search list to find which is next one below current
+        for zoom_level in range (0, num_levels):
+            if Zoom.zoom_levels[zoom_level] >= self.scale_factor:
+                current_zoom = zoom_level
+            else:
+                break
+        # If zoom is at bottom then don't go below 0
+        new_zoom = 0
+        if (current_zoom != 0):
+            new_zoom = current_zoom -1
+        self.scale_factor = Zoom.zoom_levels[new_zoom]
+
+        
+    def zoom_in (self):
+        current_zoom = 0
+        num_levels = len(Zoom.zoom_levels)
+        # Search list to find which is next one below current
+        for zoom_level in range (0, num_levels):
+            if Zoom.zoom_levels[zoom_level] >= self.scale_factor:
+                current_zoom = zoom_level
+            else:
+                break
+        # If zoom is at bottom then don't go below 0
+        new_zoom = num_levels-1
+        if (current_zoom != num_levels-1):
+            new_zoom = current_zoom +1
+        self.scale_factor = Zoom.zoom_levels[new_zoom]
+
+            
     # Perform conversion from mm to scale mm
     # Normally do before convert to pixels
     def scale_convert(self, mm_value, scale_factor=None):

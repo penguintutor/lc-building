@@ -17,6 +17,7 @@ class ViewScene():
        
     # Currently just add_walls, but in future may need to clear existing
     def update(self):
+        self.scene.clear()
         self.add_walls()
         
     def add_walls(self):
@@ -39,4 +40,7 @@ class ViewScene():
             if etches != None:
                 for etch in etches:
                     self.obj_views[len(self.obj_views)-1].add_etch(etch)
+                    
+    def clear(self):
+        self.scene.clear()
             

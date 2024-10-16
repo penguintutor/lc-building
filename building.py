@@ -17,7 +17,7 @@ class App(QApplication):
         
 
 # Scale for output - default to OO
-sc = Scale("OO")
+sc = Scale("G")
 # Pass scale instance to laser class
 Laser.sc = sc
 # Zoom level for display

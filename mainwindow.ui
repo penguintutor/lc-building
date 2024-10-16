@@ -105,7 +105,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>284</width>
+             <width>279</width>
              <height>1489</height>
             </rect>
            </property>
@@ -371,12 +371,26 @@
     <property name="title">
      <string>View</string>
     </property>
-    <addaction name="actionFront"/>
-    <addaction name="actionRight"/>
-    <addaction name="actionRear"/>
-    <addaction name="actionLeft"/>
-    <addaction name="actionTop"/>
-    <addaction name="actionBottom"/>
+    <widget class="QMenu" name="menuZoom">
+     <property name="title">
+      <string>Zoom</string>
+     </property>
+     <addaction name="actionZoom_Out"/>
+     <addaction name="actionZoom_In"/>
+    </widget>
+    <widget class="QMenu" name="menuProfile">
+     <property name="title">
+      <string>Profile</string>
+     </property>
+     <addaction name="actionFront"/>
+     <addaction name="actionRight"/>
+     <addaction name="actionRear"/>
+     <addaction name="actionLeft"/>
+     <addaction name="actionTop"/>
+     <addaction name="actionBottom"/>
+    </widget>
+    <addaction name="menuProfile"/>
+    <addaction name="menuZoom"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -395,6 +409,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen"/>
+   <addaction name="actionZoom_Out"/>
+   <addaction name="actionZoom_In"/>
    <addaction name="actionVisit_Website"/>
   </widget>
   <action name="actionExit">
@@ -457,6 +473,27 @@
   <action name="actionAdd_Wall">
    <property name="text">
     <string>Add Wall</string>
+   </property>
+  </action>
+  <action name="actionDefault">
+   <property name="text">
+    <string>Default</string>
+   </property>
+  </action>
+  <action name="actionZoom_Out">
+   <property name="icon">
+    <iconset theme="zoom-out"/>
+   </property>
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+  </action>
+  <action name="actionZoom_In">
+   <property name="icon">
+    <iconset theme="zoom-in"/>
+   </property>
+   <property name="text">
+    <string>Zoom In</string>
    </property>
   </action>
  </widget>

@@ -2,7 +2,6 @@
 # Has limited scale sizes (set using constructor)
 import sys
 
-
 class Scale():
     
     scales = {

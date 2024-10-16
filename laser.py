@@ -49,7 +49,7 @@ class Laser():
         Laser.zl = zl
         
     def set_zoom(self, zoom):
-        return self.zl.set_zoom(zoom)
+        self.zl.set_zoom(zoom)
         
 
 class Cut(Laser):

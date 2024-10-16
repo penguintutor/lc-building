@@ -2,15 +2,18 @@ import os
 from PySide6.QtCore import Qt, QCoreApplication, QUrl, QThreadPool, Signal
 #from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtCore import QObject
-from PySide6.QtWidgets import QGraphicsScene, QFileDialog
+from PySide6.QtWidgets import QMainWindow, QGraphicsScene, QFileDialog
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtGui import QWheelEvent
+from laser import Laser
 from builder import Builder
 #from svgview import SVGView
 from viewscene import ViewScene
 from vobject import VObject
 from lcconfig import LCConfig
 from gconfig import GConfig
+from vgraphicsscene import ViewGraphicsScene
 import webbrowser
 import resources
 
@@ -19,7 +22,8 @@ basedir = os.path.dirname(__file__)
 
 app_title = "Building Designer"
 
-class MainWindowUI(QObject):
+#class MainWindowUI(QObject):
+class MainWindowUI(QMainWindow):
     
     load_complete_signal = Signal()
     
@@ -46,6 +50,9 @@ class MainWindowUI(QObject):
         # screen, but not such a good experience
         status['screensize'] = self.ui.screen().size().toTuple()
         
+        # Which scene shown in main window
+        self.current_scene = 'front'
+        
         self.gconfig = GConfig(status)
         self.builder = Builder(self.config)
         
@@ -54,29 +61,27 @@ class MainWindowUI(QObject):
         
         if self.gconfig.maximized == True:
             self.ui.showMaximized()
-        
-        
-    
-        #self.scene = QGraphicsScene()
-        
-        #Examples of adding items to scenes        
-        #self.scene.addText("Hello, world!")
-        #self.image1 = QGraphicsSvgItem("resources/icon_front_01.svg")
-        #self.scene.addItem(self.image1)
-        
+              
         # Create scenes ready for holding objects to view
         # Also create view scenes which are then used to draw the particular view on the scene
         self.scenes = {}
         self.view_scenes = {}
         for scene_name in self.config.allowed_views:
-            self.scenes[scene_name] = QGraphicsScene()
+            #self.scenes[scene_name] = QGraphicsScene()
+            self.scenes[scene_name] = ViewGraphicsScene(self)
             self.view_scenes[scene_name] = ViewScene(self.scenes[scene_name], self.builder, scene_name)
         
         # Default to front view
-        self.ui.graphicsView.setScene(self.scenes['front'])
+        self.ui.graphicsView.setScene(self.scenes[self.current_scene])
 
+        # File Menu
         self.ui.actionOpen.triggered.connect(self.open_file_dialog)
         self.ui.actionExit.triggered.connect(QCoreApplication.quit)
+        # Edit Menu
+        # View Menu
+        self.ui.actionZoom_Out.triggered.connect(self.zoom_out)
+        self.ui.actionZoom_In.triggered.connect(self.zoom_in)
+        # Help Menu
         self.ui.actionVisit_Website.triggered.connect(self.visit_website)
         
         self.ui.show()      
@@ -131,6 +136,14 @@ class MainWindowUI(QObject):
         for scene_name in self.config.allowed_views:
             self.update_view (scene_name)
         
+    def zoom_out (self):
+        Laser.zl.zoom_out()
+        self.update_view (self.current_scene)
+        
+    def zoom_in (self):
+        Laser.zl.zoom_in()
+        self.update_view (self.current_scene)
+        
     # Updates each of the views by updating the scene
     def update_view (self, view_name):
         print (f"Updating scene {view_name}")
@@ -138,3 +151,5 @@ class MainWindowUI(QObject):
         # Show the main screen
         self.ui.graphicsView.show()
         
+    def scene_scroll (self, in_out):
+        print (f"Scroll received {in_out}")
