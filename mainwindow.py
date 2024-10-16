@@ -81,6 +81,12 @@ class MainWindowUI(QMainWindow):
         # View Menu
         self.ui.actionZoom_Out.triggered.connect(self.zoom_out)
         self.ui.actionZoom_In.triggered.connect(self.zoom_in)
+        self.ui.actionFront.triggered.connect(self.view_front)
+        self.ui.actionRight.triggered.connect(self.view_right)
+        self.ui.actionRear.triggered.connect(self.view_rear)
+        self.ui.actionLeft.triggered.connect(self.view_left)
+        self.ui.actionTop.triggered.connect(self.view_top)
+        self.ui.actionBottom.triggered.connect(self.view_bottom)
         # Help Menu
         self.ui.actionVisit_Website.triggered.connect(self.visit_website)
         
@@ -153,3 +159,22 @@ class MainWindowUI(QMainWindow):
         
     def scene_scroll (self, in_out):
         print (f"Scroll received {in_out}")
+        
+    def view_front (self):
+        self.change_scene('front')
+    def view_right (self):
+        self.change_scene('right')
+    def view_rear (self):
+        self.change_scene('rear')
+    def view_left (self):
+        self.change_scene('left')
+    def view_top (self):
+        self.change_scene('top')
+    def view_bottom (self):
+        self.change_scene('bottom')
+
+    def change_scene (self, new_scene):
+        self.current_scene = new_scene
+        self.view_scenes[new_scene].update()
+        self.ui.graphicsView.setScene(self.scenes[self.current_scene])
+        self.ui.graphicsView.show()
