@@ -90,6 +90,20 @@ class MainWindowUI(QMainWindow):
         # Help Menu
         self.ui.actionVisit_Website.triggered.connect(self.visit_website)
         
+        # View buttons
+        self.ui.frontViewButton.pressed.connect(self.view_front)
+        self.ui.frontViewImageButton.pressed.connect(self.view_front)
+        self.ui.rightViewButton.pressed.connect(self.view_right)
+        self.ui.rightViewImageButton.pressed.connect(self.view_right)
+        self.ui.rearViewButton.pressed.connect(self.view_rear)
+        self.ui.rearViewImageButton.pressed.connect(self.view_rear)
+        self.ui.leftViewButton.pressed.connect(self.view_left)
+        self.ui.leftViewImageButton.pressed.connect(self.view_left)
+        self.ui.topViewButton.pressed.connect(self.view_top)
+        self.ui.topViewImageButton.pressed.connect(self.view_top)
+        self.ui.bottomViewButton.pressed.connect(self.view_bottom)
+        self.ui.bottomViewImageButton.pressed.connect(self.view_bottom)
+        
         self.ui.show()      
 
 
