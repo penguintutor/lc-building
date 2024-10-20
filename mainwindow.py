@@ -27,6 +27,11 @@ class MainWindowUI(QMainWindow):
     
     load_complete_signal = Signal()
     
+    # If a long action is being performed then increment and prevent new actions
+    # Prevents locking up when zooming in on a complex image
+    # Doesn't work due to queued events
+    action_state = 0
+    
     def __init__(self):
         super().__init__()
         
@@ -145,7 +150,7 @@ class MainWindowUI(QMainWindow):
         # Todo update views
         self.update_all_views()
 
-    # Whenever performing file action then disable other actions to prevent duplicates / conflicting
+    # Whenever performing file action then disable other file actions to prevent duplicates / conflicting
     def disable_file_actions(self):
         self.ui.actionOpen.setEnabled(False)
         
