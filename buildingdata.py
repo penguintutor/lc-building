@@ -9,7 +9,9 @@ def is_number(s):
         return True
     except ValueError:
         return False
-    
+
+default_pos = [50, 50]
+
 # Views must be one of these or default to front
 #allowed_views = ["front", "right", "rear", "left", "top", "bottom"]
 
@@ -158,13 +160,21 @@ class BuildingData ():
         for wall in self.data["walls"]:
             # Basic error check for minimum number of parameters
             if (len(wall) < 2):
-                wall_data.append (("Error", [[0,0],[0,0],[0,0],[0,0]], "front"))
+                wall_data.append (("Error", [[0,0],[0,0],[0,0],[0,0]], "front", [0,0]))
             # View is optional parameter 2 (default to front)
             if (len(wall) < 3 or wall[2] not in self.config.allowed_views):
                 view = "front"
             else:
                 view = wall[2]
-            wall_data.append((wall[0], self.process_multiple_tokens(wall[1]), view))
+            # basic check to see if parameter exists and is a list
+            # does not check if if they are valid values
+            if (len(wall) < 4 or type(wall[3]) != list) :
+                position = default_pos
+            else:
+                #print (f"Position defined {wall[3]}")
+                position = wall[3]
+                
+            wall_data.append((wall[0], self.process_multiple_tokens(wall[1]), view, position))
         return wall_data
     
     def get_interlocking(self):
@@ -182,13 +192,21 @@ class BuildingData ():
         for roof in self.data["roofs"]:
             # Basic error check for minimum number of parameters
             if (len(roof) < 2):
-                roof_data.append(("Error", [[0,0],[0,0],[0,0],[0,0]], "front"))
+                roof_data.append(("Error", [[0,0],[0,0],[0,0],[0,0]], "top", [0,0]))
             # View is optional parameter 2 (default to top for roof)
             if (len(roof) < 3 or roof[2] not in self.config.allowed_views):
                 view = "top"
             else:
                 view = roof[2]
-            roof_data.append((roof[0], self.process_multiple_tokens(roof[1]), view))
+            # basic check to see if parameter exists and is a list
+            # does not check if if they are valid values
+            if (len(roof) < 4 or type(roof[3]) != list) :
+                position = default_pos
+            else:
+                #print (f"Position defined {roof[3]}")
+                position = roof[3]
+                
+            roof_data.append((roof[0], self.process_multiple_tokens(roof[1]), view, position))
         return roof_data
     
     def get_textures(self):

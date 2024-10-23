@@ -13,8 +13,8 @@ class ObjView():
         self.settings = settings
         self.scene = scene
         self.offset = coords
-        #self.dwg = svgwrite.Drawing(filename, profile='tiny', size=(str(settings["docsize"][0]),str(settings["docsize"][1])))
-        
+        print (f"Offset {self.offset}")
+                
     def set_offset(self, offset):
         self.offset = offset
     
@@ -29,12 +29,14 @@ class ObjView():
             start_rect = cut.get_start_pixels_screen(self.offset)
             rect_size = cut.get_size_pixels_screen()
             self.scene.addRect(*start_rect, *rect_size) # , stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
+            print (f"Rect points {start_rect} size {rect_size}")
         elif (cut.get_type() == "polygon"):
             new_points = cut.get_points_pixels_screen(self.offset)
             polygon = QPolygonF()
             for point in new_points:
                 polygon.append(QPointF(*point))
             self.scene.addPolygon(polygon) #, stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
+            print (f"Polygon points {polygon}")
         
     def add_etch(self, etch):
         # Get strength from the etch object

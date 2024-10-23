@@ -69,12 +69,12 @@ class Builder():
         for wall in all_walls:
         #    print ("Loading Wall")
             # Convert from string values to values from bdata
-            self.walls.append(Wall(wall[0], wall[1], wall[2]))
+            self.walls.append(Wall(wall[0], wall[1], wall[2], wall[3]))
         
         # Add roofs (loads differently but afterwards is handled as a wall)
         for roof in self.building.get_roofs():
         #    print (f"Roof {roof}")
-            self.walls.append(Wall(roof[0], roof[1], roof[2]))
+            self.walls.append(Wall(roof[0], roof[1], roof[2], roof[3]))
             
         for texture in self.building.get_textures():
             # If not area then default to entire wall

@@ -30,7 +30,8 @@
           ["width", "wall_height"],
           ["0", "wall_height"],
           ["0","0"]
-          ], "front"
+          ], 
+          "front"
       ],
       ["Apex left with door", [
           ["0", "roof_height - wall_height"],
@@ -67,7 +68,7 @@
           ["width + roof_left_overlap + roof_right_overlap", "depth / 2 + depth * 0.2 + roof_front_overlap"],
           ["0", "depth / 2 + depth * 0.2 + roof_front_overlap"],
           ["0", "0"]
-          ], "top"
+          ], "top", [0,0]
       ],
       ["Roof rear", [
           ["0", "0"],
@@ -75,10 +76,9 @@
           ["width + roof_left_overlap + roof_right_overlap", "depth / 2 + depth * 0.2 + roof_rear_overlap"],
           ["0", "depth / 2 + depth * 0.2 + roof_rear_overlap"],
           ["0", "0"]
-          ], "top"
+          ], "top", [200, 200]
       ]
-      
-      
+
     ],
   "textures":
     [

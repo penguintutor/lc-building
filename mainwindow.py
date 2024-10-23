@@ -130,7 +130,7 @@ class MainWindowUI(QMainWindow):
     
     # File open is called as a separate thread
     def file_open(self):
-        print ("Loading file {self.new_filename}")
+        print (f"Loading file {self.new_filename}")
         # Prevent duplicate file opens (or saving when opening etc.)
         self.disable_file_actions()
         result = self.builder.load_file(self.new_filename)
@@ -171,13 +171,13 @@ class MainWindowUI(QMainWindow):
         
     # Updates each of the views by updating the scene
     def update_view (self, view_name):
-        print (f"Updating scene {view_name}")
+        #print (f"Updating scene {view_name}")
         self.view_scenes[view_name].update()
         # Show the main screen
         self.ui.graphicsView.show()
         
-    def scene_scroll (self, in_out):
-        print (f"Scroll received {in_out}")
+    #def scene_scroll (self, in_out):
+    #    print (f"Scroll received {in_out}")
         
     def view_front (self):
         self.change_scene('front')
