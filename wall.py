@@ -40,16 +40,31 @@ class Wall():
         self.features = []        # Features for this wall
         # by default are a wall, or could be roof
         self.type = "wall"
+        # Move these to variables so that they are cached within the wall class
+        # Only update when update_xxx is called
+        self.cut_lines = []
+        self.etches = []
+        self.outers = []
+        self.update()
 
-    # Get cuts for outside of wall and any inner cuts (eg. features)
-    def get_cuts (self):
+
+    # Updates cuts, etches and outers
+    def update (self):
+        self.update_cuts()
+        self.update_etches()
+        self.update_outers()
+
+    # Generate all the cuts and store in self.cuts
+    # For performance reasons call this initially then just use get_cuts
+    # but if update then run this again before running get_cuts
+    def update_cuts (self):
         cut_edges = []
         # Start at 1 (2nd point) end of first edge
         for i in range(1, len(self.points)):
             cut_edges.append([self.points[i-1], self.points[i]])
         
         # Convert edges into lines
-        cut_lines = []
+        self.cut_lines = []
         for i in range(0, len(cut_edges)):
             # Do any interlocks apply to this edge if so apply interlocks
             # copy edge into list for applying transformations
@@ -74,33 +89,44 @@ class Wall():
                 this_edge_segments.extend(edge_ils.add_interlock_line(start_line, end_line, remaining_edge_segment))
                 # Convert to line objects
                 for this_segment in this_edge_segments:
-                    cut_lines.append(CutLine(this_segment[0], this_segment[1]))
+                    self.cut_lines.append(CutLine(this_segment[0], this_segment[1]))
                     #print (f" Adding il segment {i} {this_segment[0]} , {this_segment[1]}")
             else:
                 # otherwise just append his one edge
-                cut_lines.append(CutLine(cut_edges[i][0], cut_edges[i][1]))
+                self.cut_lines.append(CutLine(cut_edges[i][0], cut_edges[i][1]))
                 #print (f"  Adding normal edge {i} : {cut_edges[i][0]} , {cut_edges[i][1]}")
         # Add cuts from features
         feature_cuts = self._get_cuts_features()
         if feature_cuts != None:
-            cut_lines.extend(feature_cuts)
-        return cut_lines
+            self.cut_lines.extend(feature_cuts)
+        return self.cut_lines
+        
+
+    # Get cuts for outside of wall and any inner cuts (eg. features)
+    def get_cuts (self):
+        return self.cut_lines
+    
+    def get_etches (self):
+        return self.etches
     
     # Implement this at the Wall level
-    def get_etches (self):
-        etches = self._texture_to_etches()
+    def update_etches (self):
+        self.etches = self._texture_to_etches()
         # Add cuts from features
         feature_etches = self._get_etches_features()
         if feature_etches != None:
-            etches.extend(feature_etches)
-        return etches
+            self.etches.extend(feature_etches)
+        return self.etches
 
     def get_outers (self):
-        outers = []
+        return self.outers
+        
+    def update_outers (self):
+        self.outers = []
         # Add any accessories (windows etc.)
         for feature in self.features:
-            outers.extend(feature.get_outers())
-        return outers
+            self.outers.extend(feature.get_outers())
+        return self.outers
     
     def get_type (self):
         return self.type
@@ -139,6 +165,8 @@ class Wall():
         self.features.append(Feature(startpos, points, cuts, etches, outers))
         # If want to handle settings can do so here
         # Eg. support textures
+        # Update the wall
+        self.update()
         return feature_num
     
     # add any interlock rules for the edges
