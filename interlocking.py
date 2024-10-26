@@ -1,4 +1,3 @@
-import math
 from helpers import *
 
 class Interlocking():

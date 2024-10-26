@@ -1,16 +1,10 @@
 import os
-from PySide6.QtCore import Qt, QCoreApplication, QUrl, QThreadPool, Signal
-#from PySide6.QtWebEngineWidgets import QWebEngineView
-from PySide6.QtCore import QObject
-from PySide6.QtWidgets import QMainWindow, QGraphicsScene, QFileDialog
+from PySide6.QtCore import QCoreApplication, QThreadPool, Signal
+from PySide6.QtWidgets import QMainWindow, QFileDialog
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtGui import QWheelEvent
-from laser import Laser
 from builder import Builder
-#from svgview import SVGView
 from viewscene import ViewScene
-from vobject import VObject
 from lcconfig import LCConfig
 from gconfig import GConfig
 from vgraphicsscene import ViewGraphicsScene

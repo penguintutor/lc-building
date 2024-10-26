@@ -1,12 +1,7 @@
 import sys
-import os
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Qt, QCoreApplication, QUrl
-from PySide6.QtUiTools import QUiLoader
 from mainwindow import MainWindowUI
 from scale import Scale
-from zoom import Zoom
 from laser import Laser
 from interlocking import Interlocking
 
@@ -21,8 +16,8 @@ sc = Scale("G")
 # Pass scale instance to laser class
 Laser.sc = sc
 # Zoom level for display (not used)
-zl = Zoom()
-Laser.zl = zl
+#zl = Zoom()
+#Laser.zl = zl
 
 # Use scale to apply reverse scale to actual material_thickness
 material_thickness = 3

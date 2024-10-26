@@ -5,7 +5,6 @@ from wall import Wall
 from texture import Texture
 from feature import Feature
 from objview import ObjView
-from zoom import Zoom
 
 class ViewScene():
     def __init__(self, scene, builder, view_name):
