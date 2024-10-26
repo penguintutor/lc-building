@@ -20,7 +20,7 @@ class App(QApplication):
 sc = Scale("G")
 # Pass scale instance to laser class
 Laser.sc = sc
-# Zoom level for display
+# Zoom level for display (not used)
 zl = Zoom()
 Laser.zl = zl
 

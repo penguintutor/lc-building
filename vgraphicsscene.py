@@ -16,7 +16,7 @@ class ViewGraphicsScene (QGraphicsScene):
         
     ## Code to handle CTRL & Scroll Wheel for zoom
     def wheelEvent(self, event):
-        # If control not pressed then use wheelEvent for normal window scroll
+        # If control key not pressed then use wheelEvent for normal window scroll
         if not event.modifiers() & Qt.ControlModifier:
             event.ignore()
             return

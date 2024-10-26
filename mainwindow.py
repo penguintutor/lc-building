@@ -55,6 +55,8 @@ class MainWindowUI(QMainWindow):
         # screen, but not such a good experience
         status['screensize'] = self.ui.screen().size().toTuple()
         
+        self.filename = ""
+        
         # Which scene shown in main window
         self.current_scene = 'front'
         
@@ -119,6 +121,7 @@ class MainWindowUI(QMainWindow):
         if filename[0] == '':
             print ("No filename specified")
             return
+        self.ui.statusbar.showMessage ("Loading "+filename[0])
         self.new_filename = filename[0]
         self.threadpool.start(self.file_open)
 
@@ -137,8 +140,12 @@ class MainWindowUI(QMainWindow):
         if result[0] == False:
             #Todo show error message
             print (f"Error {result[1]}")
+            self.ui.statusbar.showMessage ("Error "+result[1])
         #print ("Building loaded")
         #print (f"Builder contents\n{self.builder.building.data}")
+        else:
+            self.filename = self.new_filename
+            self.ui.statusbar.showMessage ("Loaded "+self.filename)
         # update load complete message - even if failed as otherwise load is locked
         self.load_complete_signal.emit()
         
@@ -162,12 +169,25 @@ class MainWindowUI(QMainWindow):
             self.update_view (scene_name)
         
     def zoom_out (self):
-        Laser.zl.zoom_out()
-        self.update_view (self.current_scene)
+        # Minimum zoom is 0.125 - actually two values for scale, but just look at x
+        current_scale = self.ui.graphicsView.transform().m11()
+        if current_scale <= 0.125:
+            return
+        # Otherwise scale by 1/2 size
+        self.ui.graphicsView.scale(0.5, 0.5)
+        print (f"Transform {self.ui.graphicsView.transform().m11()} = {self.ui.graphicsView.transform()}")
+        #self.update_view (self.current_scene)
         
     def zoom_in (self):
-        Laser.zl.zoom_in()
-        self.update_view (self.current_scene)
+        # Maximum zoom is 64 - actually two values for scale, but just look at x
+        current_scale = self.ui.graphicsView.transform().m11()
+        if current_scale >= 64:
+            return
+        # Otherwize zoom in by twice current
+        self.ui.graphicsView.scale(2, 2)
+        print (f"Transform {self.ui.graphicsView.transform().m11()} = {self.ui.graphicsView.transform()}")
+        
+        #self.update_view (self.current_scene)
         
     # Updates each of the views by updating the scene
     def update_view (self, view_name):
