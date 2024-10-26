@@ -19,9 +19,8 @@ class ViewScene():
         self.objs = []
         self.obj_views = []
         
-        
        
-    # Currently just add_walls, but in future may need to clear existing
+    # Clear scene and then add walls
     def update(self):
         self.scene.clear()
         self.add_walls()

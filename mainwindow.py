@@ -157,8 +157,10 @@ class MainWindowUI(QMainWindow):
         # Reenable file actions
         self.enable_file_actions()
         print ("Updating GUI")
-        # Todo update views
         self.update_all_views()
+        #print (f"Items {self.view_scenes[self.current_scene].scene.items()}")
+        #print (f"Group {self.view_scenes[self.current_scene].obj_views[0].item_group}")
+        #print (f"Group Items {self.view_scenes[self.current_scene].obj_views[0].item_group.items()}")
 
     # Whenever performing file action then disable other file actions to prevent duplicates / conflicting
     def disable_file_actions(self):
