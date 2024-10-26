@@ -45,6 +45,8 @@ class MainWindowUI(QMainWindow):
         self.ui.setWindowTitle(app_title)
         
         self.config = LCConfig()
+        # How much we are zoomed in zoom (1 = 100%, 2 = 200%)
+        self.zoom_level = 1
         
         # Status is a dict used to pass information to gconfig at startup
         # Eg screensize
@@ -145,7 +147,8 @@ class MainWindowUI(QMainWindow):
         #print (f"Builder contents\n{self.builder.building.data}")
         else:
             self.filename = self.new_filename
-            self.ui.statusbar.showMessage ("Loaded "+self.filename)
+            #self.ui.statusbar.showMessage ("Loaded "+self.filename)
+            self.update_status()
         # update load complete message - even if failed as otherwise load is locked
         self.load_complete_signal.emit()
         
@@ -170,24 +173,40 @@ class MainWindowUI(QMainWindow):
         
     def zoom_out (self):
         # Minimum zoom is 0.125 - actually two values for scale, but just look at x
-        current_scale = self.ui.graphicsView.transform().m11()
-        if current_scale <= 0.125:
+        #current_scale = self.ui.graphicsView.transform().m11()
+        #if current_scale <= 0.125:
+        if self.zoom_level <= 0.25:
             return
+        else:
+            self.zoom_level -= 0.25
         # Otherwise scale by 1/2 size
-        self.ui.graphicsView.scale(0.5, 0.5)
-        print (f"Transform {self.ui.graphicsView.transform().m11()} = {self.ui.graphicsView.transform()}")
-        #self.update_view (self.current_scene)
+        self.ui.graphicsView.resetTransform()
+        self.ui.graphicsView.scale(self.zoom_level, self.zoom_level)
+        self.update_status()
+        #print (f"Transform {self.ui.graphicsView.transform().m11()}")
         
     def zoom_in (self):
         # Maximum zoom is 64 - actually two values for scale, but just look at x
-        current_scale = self.ui.graphicsView.transform().m11()
-        if current_scale >= 64:
+        #current_scale = self.ui.graphicsView.transform().m11()
+        #if current_scale >= 64:
+        if self.zoom_level >= 10:
             return
+        else:
+            self.zoom_level += 0.25        
         # Otherwize zoom in by twice current
-        self.ui.graphicsView.scale(2, 2)
-        print (f"Transform {self.ui.graphicsView.transform().m11()} = {self.ui.graphicsView.transform()}")
-        
-        #self.update_view (self.current_scene)
+        self.ui.graphicsView.resetTransform()
+        self.ui.graphicsView.scale(self.zoom_level, self.zoom_level)
+        self.update_status()
+        #print (f"Transform {self.ui.graphicsView.transform().m11()}")
+
+    # Update statusbar
+    # If no message then show standard message otherwise override
+    # Eg. if loading then that is shown instead
+    def update_status(self, message=None):
+        if message == None:
+            message = f"File {self.filename} Zoom: {int(self.zoom_level * 100)} %"
+        self.ui.statusbar.showMessage (message)
+            
         
     # Updates each of the views by updating the scene
     def update_view (self, view_name):
