@@ -1,6 +1,6 @@
 import os
-from PySide6.QtCore import QCoreApplication, QThreadPool, Signal
-from PySide6.QtWidgets import QMainWindow, QFileDialog
+from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
@@ -79,6 +79,7 @@ class MainWindowUI(QMainWindow):
 
         # File Menu
         self.ui.actionOpen.triggered.connect(self.open_file_dialog)
+        self.ui.actionSave.triggered.connect(self.save_file)
         self.ui.actionExit.triggered.connect(QCoreApplication.quit)
         # Edit Menu
         # View Menu
@@ -120,6 +121,65 @@ class MainWindowUI(QMainWindow):
         self.ui.statusbar.showMessage ("Loading "+filename[0])
         self.new_filename = filename[0]
         self.threadpool.start(self.file_open)
+        
+    # Note save_file is called from the UI
+    # file_save is then called subsequently (typically in a threadpool)
+    # to perform the actual save operation
+    def save_file(self):
+        # If no existing filename then open dialog
+        if (self.filename == ""):
+            self.save_as_dialog()
+            # Dialog is standalone so finished at this point
+            return
+        # reach here then saving existing file
+        # No need to verify overwrite, just save
+        # Use new_filename for save as well as leaving in self.filename
+        self.new_filename = self.filename
+        self.ui.statusbar.showMessage ("Saving "+self.new_filename)
+        self.threadpool.start(self.file_save)
+                    
+    # Called from Save as, or if no existing filename
+    # Prompt user for file to safe as
+    def save_as_dialog(self):
+        filename = QFileDialog.getSaveFileName(self, "Save building file", "", "Building file (*.json);;All (*.*)", "Building file (*.json)", QFileDialog.DontConfirmOverwrite)
+        print (f"Filename is {filename}")
+        this_filename = filename[0]
+        # If no suffix/extension then add here
+        # Basic check for extension using os.path.splitext
+        file_and_ext = os.path.splitext(this_filename)
+        # If there is an extension then just continue (don't check it matches), but if not then add .json
+        if (file_and_ext[1] == ""):
+            this_filename += ".json"
+        # Check if file exists
+        file_info = QFileInfo(this_filename)
+        # Due to problem with getSaveFilename and suffix need to create own message box
+        # Otherwise whilst the dialog box will check for file replace it will provide filename with suffix added, but only
+        # check filename without suffix.
+        if file_info.exists():
+            # Confirm with user to delete
+            confirm_box = QMessageBox.question(self, "File already exists", f"The file:\n{this_filename} already exists.\n\nDo you want to replace this file?")
+            if confirm_box == QMessageBox.Yes:
+                print ("Yes replace file")
+            else:
+                print ("No do not replace")
+                return
+        
+        if this_filename == '':
+            print ("No filename specified for save")
+            return
+        self.new_filename = this_filename
+
+        self.ui.statusbar.showMessage ("Saving as "+self.new_filename)
+        # Reach here then it's saving in a new file (not overwrite)
+        self.threadpool.start(self.file_save)
+
+    # Performs the actual save (normally in a threadpool)
+    def file_save(self):
+        print (f"Saving file {self.new_filename}")
+        # Todo implement this
+        # If successful then confirm new filename
+        self.filename = self.new_filename
+        
 
     def visit_website(self, s):
         webbrowser.open("https://www.penguintutor.com/projects/laser-cut-buildings")

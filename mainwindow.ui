@@ -353,6 +353,7 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -409,6 +410,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
    <addaction name="actionZoom_Out"/>
    <addaction name="actionZoom_In"/>
    <addaction name="actionVisit_Website"/>
@@ -496,6 +498,14 @@
    </property>
    <property name="text">
     <string>Zoom In</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset theme="document-save"/>
+   </property>
+   <property name="text">
+    <string>Save</string>
    </property>
   </action>
  </widget>

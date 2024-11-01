@@ -15,9 +15,6 @@ class App(QApplication):
 sc = Scale("G")
 # Pass scale instance to laser class
 Laser.sc = sc
-# Zoom level for display (not used)
-#zl = Zoom()
-#Laser.zl = zl
 
 # Use scale to apply reverse scale to actual material_thickness
 material_thickness = 3

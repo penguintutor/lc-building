@@ -1,0 +1,228 @@
+{
+  "name": "Apex shed 6x4",
+  "type": "shed",
+  "subtype": "apex",
+  "description": "Typical 6x4 Apex shed",
+  "parameters": 
+    {
+      "depth": 1826, 
+      "width": 1180, 
+      "wall_height": 1864,
+      "side_wall_height": 1814,
+      "roof_height": 2122,
+      "roof_depth": 1882,
+      "roof_right_overlap": 100,
+      "roof_left_overlap": 100,
+      "roof_front_overlap": 50,
+      "roof_rear_overlap": 50
+    },
+    "settings":
+      {
+        "outertype": "cuts",
+        "interlocking": "true",
+        "material_thickness": 3
+      },
+  "walls":
+    [
+      ["Side with window", [
+          ["0","0"],
+          ["depth", "0"],
+          ["depth", "wall_height - 10"],
+          ["0", "wall_height - 10"],
+          ["0","0"]
+          ]
+      ],
+      ["Apex front", [
+          ["0", "roof_height - wall_height"],
+          ["width / 2", "0"],
+          ["width", "roof_height - wall_height"],
+          ["width", "roof_height"],
+          ["0", "roof_height"],
+          ["0", "roof_height - wall_height"]
+          ]
+      ],
+      ["Side with no windows", [
+          ["0","0"],
+          ["depth", "0"],
+          ["depth", "wall_height - 10"],
+          ["0", "wall_height - 10"],
+          ["0","0"]
+          ]
+      ],
+      ["Apex rear", [
+          ["0", "roof_height - wall_height"],
+          ["width / 2", "0"],
+          ["width", "roof_height - wall_height"],
+          ["width", "roof_height"],
+          ["0", "roof_height"],
+          ["0", "roof_height - wall_height"]
+          ]
+      ]
+    ],
+  "roofs":
+    [
+      ["Roof apex left", [
+          ["0", "0"],
+          ["depth + roof_front_overlap + roof_rear_overlap", "0"],
+          ["depth + roof_front_overlap + roof_rear_overlap", "width / 2 + width * 0.2 + roof_left_overlap"],
+          ["0", "width / 2 + width * 0.2 + roof_left_overlap"],
+          ["0", "0"]
+          ]
+      ],
+      ["Roof apex right", [
+          ["0", "0"],
+          ["depth + roof_front_overlap + roof_rear_overlap", "0"],
+          ["depth + roof_front_overlap + roof_rear_overlap", "width / 2 + width * 0.2 + roof_right_overlap"],
+          ["0", "width / 2 + width * 0.2 + roof_right_overlap"],
+          ["0", "0"]
+          ]
+      ]
+      
+      
+    ],
+  "textures":
+    [
+        {
+        "type": "wood",
+        "wall": 0,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        },
+        {
+        "type": "wood",
+        "wall": 1,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        },
+        {
+        "type": "wood",
+        "wall": 2,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        },
+        {
+        "type": "wood",
+        "wall": 3,
+        "settings":
+          {
+            "wood_height": 150,
+            "wood_etch": 10
+          }
+        }
+
+    ],
+  "interlocking":
+    [
+      {
+      "primary": [1, 4],
+	  "secondary": [0, 1],
+	  "step": 160,
+	  "start": 155
+      },
+      {
+      "primary": [1, 2, "reverse"],
+	  "secondary": [2, 3, "reverse"],
+	  "step": 160,
+	  "start": 155
+      },
+      {
+      "primary": [3, 4],
+	  "secondary": [2, 1],
+	  "step": 160,
+	  "start": 155
+      },
+      {
+      "primary": [3, 2, "reverse"],
+	  "secondary": [0, 3, "reverse"],
+	  "step": 160,
+	  "start": 155
+      }
+    ],
+  "features":
+    [
+      {
+      "type": "window",
+	  "template": "window_shed_1",
+	  "wall": 0,
+	  "parameters": 
+        {
+          "width": 400, 
+          "height": 555, 
+          "pos": [715, 50]
+        },
+      "cuts":
+        [
+          ["rect", [[0, 0], [400, 555]]]
+        ],
+      "etches":
+        [
+          []
+        ],
+      "outers":
+        [
+          []
+        ]
+      },
+      {
+      	"type": "door",
+        "template": "door_shed_1",
+        "wall": 1,
+        "parameters": 
+	    {
+          "width": 800,
+          "height": 1800,
+          "pos": [190, 322]
+        },
+      "settings":
+        {
+          "outertype": "cut"
+        },
+      "outers":
+        [
+          ["line", [[0, 1800], [0, 0]]],
+          ["line", [[0, 0], [800, 0]]],
+          ["line", [[800, 0], [800, 1800]]]
+        ],
+      "cuts":
+        [
+
+        ],
+      "etches":
+        [
+          ["rect", [[175, 0], [10, 1800]]],
+          ["rect", [[325, 0], [10, 1800]]],
+          ["rect", [[475, 0], [10, 1800]]],
+          ["rect", [[625, 0], [10, 1800]]],
+          ["polygon", [
+              [800, 270],
+              [500, 295],
+              [800, 320],
+              [800, 270]
+          ]],
+          ["polygon", [
+              [800, 900],
+              [500, 925],
+              [800, 950],
+              [800, 900]
+          ]],
+          ["polygon", [
+              [800, 1530],
+              [500, 1555],
+              [800, 1580],
+              [800, 1530]
+          ]]
+        ]
+      }
+    ]
+}
+
+
