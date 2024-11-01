@@ -380,6 +380,15 @@ class OuterLine(Outer):
     def get_args(self):
         return [self.start, self.end]
     
+    def get_start(self):
+        return (self.start[0]+self.io[0], self.start[1]+self.io[1])
+    
+    def get_end(self):
+        return (self.end[0]+self.io[0], self.end[1]+self.io[1])
+
+    def get_size(self):
+        return self.size
+
     # Returns as a cut object
     def get_cut(self):
         args = self.get_args()
@@ -388,6 +397,17 @@ class OuterLine(Outer):
     def get_etch(self):
         args = self.get_args()
         return EtchLine(args[0], args[1], self.io, strength)
+    
+    def get_start_pixels_screen(self, offset=(0,0)):
+        # Add internal offset to offset
+        start_pixels = self.vs.convert(self.get_start())
+        # Add offset
+        return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
+    
+    def get_end_pixels_screen(self, offset=(0,0)):
+        end_pixels = self.vs.convert(self.get_end())
+        # Add offset
+        return ([end_pixels[0]+offset[0], end_pixels[1]+offset[1]])
     
 class OuterRect(Outer):
     def __init__(self, start, size, internal_offset=(0,0), strength=5):
@@ -408,7 +428,15 @@ class OuterRect(Outer):
         args = self.get_args()
         return EtchRect(args[0], args[1], self.io)
 
-        
+    def get_start_pixels_screen(self, offset=(0,0)):
+        start_pixels = Laser.vs.convert(self.get_start())
+        # Add offset
+        return ([start_pixels[0]+offset[0], start_pixels[1]+offset[1]])
+    
+    
+    def get_size_pixels_screen(self):
+        return Laser.vs.convert(self.size)
+    
 class OuterPolygon(Outer):
     def __init__(self, points, internal_offset=(0,0), strength=5):
         self.strength = strength
@@ -425,3 +453,9 @@ class OuterPolygon(Outer):
     def get_etch(self):
         return EtchPolygon(self.get_args(), self.io)
 
+    def get_points_pixels_screen(self, offset=(0,0)):
+        new_points = []
+        for point in self.get_points():
+            sc_point = Laser.vs.convert(point)
+            new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
+        return new_points

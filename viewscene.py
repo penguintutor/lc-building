@@ -47,6 +47,12 @@ class ViewScene():
                 for etch in etches:
                     self.obj_views[len(self.obj_views)-1].add_etch(etch)
                     
+            # Get the outers (show different pen)
+            outers = wall.get_outers()
+            if outers != None:
+                for outer in outers:
+                    self.obj_views[len(self.obj_views)-1].add_outer(outer)
+                    
     def clear(self):
         self.scene.clear()
             
