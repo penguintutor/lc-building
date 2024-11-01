@@ -195,7 +195,7 @@ class MainWindowUI(QMainWindow):
         self.update_status()
         #print (f"Transform {self.ui.graphicsView.transform().m11()}")
 
-    # Update statusbar
+    # Update statusbar.
     # If no message then show standard message otherwise override
     # Eg. if loading then that is shown instead
     def update_status(self, message=None):

@@ -37,14 +37,14 @@ class ObjView():
             start_rect = cut.get_start_pixels_screen(self.offset)
             rect_size = cut.get_size_pixels_screen()
             this_cut = self.scene.addRect(*start_rect, *rect_size) # , stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
-            print (f"Rect points {start_rect} size {rect_size}")
+            #print (f"Rect points {start_rect} size {rect_size}")
         elif (cut.get_type() == "polygon"):
             new_points = cut.get_points_pixels_screen(self.offset)
             polygon = QPolygonF()
             for point in new_points:
                 polygon.append(QPointF(*point))
             this_cut = self.scene.addPolygon(polygon) #, stroke=self.settings['cutstroke'], fill="none", stroke_width=self.settings['strokewidth']))
-            print (f"Polygon points {polygon}")
+            #print (f"Polygon points {polygon}")
         self.item_group.addToGroup(this_cut)
 
         

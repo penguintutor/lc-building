@@ -27,8 +27,8 @@ As a result of PEP 704 this normally needs to be done by creating a virtual envi
 
 
 ### Command line lcmake file
-Currently configs are in the builings directory, but are referenced by hard coding in the lcmake.py file.
-This also needs a folder called output, if one does not already exist then it should be creaed.
+Currently configs are in the buildings directory, but are referenced by hard coding in the lcmake.py file.
+This also needs a folder called output, if one does not already exist then it should be created.
 After configuring the above then run
 
     python3 lcmake.py 

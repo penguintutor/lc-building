@@ -114,7 +114,7 @@ class Wall():
     # Implement this at the Wall level
     def update_etches (self):
         self.etches = self._texture_to_etches()
-        # Add cuts from features
+        # Add etches from features
         feature_etches = self._get_etches_features()
         if feature_etches != None:
             self.etches.extend(feature_etches)
@@ -148,6 +148,8 @@ class Wall():
         if area == []:
             area = self.points
         self.textures.append(Texture(area, type, settings))
+        self.update()
+        #print (f"Added Texture {type}")
 
        
 

@@ -7,8 +7,6 @@ from PySide6.QtGui import QWheelEvent
 from PySide6.QtCore import Qt
 
 class ViewGraphicsScene (QGraphicsScene):
-    
-    action_state = 0
 
     def __init__(self, main_window):
         super().__init__()
