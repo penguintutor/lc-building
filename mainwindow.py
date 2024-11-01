@@ -72,7 +72,7 @@ class MainWindowUI(QMainWindow):
         for scene_name in self.config.allowed_views:
             #self.scenes[scene_name] = QGraphicsScene()
             self.scenes[scene_name] = ViewGraphicsScene(self)
-            self.view_scenes[scene_name] = ViewScene(self.scenes[scene_name], self.builder, scene_name)
+            self.view_scenes[scene_name] = ViewScene(self.scenes[scene_name], self.builder, self.gconfig, scene_name)
         
         # Default to front view
         self.ui.graphicsView.setScene(self.scenes[self.current_scene])

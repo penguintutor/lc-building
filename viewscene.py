@@ -7,9 +7,10 @@ from feature import Feature
 from objview import ObjView
 
 class ViewScene():
-    def __init__(self, scene, builder, view_name):
+    def __init__(self, scene, builder, gconfig, view_name):
         self.scene = scene
         self.builder = builder
+        self.gconfig = gconfig
         self.view_name = view_name
         # obj are any objects to manipulate (typically wall objects from builder)
         # which can be used to interact with the wall
@@ -35,12 +36,11 @@ class ViewScene():
             # Create objview to abstract out the drawing
             # Uses lasercutter config lcconfig - could have heirarchical in future - allow override for graphics display
             # Note currently put at 0,0 - this will overwrite need to work out positioning
-            self.obj_views.append(ObjView(self.scene, self.builder.config, coords = wall.position))
+            self.obj_views.append(ObjView(self.scene, self.gconfig, coords = wall.position))
             # Now draw them on the scene
-            cuts = wall.get_cuts()
-            for cut in cuts:
-                self.obj_views[len(self.obj_views)-1].add_cut(cut)
- 
+            # Etches first, then outers then walls - this then shows overlap in that order
+            # Also typically will want to output in that order (although that is under control of laser cut software)
+
             # Get the etching
             etches = wall.get_etches()
             if etches != None:
@@ -52,6 +52,11 @@ class ViewScene():
             if outers != None:
                 for outer in outers:
                     self.obj_views[len(self.obj_views)-1].add_outer(outer)
+                    
+            cuts = wall.get_cuts()
+            for cut in cuts:
+                self.obj_views[len(self.obj_views)-1].add_cut(cut)
+ 
                     
     def clear(self):
         self.scene.clear()
