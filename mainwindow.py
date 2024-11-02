@@ -80,6 +80,7 @@ class MainWindowUI(QMainWindow):
         # File Menu
         self.ui.actionOpen.triggered.connect(self.open_file_dialog)
         self.ui.actionSave.triggered.connect(self.save_file)
+        self.ui.actionSave_as.triggered.connect(self.save_as_dialog)
         self.ui.actionExit.triggered.connect(QCoreApplication.quit)
         # Edit Menu
         # View Menu
