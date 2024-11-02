@@ -58,7 +58,7 @@ Convention is to start top left (where not top left - eg. apex then left takes p
 
 First entry is name for the wall (for user), followed by a list of lines to define edges)
 
-After list of points holds gui information, including view (eg. "front") and position within that view eg. [0,0]. Note this applies to position within that view only, not how it will output. New entries default to [0,0] and can be moved by the user.
+After list of points holds gui information, including view (eg. "front") and position within that view eg. [0,0]. Note this applies to position within that view only, not how it will output. New entries default to [0,0] or available position and can be moved by the user.
 
 
 ## Roofs

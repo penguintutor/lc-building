@@ -36,7 +36,8 @@ class Builder():
     # If want to confirm to overwrite check before calling this
     def save_file(self, filename):
         #Todo update building at this point
-        self.building.save_file(filename)
+        # eg. position of walls
+        return self.building.save_file(filename)
         
     # Get the walls that match a certain view
     def get_walls_view(self, view):

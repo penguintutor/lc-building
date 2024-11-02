@@ -20,6 +20,7 @@ app_title = "Building Designer"
 class MainWindowUI(QMainWindow):
     
     load_complete_signal = Signal()
+    file_save_warning_signal = Signal()
     
     # If a long action is being performed then increment and prevent new actions
     # Prevents locking up when zooming in on a complex image
@@ -34,6 +35,7 @@ class MainWindowUI(QMainWindow):
         
         # Connect signal handler
         self.load_complete_signal.connect(self.load_complete)
+        self.file_save_warning_signal.connect(self.file_save_warning)
         
         self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
@@ -41,6 +43,9 @@ class MainWindowUI(QMainWindow):
         self.config = LCConfig()
         # How much we are zoomed in zoom (1 = 100%, 2 = 200%)
         self.zoom_level = 1
+        
+        # Used if need to send a status message (eg. pop-up warning)
+        self.status_message = ""
         
         # Status is a dict used to pass information to gconfig at startup
         # Eg screensize
@@ -174,12 +179,21 @@ class MainWindowUI(QMainWindow):
         # Reach here then it's saving in a new file (not overwrite)
         self.threadpool.start(self.file_save)
 
-    # Performs the actual save (normally in a threadpool)
+    # Performs the actual save (normally triggered in a threadpool)
     def file_save(self):
         print (f"Saving file {self.new_filename}")
         # Todo implement this
+        success = self.builder.save_file(self.new_filename)
         # If successful then confirm new filename
-        self.filename = self.new_filename
+        if success[0] == True:
+            self.filename = self.new_filename
+        # If not then give an error message - need to pass back to GUI thread
+        else:
+            self.status_message = f"Unable to save {self.new_filename}.\n\nError: {success[1]}"
+            self.file_save_warning_signal.emit()
+            
+    def file_save_warning(self):
+        QMessageBox.warning(self, "File save error", self.status_message, QMessageBox.Ok)
         
 
     def visit_website(self, s):

@@ -25,7 +25,6 @@ class BuildingData ():
             self.config = LCConfig()
         else:
             self.config = lcconfig
-
     
     # Checks the appropriate parameters for a matching value_string then evaluate
     # Returns as string
@@ -103,9 +102,12 @@ class BuildingData ():
         # Updates filename with new filename
         self.filename = filename
         json_data = json.dumps(self.data)
-        with open(filename, 'w') as datafile:
-            datafile.write(json_data)
-            
+        try:
+            with open(filename, 'w') as datafile:
+                datafile.write(json_data)
+        except Exeption as err:
+            return (False, err)
+        return (True, "")
     
     # Sets all the data entries - used when loading a template 
     # Overwrites all data
