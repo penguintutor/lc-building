@@ -32,7 +32,7 @@ class Wall():
         self.points = points
         self.polygon = Polygon(points)
         self.view = view          # Which side to view it on when in the GUI
-        self.position = position  # position within GUI scene
+        self.position = position  # position within GUI scenese
         #print (f"Position {self.position}")
         #self.max_width = width
         #self.max_height = height
@@ -40,8 +40,9 @@ class Wall():
         self.il = []              # Interlocking - only one allowed per edge, but multiple allowed on a wall
         self.textures = []        # Typically one texture per wall, but can have multiple if zones used - must not overlap
         self.features = []        # Features for this wall
-        # by default are a wall, or could be roof
-        self.type = "wall"
+        # by default are a wall, or could be roof - in future wall & roof are same
+        # type will likely be used for different ways of creating a wall (eg. rectangle vs apex)
+        #self.type = "wall"
         # Move these to variables so that they are cached within the wall class
         # Only update when update_xxx is called
         self.cut_lines = []

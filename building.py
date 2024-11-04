@@ -4,6 +4,7 @@ from mainwindow import MainWindowUI
 from scale import Scale
 from laser import Laser
 from interlocking import Interlocking
+from wallwindow import WallWindowUI
 
 
 class App(QApplication):

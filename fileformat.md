@@ -63,6 +63,9 @@ After list of points holds gui information, including view (eg. "front") and pos
 
 ## Roofs
 
+**This will be deprecated in future version. Use walls instead.** 
+
+
 Roofs are added separately in the building file, but will then be treated as if they were a wall.
 
 * need to manually compensate for any differences to roof - eg. add extra to allow for slope
@@ -86,7 +89,7 @@ When texture is applied it starts from bottom left and keep applying upwards.
 
 
 ## Features 
-Features include doors and windows. Typically there area will be excluded from wall textures.
+Features include doors and windows. Typically their area will be excluded from wall textures.
 Then can contain cuts (always cut), etches (always etches) or outers (etch / cut depending on the outertype setting).These can be defined as line, rects, or polygon. 
 
 Has a pos which indicates start point (top left) and all inner features are relative to that. Assuming bounding box is a rectangle then uses width, height to create a rectangle as the exclusion area. Alternatives use "exclude" followed by polygon for exclusion area (in which case width / height are ignored). If polygon is used then points should be relative to the pos

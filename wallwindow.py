@@ -1,6 +1,12 @@
+# Window to add / update wall or roof
+# Currently allows creation using different types (eg. rectangle / apex)
+# However all are stored and edited as custom
+# May change in future, but will need a change in file format as well as how wall.py
+# interprets the different types
+
 import os
-from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox
+from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo, QObject
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QWidget
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
@@ -10,112 +16,48 @@ from gconfig import GConfig
 from vgraphicsscene import ViewGraphicsScene
 import webbrowser
 import resources
-from wallwindow import WallWindowUI
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
 
-app_title = "Building Designer"
+app_title = "Add Wall / Roof"
 
-class MainWindowUI(QMainWindow):
+#class WallWindowUI(QObject):
+#class WallWindowUI(QWidget):
+class WallWindowUI(QMainWindow):
     
-    load_complete_signal = Signal()
-    file_save_warning_signal = Signal()
-    
-    def __init__(self):
+    #load_complete_signal = Signal()
+    #name_warning_signal = Signal()
+       
+    def __init__(self, config, gconfig, builder):
+    #def __init__(self):
         super().__init__()
         
-        # Threadpool to maintain responsiveness during load / export
-        self.threadpool = QThreadPool()
-        
         # Connect signal handler
-        self.load_complete_signal.connect(self.load_complete)
-        self.file_save_warning_signal.connect(self.file_save_warning)
+        #self.load_complete_signal.connect(self.load_complete)
+        #self.name_warning_signal.connect(self.name_warning)
         
-        self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
+        self.ui = loader.load(os.path.join(basedir, "wallwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
         
-        self.config = LCConfig()
-        # How much we are zoomed in zoom (1 = 100%, 2 = 200%)
-        self.zoom_level = 1
+        self.config = config
+        self.gconfig = gconfig
+        self.builder = builder
         
         # Used if need to send a status message (eg. pop-up warning)
         self.status_message = ""
         
-        # Status is a dict used to pass information to gconfig at startup
-        # Eg screensize
-        status={}
-        # Pass screensize to gconfig
-        # Uses screen 0 which is normally current screen but may not be
-        # Only used to set default size so doesn't matter if it's on a different
-        # screen, but not such a good experience
-        status['screensize'] = self.ui.screen().size().toTuple()
+        self.ui.buttonBox.rejected.connect(self.hide)
         
-        self.filename = ""
-        
-        # Which scene shown in main window
-        self.current_scene = 'front'
-        
-        self.gconfig = GConfig(status)
-        self.builder = Builder(self.config)
-        
-        # Set default screensize (even if going to maximise afterwards)
-        self.ui.resize(*self.gconfig.default_screensize)
-        
-        if self.gconfig.maximized == True:
-            self.ui.showMaximized()
-              
-        # Create scenes ready for holding objects to view
-        # Also create view scenes which are then used to draw the particular view on the scene
-        self.scenes = {}
-        self.view_scenes = {}
-        for scene_name in self.config.allowed_views:
-            #self.scenes[scene_name] = QGraphicsScene()
-            self.scenes[scene_name] = ViewGraphicsScene(self)
-            self.view_scenes[scene_name] = ViewScene(self.scenes[scene_name], self.builder, self.gconfig, scene_name)
-        
-        # Default to front view
-        self.ui.graphicsView.setScene(self.scenes[self.current_scene])
-
-        # File Menu
-        self.ui.actionOpen.triggered.connect(self.open_file_dialog)
-        self.ui.actionSave.triggered.connect(self.save_file)
-        self.ui.actionSave_as.triggered.connect(self.save_as_dialog)
-        self.ui.actionExit.triggered.connect(QCoreApplication.quit)
-        # Edit Menu
-        self.ui.actionAdd_Wall.triggered.connect(self.add_wall)
-        # View Menu
-        self.ui.actionZoom_Out.triggered.connect(self.zoom_out)
-        self.ui.actionZoom_In.triggered.connect(self.zoom_in)
-        self.ui.actionFront.triggered.connect(self.view_front)
-        self.ui.actionRight.triggered.connect(self.view_right)
-        self.ui.actionRear.triggered.connect(self.view_rear)
-        self.ui.actionLeft.triggered.connect(self.view_left)
-        self.ui.actionTop.triggered.connect(self.view_top)
-        self.ui.actionBottom.triggered.connect(self.view_bottom)
-        # Help Menu
-        self.ui.actionVisit_Website.triggered.connect(self.visit_website)
-        
-        # View buttons
-        self.ui.frontViewButton.pressed.connect(self.view_front)
-        self.ui.frontViewImageButton.pressed.connect(self.view_front)
-        self.ui.rightViewButton.pressed.connect(self.view_right)
-        self.ui.rightViewImageButton.pressed.connect(self.view_right)
-        self.ui.rearViewButton.pressed.connect(self.view_rear)
-        self.ui.rearViewImageButton.pressed.connect(self.view_rear)
-        self.ui.leftViewButton.pressed.connect(self.view_left)
-        self.ui.leftViewImageButton.pressed.connect(self.view_left)
-        self.ui.topViewButton.pressed.connect(self.view_top)
-        self.ui.topViewImageButton.pressed.connect(self.view_top)
-        self.ui.bottomViewButton.pressed.connect(self.view_bottom)
-        self.ui.bottomViewImageButton.pressed.connect(self.view_bottom)
-        
-        # Action buttons
-        self.ui.addWallButton.pressed.connect(self.add_wall)
+        self.ui.delete_0.pressed.connect(self.view_bottom)
         
         self.ui.show()
+    
+    def show(self):
+        self.ui.show()
         
-        #self.wall_window = WallWindowUI()
+    def hide(self):
+        self.ui.hide()
 
 
     def open_file_dialog(self):
@@ -308,11 +250,3 @@ class MainWindowUI(QMainWindow):
         self.view_scenes[new_scene].update()
         self.ui.graphicsView.setScene(self.scenes[self.current_scene])
         self.ui.graphicsView.show()
-
-    # Add new wall dialog
-    def add_wall (self):
-        self.wall_window = WallWindowUI(self.config, self.gconfig, self.builder)
-        #wall_window = WallWindowUI()
-        #self.wall_window.show()
-        #wall_window.exec()
-        print ("Wall window launched")

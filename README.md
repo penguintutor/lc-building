@@ -16,12 +16,21 @@ At the time of writing this is not included in the standard repositories and so 
 As a result of PEP 704 this normally needs to be done by creating a virtual environment. The following is the recomended method for use on Linux, including Ubuntu or Raspberry Pi.
 
     mkdir ~/venv
-    python -m venv ~/venv/pyside6
+    python3 -m venv ~/venv/pyside6
     source ~/venv/pyside6/bin/activate
     pip install pyside6
     pip install shapely
     pip install svgwrite
     
+If you are running Linux Mint then you may also need to install additional packages first using:
+    sudo apt install python3.12-venv 
+    sudo apt install libxcb-cursor0
+    
+On systems you may also need to install pip using
+    sudo apt install python3-pip
+
+Some may need a different version of venv (eg.)
+    sudo apt install python3.*-venv
     
 ## Running the code
 
