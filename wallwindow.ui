@@ -113,7 +113,7 @@
     </property>
     <layout class="QGridLayout" name="gridLayout">
      <item row="4" column="2">
-      <widget class="QLineEdit" name="text_2_0">
+      <widget class="QLineEdit" name="wall_input_x_2">
        <property name="text">
         <string>mm</string>
        </property>
@@ -130,7 +130,7 @@
       <widget class="QComboBox" name="wallTypeCombo"/>
      </item>
      <item row="10" column="3">
-      <widget class="QLabel" name="label_35">
+      <widget class="QLabel" name="wall_label_y_8">
        <property name="text">
         <string>Y</string>
        </property>
@@ -140,14 +140,14 @@
       </widget>
      </item>
      <item row="7" column="2">
-      <widget class="QLineEdit" name="text_5_0">
+      <widget class="QLineEdit" name="wall_input_x_5">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="4" column="5">
-      <widget class="QPushButton" name="delete_2">
+      <widget class="QPushButton" name="wall_delete_2">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -163,28 +163,28 @@
       </widget>
      </item>
      <item row="4" column="4">
-      <widget class="QLineEdit" name="text_2_1">
+      <widget class="QLineEdit" name="wall_input_y_2">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="3" column="3">
-      <widget class="QLabel" name="label_11">
+      <widget class="QLabel" name="wall_label_y_1">
        <property name="text">
         <string>Scale size:</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLabel" name="label_22">
+      <widget class="QLabel" name="wall_label_x_0">
        <property name="text">
         <string>X</string>
        </property>
       </widget>
      </item>
      <item row="9" column="3">
-      <widget class="QLabel" name="label_34">
+      <widget class="QLabel" name="wall_label_y_7">
        <property name="text">
         <string>Y</string>
        </property>
@@ -194,42 +194,42 @@
       </widget>
      </item>
      <item row="2" column="3">
-      <widget class="QLabel" name="label_12">
+      <widget class="QLabel" name="wall_label_y_0">
        <property name="text">
         <string>Scale size:</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLabel" name="label_23">
+      <widget class="QLabel" name="wall_label_x_1">
        <property name="text">
         <string>X</string>
        </property>
       </widget>
      </item>
      <item row="2" column="4">
-      <widget class="QLineEdit" name="text_0_1">
+      <widget class="QLineEdit" name="wall_input_y_0">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="10" column="0">
-      <widget class="QLabel" name="label_16">
+      <widget class="QLabel" name="wall_label_8">
        <property name="text">
         <string>Point 9</string>
        </property>
       </widget>
      </item>
      <item row="7" column="0">
-      <widget class="QLabel" name="label_15">
+      <widget class="QLabel" name="wall_label_5">
        <property name="text">
         <string>Point 6</string>
        </property>
       </widget>
      </item>
      <item row="3" column="5">
-      <widget class="QPushButton" name="delete_1">
+      <widget class="QPushButton" name="wall_delete_1">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -245,38 +245,38 @@
       </widget>
      </item>
      <item row="5" column="1">
-      <widget class="QLabel" name="label_21">
+      <widget class="QLabel" name="wall_label_x_3">
        <property name="text">
         <string>X</string>
        </property>
       </widget>
      </item>
      <item row="4" column="0">
-      <widget class="QLabel" name="label_9">
+      <widget class="QLabel" name="wall_label_2">
        <property name="text">
         <string>Wall height min:</string>
        </property>
       </widget>
      </item>
      <item row="10" column="1">
-      <widget class="QLabel" name="label_29">
+      <widget class="QLabel" name="wall_label_x_8">
        <property name="text">
         <string>X</string>
        </property>
       </widget>
      </item>
      <item row="11" column="0">
-      <widget class="QLabel" name="label_19">
+      <widget class="QLabel" name="wall_label_9">
        <property name="text">
         <string>Point 10</string>
        </property>
       </widget>
      </item>
      <item row="12" column="2" colspan="2">
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="profileCombo"/>
      </item>
      <item row="7" column="3">
-      <widget class="QLabel" name="label_32">
+      <widget class="QLabel" name="wall_label_y_5">
        <property name="text">
         <string>Y</string>
        </property>
@@ -286,28 +286,28 @@
       </widget>
      </item>
      <item row="2" column="2">
-      <widget class="QLineEdit" name="text_0_0">
+      <widget class="QLineEdit" name="wall_input_x_0">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="4" column="3">
-      <widget class="QLabel" name="label_10">
+      <widget class="QLabel" name="wall_label_y_2">
        <property name="text">
         <string>Scale size:</string>
        </property>
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="label_6">
+      <widget class="QLabel" name="wall_label_1">
        <property name="text">
         <string>Wall height max:</string>
        </property>
       </widget>
      </item>
      <item row="6" column="3">
-      <widget class="QLabel" name="label_31">
+      <widget class="QLabel" name="wall_label_y_4">
        <property name="text">
         <string>Y</string>
        </property>
@@ -317,14 +317,14 @@
       </widget>
      </item>
      <item row="3" column="4">
-      <widget class="QLineEdit" name="text_1_1">
+      <widget class="QLineEdit" name="wall_input_y_1">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="11" column="3">
-      <widget class="QLabel" name="label_36">
+      <widget class="QLabel" name="wall_label_y_9">
        <property name="text">
         <string>Y</string>
        </property>
@@ -334,21 +334,21 @@
       </widget>
      </item>
      <item row="6" column="2">
-      <widget class="QLineEdit" name="text_4_0">
+      <widget class="QLineEdit" name="wall_input_x_4">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="5" column="2">
-      <widget class="QLineEdit" name="text_3_0">
+      <widget class="QLineEdit" name="wall_input_x_3">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLabel" name="label_24">
+      <widget class="QLabel" name="wall_label_x_2">
        <property name="text">
         <string>X</string>
        </property>
@@ -358,7 +358,7 @@
       <widget class="QLineEdit" name="nameText"/>
      </item>
      <item row="4" column="6">
-      <widget class="QPushButton" name="add_2">
+      <widget class="QPushButton" name="wall_add_2">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -371,21 +371,21 @@
       </widget>
      </item>
      <item row="8" column="0">
-      <widget class="QLabel" name="label_17">
+      <widget class="QLabel" name="wall_label_6">
        <property name="text">
         <string>Point 7</string>
        </property>
       </widget>
      </item>
      <item row="6" column="0">
-      <widget class="QLabel" name="label_14">
+      <widget class="QLabel" name="wall_label_4">
        <property name="text">
         <string>Point 5</string>
        </property>
       </widget>
      </item>
      <item row="8" column="3">
-      <widget class="QLabel" name="label_33">
+      <widget class="QLabel" name="wall_label_y_6">
        <property name="text">
         <string>Y</string>
        </property>
@@ -395,21 +395,21 @@
       </widget>
      </item>
      <item row="9" column="0">
-      <widget class="QLabel" name="label_18">
+      <widget class="QLabel" name="wall_label_7">
        <property name="text">
         <string>Point 8</string>
        </property>
       </widget>
      </item>
      <item row="7" column="1">
-      <widget class="QLabel" name="label_26">
+      <widget class="QLabel" name="wall_label_x_5">
        <property name="text">
         <string>X</string>
        </property>
       </widget>
      </item>
      <item row="3" column="6">
-      <widget class="QPushButton" name="add_1">
+      <widget class="QPushButton" name="wall_add_1">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -422,14 +422,14 @@
       </widget>
      </item>
      <item row="8" column="1">
-      <widget class="QLabel" name="label_27">
+      <widget class="QLabel" name="wall_label_x_6">
        <property name="text">
         <string>X</string>
        </property>
       </widget>
      </item>
      <item row="2" column="5">
-      <widget class="QPushButton" name="delete_0">
+      <widget class="QPushButton" name="wall_delete_0">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -459,21 +459,21 @@
       </widget>
      </item>
      <item row="9" column="1">
-      <widget class="QLabel" name="label_28">
+      <widget class="QLabel" name="wall_label_x_7">
        <property name="text">
         <string>X</string>
        </property>
       </widget>
      </item>
      <item row="11" column="1">
-      <widget class="QLabel" name="label_30">
+      <widget class="QLabel" name="wall_label_x_9">
        <property name="text">
         <string>X</string>
        </property>
       </widget>
      </item>
      <item row="2" column="6">
-      <widget class="QPushButton" name="add_0">
+      <widget class="QPushButton" name="wall_add_0">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -486,28 +486,28 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="wall_label_0">
        <property name="text">
         <string>Wall width:</string>
        </property>
       </widget>
      </item>
      <item row="3" column="2">
-      <widget class="QLineEdit" name="text_1_0">
+      <widget class="QLineEdit" name="wall_input_x_1">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="6" column="1">
-      <widget class="QLabel" name="label_25">
+      <widget class="QLabel" name="wall_label_x_4">
        <property name="text">
         <string>X</string>
        </property>
       </widget>
      </item>
      <item row="5" column="3">
-      <widget class="QLabel" name="label_20">
+      <widget class="QLabel" name="wall_label_y_3">
        <property name="text">
         <string>Y</string>
        </property>
@@ -517,91 +517,91 @@
       </widget>
      </item>
      <item row="5" column="0">
-      <widget class="QLabel" name="label_13">
+      <widget class="QLabel" name="wall_label_3">
        <property name="text">
         <string>Point 4</string>
        </property>
       </widget>
      </item>
      <item row="8" column="2">
-      <widget class="QLineEdit" name="text_6_0">
+      <widget class="QLineEdit" name="wall_input_x_6">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="9" column="2">
-      <widget class="QLineEdit" name="text_7_0">
+      <widget class="QLineEdit" name="wall_input_x_7">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="10" column="2">
-      <widget class="QLineEdit" name="text_8_0">
+      <widget class="QLineEdit" name="wall_input_x_8">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="11" column="2">
-      <widget class="QLineEdit" name="text_9_0">
+      <widget class="QLineEdit" name="wall_input_x_9">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="5" column="4">
-      <widget class="QLineEdit" name="text_3_1">
+      <widget class="QLineEdit" name="wall_input_y_3">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="6" column="4">
-      <widget class="QLineEdit" name="text_4_1">
+      <widget class="QLineEdit" name="wall_input_y_4">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="7" column="4">
-      <widget class="QLineEdit" name="text_5_1">
+      <widget class="QLineEdit" name="wall_input_y_5">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="8" column="4">
-      <widget class="QLineEdit" name="text_6_1">
+      <widget class="QLineEdit" name="wall_input_y_6">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="9" column="4">
-      <widget class="QLineEdit" name="text_7_1">
+      <widget class="QLineEdit" name="wall_input_y_7">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="10" column="4">
-      <widget class="QLineEdit" name="text_8_1">
+      <widget class="QLineEdit" name="wall_input_y_8">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="11" column="4">
-      <widget class="QLineEdit" name="text_9_1">
+      <widget class="QLineEdit" name="wall_input_y_9">
        <property name="text">
         <string>mm</string>
        </property>
       </widget>
      </item>
      <item row="5" column="5">
-      <widget class="QPushButton" name="delete_3">
+      <widget class="QPushButton" name="wall_delete_3">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -617,7 +617,7 @@
       </widget>
      </item>
      <item row="6" column="5">
-      <widget class="QPushButton" name="delete_4">
+      <widget class="QPushButton" name="wall_delete_4">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -633,7 +633,7 @@
       </widget>
      </item>
      <item row="7" column="5">
-      <widget class="QPushButton" name="delete_5">
+      <widget class="QPushButton" name="wall_delete_5">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -649,7 +649,7 @@
       </widget>
      </item>
      <item row="8" column="5">
-      <widget class="QPushButton" name="delete_6">
+      <widget class="QPushButton" name="wall_delete_6">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -665,7 +665,7 @@
       </widget>
      </item>
      <item row="9" column="5">
-      <widget class="QPushButton" name="delete_7">
+      <widget class="QPushButton" name="wall_delete_7">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -681,7 +681,7 @@
       </widget>
      </item>
      <item row="10" column="5">
-      <widget class="QPushButton" name="delete_8">
+      <widget class="QPushButton" name="wall_delete_8">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -697,7 +697,7 @@
       </widget>
      </item>
      <item row="11" column="5">
-      <widget class="QPushButton" name="delete_9">
+      <widget class="QPushButton" name="wall_delete_9">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -713,7 +713,7 @@
       </widget>
      </item>
      <item row="5" column="6">
-      <widget class="QPushButton" name="add_3">
+      <widget class="QPushButton" name="wall_add_3">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -726,7 +726,7 @@
       </widget>
      </item>
      <item row="6" column="6">
-      <widget class="QPushButton" name="add_4">
+      <widget class="QPushButton" name="wall_add_4">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -739,7 +739,7 @@
       </widget>
      </item>
      <item row="7" column="6">
-      <widget class="QPushButton" name="add_5">
+      <widget class="QPushButton" name="wall_add_5">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -752,7 +752,7 @@
       </widget>
      </item>
      <item row="8" column="6">
-      <widget class="QPushButton" name="add_6">
+      <widget class="QPushButton" name="wall_add_6">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -765,7 +765,7 @@
       </widget>
      </item>
      <item row="9" column="6">
-      <widget class="QPushButton" name="add_7">
+      <widget class="QPushButton" name="wall_add_7">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -778,7 +778,7 @@
       </widget>
      </item>
      <item row="10" column="6">
-      <widget class="QPushButton" name="add_8">
+      <widget class="QPushButton" name="wall_add_8">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -791,7 +791,7 @@
       </widget>
      </item>
      <item row="11" column="6">
-      <widget class="QPushButton" name="add_9">
+      <widget class="QPushButton" name="wall_add_9">
        <property name="maximumSize">
         <size>
          <width>20</width>

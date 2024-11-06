@@ -9,6 +9,7 @@ from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo, QOb
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QWidget
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
+from scale import Scale
 from builder import Builder
 from viewscene import ViewScene
 from lcconfig import LCConfig
@@ -44,209 +45,156 @@ class WallWindowUI(QMainWindow):
         self.gconfig = gconfig
         self.builder = builder
         
+        # Generate lists to allow access to the different fields
+        # Simplifies translation and iteration over ui elements
+        # Dict for each field and list of num 0 to 9
+        self.wall_elements = {"label":[], "label_x":[], "label_y":[], "input_x":[], "input_y":[], "delete":[], "add":[]}
+        for i in range (0, 10):
+            exec ("self.wall_elements[\"label\"].append(self.ui.wall_label_"+str(i)+")")
+            exec ("self.wall_elements[\"label_x\"].append(self.ui.wall_label_x_"+str(i)+")")
+            exec ("self.wall_elements[\"label_y\"].append(self.ui.wall_label_y_"+str(i)+")")
+            exec ("self.wall_elements[\"input_x\"].append(self.ui.wall_input_x_"+str(i)+")")
+            exec ("self.wall_elements[\"input_y\"].append(self.ui.wall_input_y_"+str(i)+")")
+            exec ("self.wall_elements[\"delete\"].append(self.ui.wall_delete_"+str(i)+")")
+            exec ("self.wall_elements[\"add\"].append(self.ui.wall_add_"+str(i)+")")
+            
+        # Enable click actions on delete and add
+        # This has been donemanually for each entry as the lambda function doesn't work
+        # inside the exec function
+        self.ui.wall_delete_0.pressed.connect(lambda: self.del_entry(0))
+        self.ui.wall_delete_1.pressed.connect(lambda: self.del_entry(1))
+        self.ui.wall_delete_2.pressed.connect(lambda: self.del_entry(2))
+        self.ui.wall_delete_3.pressed.connect(lambda: self.del_entry(3))
+        self.ui.wall_delete_4.pressed.connect(lambda: self.del_entry(4))
+        self.ui.wall_delete_5.pressed.connect(lambda: self.del_entry(5))
+        self.ui.wall_delete_6.pressed.connect(lambda: self.del_entry(6))
+        self.ui.wall_delete_7.pressed.connect(lambda: self.del_entry(7))
+        self.ui.wall_delete_8.pressed.connect(lambda: self.del_entry(8))
+        self.ui.wall_delete_9.pressed.connect(lambda: self.del_entry(9))
+        self.ui.wall_add_0.pressed.connect(lambda: self.add_entry(0))
+        self.ui.wall_add_1.pressed.connect(lambda: self.add_entry(1))
+        self.ui.wall_add_2.pressed.connect(lambda: self.add_entry(2))
+        self.ui.wall_add_3.pressed.connect(lambda: self.add_entry(3))
+        self.ui.wall_add_4.pressed.connect(lambda: self.add_entry(4))
+        self.ui.wall_add_5.pressed.connect(lambda: self.add_entry(5))
+        self.ui.wall_add_6.pressed.connect(lambda: self.add_entry(6))
+        self.ui.wall_add_7.pressed.connect(lambda: self.add_entry(7))
+        self.ui.wall_add_8.pressed.connect(lambda: self.add_entry(8))
+        self.ui.wall_add_9.pressed.connect(lambda: self.add_entry(9))
+            
+        # Set wall type pull down menu
+        self.ui.wallTypeCombo.addItem("Rectangular")
+        self.ui.wallTypeCombo.addItem("Apex")
+        self.ui.wallTypeCombo.addItem("Custom")
+        
+        # Set Scale pull down menu based on config
+        for this_scale in Scale.scales.keys():
+            self.ui.scaleCombo.addItem(this_scale)
+        # Defaults to position 1 (OO)
+        # May want to do this application wide instead of in this menu
+        self.ui.scaleCombo.setCurrentIndex(1)
+        
+        # Profile view combo box default to front 1st entry
+        # Need to convert to lower case when saved
+        self.ui.profileCombo.addItem("Front")
+        self.ui.profileCombo.addItem("Right")
+        self.ui.profileCombo.addItem("Rear")
+        self.ui.profileCombo.addItem("Left")
+        self.ui.profileCombo.addItem("Top")
+        self.ui.profileCombo.addItem("Bottom") 
+        
+        # Number of rows displayed in custom view (minimum is 4)
+        self.num_rows = 4
+        
+        # When wall type changed then change UI
+        self.ui.wallTypeCombo.activated.connect(self.set_view)
+
         # Used if need to send a status message (eg. pop-up warning)
         self.status_message = ""
         
         self.ui.buttonBox.rejected.connect(self.hide)
         
-        self.ui.delete_0.pressed.connect(self.view_bottom)
+        # temp
+        #self.ui.wall_delete_0.pressed.connect(self.view_bottom)
+        
+        self.simple_interface()
         
         self.ui.show()
+    
+    # Change these to add / delete entries
+    def del_entry(self, entry_num):
+        print (f"Del entry {entry_num}")
+        
+    def add_entry(self, entry_num):
+        print (f"Add entry {entry_num}")
+    
+    # Change the view based on type combo selection
+    def set_view(self):
+        selected = self.ui.wallTypeCombo.currentIndex()
+        # 0 is rectangle - simplified view
+        if selected == 0:
+            self.simple_interface()
+        # Apex view
+        elif selected == 1:
+            self.apex_interface()
+        else:
+            self.custom_interface()
     
     def show(self):
         self.ui.show()
         
     def hide(self):
         self.ui.hide()
-
-
-    def open_file_dialog(self):
-        filename = QFileDialog.getOpenFileName(self.parent(), "Open building file", "", "Building file (*.json);;All (*.*)")
-        print (f'Selected file {filename}')
-        # possibly check for valid file
-        if filename[0] == '':
-            print ("No filename specified")
-            return
-        self.ui.statusbar.showMessage ("Loading "+filename[0])
-        self.new_filename = filename[0]
-        self.threadpool.start(self.file_open)
         
-    # Note save_file is called from the UI
-    # file_save is then called subsequently (typically in a threadpool)
-    # to perform the actual save operation
-    def save_file(self):
-        # If no existing filename then open dialog
-        if (self.filename == ""):
-            self.save_as_dialog()
-            # Dialog is standalone so finished at this point
-            return
-        # reach here then saving existing file
-        # No need to verify overwrite, just save
-        # Use new_filename for save as well as leaving in self.filename
-        self.new_filename = self.filename
-        self.ui.statusbar.showMessage ("Saving "+self.new_filename)
-        self.threadpool.start(self.file_save)
-                    
-    # Called from Save as, or if no existing filename
-    # Prompt user for file to safe as
-    def save_as_dialog(self):
-        filename = QFileDialog.getSaveFileName(self, "Save building file", "", "Building file (*.json);;All (*.*)", "Building file (*.json)", QFileDialog.DontConfirmOverwrite)
-        print (f"Filename is {filename}")
-        this_filename = filename[0]
-        # If no suffix/extension then add here
-        # Basic check for extension using os.path.splitext
-        file_and_ext = os.path.splitext(this_filename)
-        # If there is an extension then just continue (don't check it matches), but if not then add .json
-        if (file_and_ext[1] == ""):
-            this_filename += ".json"
-        # Check if file exists
-        file_info = QFileInfo(this_filename)
-        # Due to problem with getSaveFilename and suffix need to create own message box
-        # Otherwise whilst the dialog box will check for file replace it will provide filename with suffix added, but only
-        # check filename without suffix.
-        if file_info.exists():
-            # Confirm with user to delete
-            confirm_box = QMessageBox.question(self, "File already exists", f"The file:\n{this_filename} already exists.\n\nDo you want to replace this file?")
-            if confirm_box == QMessageBox.Yes:
-                print ("Yes replace file")
-            else:
-                print ("No do not replace")
-                return
-        
-        if this_filename == '':
-            print ("No filename specified for save")
-            return
-        self.new_filename = this_filename
-
-        self.ui.statusbar.showMessage ("Saving as "+self.new_filename)
-        # Reach here then it's saving in a new file (not overwrite)
-        self.threadpool.start(self.file_save)
-
-    # Performs the actual save (normally triggered in a threadpool)
-    def file_save(self):
-        print (f"Saving file {self.new_filename}")
-        # Todo implement this
-        success = self.builder.save_file(self.new_filename)
-        # If successful then confirm new filename
-        if success[0] == True:
-            self.filename = self.new_filename
-        # If not then give an error message - need to pass back to GUI thread
-        else:
-            self.status_message = f"Unable to save {self.new_filename}.\n\nError: {success[1]}"
-            self.file_save_warning_signal.emit()
+    def custom_interface(self):
+        # Minimum of 4 entries (assumes back to start for 5)
+        for i in range (0, 4):
+            # Change text fields for the main entries
+            self.wall_elements["label"][i].setText(f"Point {i+1}")
+            # Enable the X and Y labels and input fields
+            self.wall_elements["label_x"][i].show()
+            self.wall_elements["label_y"][i].setText("Y")
+            self.wall_elements["label_y"][i].show()
+            self.wall_elements["input_x"][i].show()
+            self.wall_elements["input_y"][i].show()
+            self.wall_elements["delete"][i].show()
+            self.wall_elements["add"][i].show()
             
-    def file_save_warning(self):
-        QMessageBox.warning(self, "File save error", self.status_message, QMessageBox.Ok)
+
+    # Simple interface used for basic rectangular wall (or initial setup for apex)
+    def simple_interface(self):
+        # Set text on simple labels
+        self.ui.wall_label_0.setText("Wall width:")
+        self.ui.wall_label_1.setText("Wall height:")
+        self.ui.wall_label_y_0.setText("Scale size:")
+        self.ui.wall_label_y_1.setText("Scale size:")
+        self.ui.wall_label_y_2.setText("Scale size:")
+        # Update all fields to remove delete and add buttons
+        for i in range (0, 10):
+            self.wall_elements["label_x"][i].hide()
+            self.wall_elements["delete"][i].hide()
+            self.wall_elements["add"][i].hide()
+        # Hide none standard fields
+        # Hide labels
+        for i in range (2, 10):
+            self.wall_elements["label"][i].setText("")
+            # Do not hide label_y for first entries as says "Scale"
+            self.wall_elements["label_y"][i].hide()
+            self.wall_elements["input_x"][i].hide()
+            self.wall_elements["input_y"][i].hide()
+
+        
+    # Based on simple interface then adds extra field for additional wall height
+    def apex_interface(self):
+        self.simple_interface()
+        # Set text of the wall height 1 to max
+        self.ui.wall_label_1.setText("Wall height max:")
+        self.ui.wall_label_2.setText("Wall height min:") 
+        # Re-enable line 2
+        self.ui.wall_label_2.show()
+        self.ui.wall_label_y_2.show()
+        self.ui.wall_input_x_2.show()
+        self.ui.wall_input_y_2.show()
+        
         
 
-    def visit_website(self, s):
-        webbrowser.open("https://www.penguintutor.com/projects/laser-cut-buildings")
-
-    def edit_menu(self):
-        pass
-    
-    # File open is called as a separate thread
-    def file_open(self):
-        print (f"Loading file {self.new_filename}")
-        # Prevent duplicate file opens (or saving when opening etc.)
-        self.disable_file_actions()
-        result = self.builder.load_file(self.new_filename)
-        if result[0] == False:
-            #Todo show error message
-            print (f"Error {result[1]}")
-            self.ui.statusbar.showMessage ("Error "+result[1])
-        #print ("Building loaded")
-        #print (f"Builder contents\n{self.builder.building.data}")
-        else:
-            self.filename = self.new_filename
-            #self.ui.statusbar.showMessage ("Loaded "+self.filename)
-            self.update_status()
-        # update load complete message - even if failed as otherwise load is locked
-        self.load_complete_signal.emit()
-        
-    # Called from load_complete_signal after a file has been loaded
-    def load_complete(self):
-        # Reenable file actions
-        self.enable_file_actions()
-        print ("Updating GUI")
-        self.update_all_views()
-        #print (f"Items {self.view_scenes[self.current_scene].scene.items()}")
-        #print (f"Group {self.view_scenes[self.current_scene].obj_views[0].item_group}")
-        #print (f"Group Items {self.view_scenes[self.current_scene].obj_views[0].item_group.items()}")
-
-    # Whenever performing file action then disable other file actions to prevent duplicates / conflicting
-    def disable_file_actions(self):
-        self.ui.actionOpen.setEnabled(False)
-        
-    def enable_file_actions(self):
-        self.ui.actionOpen.setEnabled(True)
-        
-    def update_all_views (self):
-        for scene_name in self.config.allowed_views:
-            self.update_view (scene_name)
-        
-    def zoom_out (self):
-        # Minimum zoom is 0.125 - actually two values for scale, but just look at x
-        #current_scale = self.ui.graphicsView.transform().m11()
-        #if current_scale <= 0.125:
-        if self.zoom_level <= 0.25:
-            return
-        else:
-            self.zoom_level -= 0.25
-        # Otherwise scale by 1/2 size
-        self.ui.graphicsView.resetTransform()
-        self.ui.graphicsView.scale(self.zoom_level, self.zoom_level)
-        self.update_status()
-        #print (f"Transform {self.ui.graphicsView.transform().m11()}")
-        
-    def zoom_in (self):
-        # Maximum zoom is 64 - actually two values for scale, but just look at x
-        #current_scale = self.ui.graphicsView.transform().m11()
-        #if current_scale >= 64:
-        if self.zoom_level >= 10:
-            return
-        else:
-            self.zoom_level += 0.25        
-        # Otherwize zoom in by twice current
-        self.ui.graphicsView.resetTransform()
-        self.ui.graphicsView.scale(self.zoom_level, self.zoom_level)
-        self.update_status()
-        #print (f"Transform {self.ui.graphicsView.transform().m11()}")
-
-    # Update statusbar.
-    # If no message then show standard message otherwise override
-    # Eg. if loading then that is shown instead
-    def update_status(self, message=None):
-        if message == None:
-            message = f"File {self.filename} Zoom: {int(self.zoom_level * 100)} %"
-        self.ui.statusbar.showMessage (message)
-            
-        
-    # Updates each of the views by updating the scene
-    def update_view (self, view_name):
-        #print (f"Updating scene {view_name}")
-        self.view_scenes[view_name].update()
-        # Show the main screen
-        self.ui.graphicsView.show()
-        
-    #def scene_scroll (self, in_out):
-    #    print (f"Scroll received {in_out}")
-        
-    def view_front (self):
-        self.change_scene('front')
-    def view_right (self):
-        self.change_scene('right')
-    def view_rear (self):
-        self.change_scene('rear')
-    def view_left (self):
-        self.change_scene('left')
-    def view_top (self):
-        self.change_scene('top')
-    def view_bottom (self):
-        self.change_scene('bottom')
-
-    def change_scene (self, new_scene):
-        self.current_scene = new_scene
-        self.view_scenes[new_scene].update()
-        self.ui.graphicsView.setScene(self.scenes[self.current_scene])
-        self.ui.graphicsView.show()

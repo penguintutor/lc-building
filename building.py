@@ -13,7 +13,7 @@ class App(QApplication):
         
 
 # Scale for output - default to OO
-sc = Scale("G")
+sc = Scale("OO")
 # Pass scale instance to laser class
 Laser.sc = sc
 
