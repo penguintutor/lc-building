@@ -1,3 +1,9 @@
 # Todo
 
 Replace hardcoded material thickness / interlocking with setting
+
+
+## In add wall window
+Handle scale conversion to mm and vice versa
+Warn and reset values when switching between custom and simplified
+Warn and convert when switching between custom and simplified

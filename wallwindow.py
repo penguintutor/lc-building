@@ -184,11 +184,11 @@ class WallWindowUI(QMainWindow):
         self.ui.hide()
         
     # Cancel button is pressed
-    # reset then hide
     def cancel(self):
-        self.reset()
         self.hide()
     
+    # Reset is not used as this is reset when launched
+    # Left here in case a reset button is added
     def reset(self):
         # Set all values to mm and got to rectangle
         for row in range (0, self.max_rows):
@@ -200,10 +200,55 @@ class WallWindowUI(QMainWindow):
     def accept(self):
         # Validate data - doesn't matter if some fields are not filled in, but need at least 3 points (triangular wall)
         # Add to builder, then reset and hide window
+        # Validates entries
+        wall_data = {
+            'name' : self.ui.nameText.text(),
+            'view' : self.ui.profileCombo.currentText().lower()
+            }
+        # Check for points first as that is a critical error, whereas name would be just a warning
+        # If simplified interface then try that first
+        # Work through the points provided and add as appropriate
+        # Rectangle
+        if self.ui.wallTypeCombo.currentIndex() == 0:
+            # check we have each of the values
+            # width is row 0 - use non scale size
+            width = self.wall_elements["input_x"][0].text()
+            # check it's an integer string and if so convert to int
+            try:
+                width = int(width)
+            except ValueError:
+                QMessageBox.warning(self, "Width not a number", "Width is not a number. Please provide a valid size in mm.")
+                return
+            # Also check it's not a negative number
+            if width <= 0:
+                QMessageBox.warning(self, "Width is invalid", "Width is not a valid number. Please provide a valid size in mm.")
+                return
+            
+            # Do the same with height - row 1
+            height = self.wall_elements["input_x"][1].text()
+            # check it's an integer string and if so convert to int
+            try:
+                height = int(height)
+            except ValueError:
+                QMessageBox.warning(self, "Height not a number", "Height is not a number. Please provide a valid size in mm.")
+                return
+            # Also check it's not a negative number
+            if height <= 0:
+                QMessageBox.warning(self, "Height is invalid", "Height is not a valid number. Please provide a valid size in mm.")
+                return
         
+        
+        
+        # If it's a custom view
+        #### for row in range (entry_num, self.num_rows):
+        
+        # Warning but proceed with creating
+        if (wall_data['name'] == ""):
+            wall_data['name'] = "Unknown"
+            QMessageBox.warning(self, "Warning name not provided", "A name was not provided for the wall. The wall will be called \"Unknown\"")
+            
         #name, points, view="front"
         
-        self.reset()
         self.hide()
         
     # Used to hide a row when in custom mode
@@ -231,6 +276,12 @@ class WallWindowUI(QMainWindow):
             self.wall_elements["add"][row].show()
         
     def custom_interface(self):
+        # Change information at the top of the screen
+        self.ui.dimensionsText1.setText("Enter dimensions in mm full size (1:1).")
+        self.ui.dimensionsText2.setText("All points relative to top left position.")
+        # Hide scale option
+        self.ui.scaleCombo.hide()
+        self.ui.scaleLabel.hide()
         # Minimum of 4 entries (assumes back to start for 5)
         for i in range (0, 4):
             # Change text fields for the main entries
@@ -247,6 +298,12 @@ class WallWindowUI(QMainWindow):
 
     # Simple interface used for basic rectangular wall (or initial setup for apex)
     def simple_interface(self):
+        # Change information at the top of the screen
+        self.ui.dimensionsText1.setText("Enter dimensions in mm.")
+        self.ui.dimensionsText2.setText("")
+        # Show scale pull-down - only used for UI always save using full size dimensions
+        self.ui.scaleCombo.show()
+        self.ui.scaleLabel.show()
         # Set text on simple labels
         self.ui.wall_label_0.setText("Wall width:")
         self.ui.wall_label_1.setText("Wall height:")
