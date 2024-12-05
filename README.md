@@ -15,21 +15,24 @@ The following python modules are required
 At the time of writing this is not included in the standard repositories and so should be instaled through PIP.
 As a result of PEP 704 this normally needs to be done by creating a virtual environment. The following is the recomended method for use on Linux, including Ubuntu or Raspberry Pi.
 
-    mkdir ~/venv
-    python3 -m venv ~/venv/pyside6
-    source ~/venv/pyside6/bin/activate
+    mkdir ~/.venv
+    python3 -m venv ~/.venv/pyside6
+    source ~/.venv/pyside6/bin/activate
     pip install pyside6
     pip install shapely
     pip install svgwrite
     
 If you are running Linux Mint then you may also need to install additional packages first using:
+
     sudo apt install python3.12-venv 
     sudo apt install libxcb-cursor0
     
 On systems you may also need to install pip using
+
     sudo apt install python3-pip
 
 Some may need a different version of venv (eg.)
+
     sudo apt install python3.*-venv
     
 ## Running the code
@@ -44,13 +47,10 @@ After configuring the above then run
 
 
 ### GUI version
-The Graphical User Interface version is under development. To see the current status you first need to enable
-Pyside 6 through a virtual machine. If using the same steps as mentioned above then use
-    
+The Graphical User Interface version is under development. To see the current status you first need to enable Pyside 6 through a virtual environment. If using the same steps as mentioned above then use
 
-    source ~/venv/pyside6/bin/activate
+    source ~/.venv/pyside6/bin/activate
     python3 building.py 
-
     
    
 ## Development tests
@@ -74,14 +74,14 @@ other units (eg. inches) to be used as an input, but they will
 still be handled internally as mm.
 
 ### Overlapping etches
-Some lightburning software do not allow overlapping etches.
-In the case of lightburn they will not output any parts that overlap.
-This is a limitation of the lightburning software rather than this 
+Some laser cutting software does not allow overlapping etches.
+In the case of Lightburn it will not output any parts that overlap.
+This is a limitation of the laser cutting software rather than this 
 program.
 
 It is recommended that you allow overlaps within this software and
 then use the appropriate feature in the laser burning software. 
-For example in lightburn you will need to use the weld feature, or
+For example in Lightburn you will need to use the weld feature, or
 you could edit in Inkscape. 
 
 When creating templates it is much simpler to allow overlapping etches. 
