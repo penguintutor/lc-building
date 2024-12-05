@@ -56,7 +56,7 @@ For walls the values can all be entered as strings including tokens (eg. value n
 Wall is made up of points of a polygon. 
 Convention is to start top left (where not top left - eg. apex then left takes priority). Then go clockwise. This makes it easier to identify the edge number.
 
-First entry is name for the wall (for user), followed by a list of lines to define edges)
+First entry is name for the wall (for user), followed by a list of points
 
 After list of points holds gui information, including view (eg. "front") and position within that view eg. [0,0]. Note this applies to position within that view only, not how it will output. New entries default to [0,0] or available position and can be moved by the user.
 
@@ -64,7 +64,6 @@ After list of points holds gui information, including view (eg. "front") and pos
 ## Roofs
 
 **This will be deprecated in future version. Use walls instead.** 
-
 
 Roofs are added separately in the building file, but will then be treated as if they were a wall.
 

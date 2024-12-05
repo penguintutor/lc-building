@@ -36,6 +36,10 @@ class Builder():
     # If want to confirm to overwrite check before calling this
     def save_file(self, filename):
         #Todo update building at this point
+        
+        
+        ####***************************####
+        
         # eg. position of walls
         return self.building.save_file(filename)
         
@@ -49,6 +53,13 @@ class Builder():
                 #print ("Adding wall here ")
                 view_walls.append(wall)
         return view_walls
+        
+    # Takes a dictionary with the wall data where points is a list within the dictionary
+    # Wall args are: name, points, view="front", position=[0,0]
+    def add_wall(self, wall_data):
+        # Todo Calculate position
+        position = [0,0]
+        self.walls.append(Wall(wall_data['name'], wall_data['points'], wall_data['view'], position)) 
         
     # After loading data this converts into builder objects
     # Deletes any existing entries

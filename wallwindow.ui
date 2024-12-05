@@ -88,6 +88,9 @@
       <height>25</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
@@ -108,7 +111,7 @@
       <x>20</x>
       <y>120</y>
       <width>751</width>
-      <height>411</height>
+      <height>425</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
@@ -156,6 +159,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>-</string>
@@ -238,6 +244,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>-</string>
@@ -365,6 +374,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>+</string>
        </property>
@@ -416,6 +428,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>+</string>
        </property>
@@ -438,6 +453,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>-</string>
@@ -479,6 +497,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>+</string>
@@ -611,6 +632,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>-</string>
        </property>
@@ -626,6 +650,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>-</string>
@@ -643,6 +670,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>-</string>
        </property>
@@ -658,6 +688,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>-</string>
@@ -675,6 +708,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>-</string>
        </property>
@@ -690,6 +726,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>-</string>
@@ -707,6 +746,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>-</string>
        </property>
@@ -719,6 +761,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>+</string>
@@ -733,6 +778,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>+</string>
        </property>
@@ -745,6 +793,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>+</string>
@@ -759,6 +810,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>+</string>
        </property>
@@ -771,6 +825,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>+</string>
@@ -785,6 +842,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="text">
         <string>+</string>
        </property>
@@ -797,6 +857,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
         <string>+</string>
@@ -821,6 +884,31 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>nameText</tabstop>
+  <tabstop>wallTypeCombo</tabstop>
+  <tabstop>wall_input_x_0</tabstop>
+  <tabstop>wall_input_y_0</tabstop>
+  <tabstop>wall_input_x_1</tabstop>
+  <tabstop>wall_input_y_1</tabstop>
+  <tabstop>wall_input_x_2</tabstop>
+  <tabstop>wall_input_y_2</tabstop>
+  <tabstop>wall_input_x_3</tabstop>
+  <tabstop>wall_input_y_3</tabstop>
+  <tabstop>wall_input_x_4</tabstop>
+  <tabstop>wall_input_y_4</tabstop>
+  <tabstop>wall_input_x_5</tabstop>
+  <tabstop>wall_input_y_5</tabstop>
+  <tabstop>wall_input_x_6</tabstop>
+  <tabstop>wall_input_y_6</tabstop>
+  <tabstop>wall_input_x_7</tabstop>
+  <tabstop>wall_input_y_7</tabstop>
+  <tabstop>wall_input_x_8</tabstop>
+  <tabstop>wall_input_y_8</tabstop>
+  <tabstop>wall_input_x_9</tabstop>
+  <tabstop>wall_input_y_9</tabstop>
+  <tabstop>profileCombo</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

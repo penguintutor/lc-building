@@ -105,6 +105,8 @@ class WallWindowUI(QMainWindow):
         
         # Number of rows displayed in custom view (minimum is 4)
         self.num_rows = 4
+        self.min_rows = 4
+        self.max_rows = 10	# Must not be larger than the number of elements in the UI
         
         # When wall type changed then change UI
         self.ui.wallTypeCombo.activated.connect(self.set_view)
@@ -112,21 +114,54 @@ class WallWindowUI(QMainWindow):
         # Used if need to send a status message (eg. pop-up warning)
         self.status_message = ""
         
-        self.ui.buttonBox.rejected.connect(self.hide)
-        
-        # temp
-        #self.ui.wall_delete_0.pressed.connect(self.view_bottom)
+        self.ui.buttonBox.rejected.connect(self.cancel)
+        self.ui.buttonBox.accepted.connect(self.accept)
         
         self.simple_interface()
         
         self.ui.show()
     
-    # Change these to add / delete entries
+    
+    # Del an entry - delete entry, move others up and if > min remove bottom row
     def del_entry(self, entry_num):
-        print (f"Del entry {entry_num}")
+        # Are there entries after this in which case move up
+        if entry_num < self.num_rows - 1:
+            for row in range (entry_num, self.num_rows):
+                # If the number of rows is the maximum then we don't have one to copy from so skip
+                if row >= self.num_rows -1:
+                    continue
+                self.wall_elements["input_x"][row].setText(self.wall_elements["input_x"][row+1].text())
+                self.wall_elements["input_y"][row].setText(self.wall_elements["input_x"][row+1].text())
+        # If there are more than the minimum then hide the last one
+        if self.num_rows > self.min_rows:
+            self.num_rows -= 1
+            self.hide_row(self.num_rows)
+        # otherwise set the last row to mm mm
+        else:
+            self.wall_elements["input_x"][self.num_rows-1].setText("mm")
+            self.wall_elements["input_y"][self.num_rows-1].setText("mm")
+
         
+            
+    # Add an entry inserting below (ie +1 ) current entry and enabling next display
+    # Warning if we have maximum entries then the last one will be lost
     def add_entry(self, entry_num):
-        print (f"Add entry {entry_num}")
+        # If not the last entry then shift values down
+        if entry_num < self.num_rows - 1:
+            for row in range (self.num_rows, entry_num, -1):
+                # if last entry then skip, this will lose the last entry but prevent exceeding the list
+                if row+1 >= self.max_rows:
+                    continue
+                self.wall_elements["input_x"][row+1].setText(self.wall_elements["input_x"][row].text())
+                self.wall_elements["input_y"][row+1].setText(self.wall_elements["input_x"][row].text())
+            # Set current row to mm
+            self.wall_elements["input_x"][entry_num+1].setText("mm")
+            self.wall_elements["input_y"][entry_num+1].setText("mm")
+        #if there are less than the max then add a new entry
+        if self.num_rows < self.max_rows:
+            self.show_row(self.num_rows)
+            self.num_rows += 1
+        #print (f"Add entry {entry_num}")
     
     # Change the view based on type combo selection
     def set_view(self):
@@ -140,11 +175,60 @@ class WallWindowUI(QMainWindow):
         else:
             self.custom_interface()
     
+    # Show entire window
     def show(self):
         self.ui.show()
         
+    # hide entire windows
     def hide(self):
         self.ui.hide()
+        
+    # Cancel button is pressed
+    # reset then hide
+    def cancel(self):
+        self.reset()
+        self.hide()
+    
+    def reset(self):
+        # Set all values to mm and got to rectangle
+        for row in range (0, self.max_rows):
+            self.wall_elements["input_x"][row].setText("mm")
+            self.wall_elements["input_y"][row].setText("mm")
+        self.simple_interface()
+        
+    # Accept button is pressed
+    def accept(self):
+        # Validate data - doesn't matter if some fields are not filled in, but need at least 3 points (triangular wall)
+        # Add to builder, then reset and hide window
+        
+        #name, points, view="front"
+        
+        self.reset()
+        self.hide()
+        
+    # Used to hide a row when in custom mode
+    def hide_row(self, row):
+        self.wall_elements["label"][row].setText("")
+        self.wall_elements["label_x"][row].hide()
+        self.wall_elements["label_y"][row].hide()
+        self.wall_elements["label_y"][row].hide()
+        self.wall_elements["input_x"][row].hide()
+        self.wall_elements["input_y"][row].hide()
+        self.wall_elements["delete"][row].hide()
+        self.wall_elements["add"][row].hide()
+        
+    # Used to hide a row when in custom mode
+    def show_row(self, row):
+        self.wall_elements["label"][row].setText(f"Point {row+1}")
+        self.wall_elements["label_x"][row].show()
+        self.wall_elements["label_y"][row].show()
+        self.wall_elements["label_y"][row].show()
+        self.wall_elements["input_x"][row].show()
+        self.wall_elements["input_y"][row].show()
+        self.wall_elements["delete"][row].show()
+        # if the last allowed row then don't show the add button
+        if row < self.max_rows - 1:
+            self.wall_elements["add"][row].show()
         
     def custom_interface(self):
         # Minimum of 4 entries (assumes back to start for 5)
@@ -170,13 +254,15 @@ class WallWindowUI(QMainWindow):
         self.ui.wall_label_y_1.setText("Scale size:")
         self.ui.wall_label_y_2.setText("Scale size:")
         # Update all fields to remove delete and add buttons
-        for i in range (0, 10):
+        for i in range (0, self.max_rows):
             self.wall_elements["label_x"][i].hide()
             self.wall_elements["delete"][i].hide()
             self.wall_elements["add"][i].hide()
         # Hide none standard fields
         # Hide labels
-        for i in range (2, 10):
+        for i in range (2, self.max_rows):
+            # Do not hide first label as that would reformat the window
+            # Instead set it to ""
             self.wall_elements["label"][i].setText("")
             # Do not hide label_y for first entries as says "Scale"
             self.wall_elements["label_y"][i].hide()
