@@ -196,6 +196,8 @@ class WallWindowUI(QMainWindow):
     def reset(self):
         # Set to 0 (rectangle)
         self.ui.wallTypeCombo.setCurrentIndex(0)
+        # Set title to blank
+        self.ui.nameText.setText("")
         # Set all values to mm and got to rectangle
         for row in range (0, self.max_rows):
             self.wall_elements["input_x"][row].setText("mm")
@@ -303,16 +305,16 @@ class WallWindowUI(QMainWindow):
         # Both x and y must be numbers for it to be considered valid
         else:
             for row in range (0, self.num_rows):
-                this_width = self.wall_elements["input_x"][row].text()
-                this_height = self.wall_elements["input_x"][row].text()
+                this_x = self.wall_elements["input_x"][row].text()
+                this_y = self.wall_elements["input_y"][row].text()
                 # convert to int - if either fail then ignore
                 try:
-                    this_width = int(this_width)
-                    this_height = int(this_height)
+                    this_x = int(this_x)
+                    this_y = int(this_y)
                 except ValueError:
                     continue
                 else:
-                    wall_data['points'].append([this_width, this_height])
+                    wall_data['points'].append([this_x, this_y])
             # Do we have at least 3?
             if len(wall_data['points']) < 3:
                 QMessageBox.warning(self, "Insufficient points", "Insufficient points entered. Please ensure both x and y are valid sizes in mm.")
@@ -320,14 +322,14 @@ class WallWindowUI(QMainWindow):
             # Check if start and last points are equal, if not then complete the rectangle
             if wall_data['points'][0] != wall_data['points'][len(wall_data['points'])-1]:
                 wall_data['points'].append(wall_data['points'][0])
-        
-        # If it's a custom view
-        #### for row in range (entry_num, self.num_rows):
-        
-        # Warning but proceed with creating
+             
+        # Followin gives a warning but allows proceed with creating
         if (wall_data['name'] == ""):
-            wall_data['name'] = "Unknown"
-            QMessageBox.warning(self, "Warning name not provided", "A name was not provided for the wall. The wall will be called \"Unknown\"")
+            return_val = QMessageBox.warning(self, 'Warning name not provided', 'A name was not provided for the wall. Accept default named \"Unknown\"?', QMessageBox.Ok | QMessageBox.Cancel)
+            if return_val == QMessageBox.Ok:
+                wall_data['name'] = "Unknown"
+            else:
+                return
             
         # Add this wall
         self.builder.add_wall(wall_data)
@@ -335,7 +337,7 @@ class WallWindowUI(QMainWindow):
         self.parent.update_all_views()
         
         # Reset the window and hide
-        self.reset
+        self.reset()
         self.hide()
         
     # Used to hide a row when in custom mode
