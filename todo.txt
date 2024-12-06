@@ -7,3 +7,8 @@ Replace hardcoded material thickness / interlocking with setting
 Handle scale conversion to mm and vice versa
 Warn and reset values when switching between custom and simplified
 Warn and convert when switching between custom and simplified
+Handle selection of scale
+- when created set it to default
+- when reset go back to default
+Switching to custom set first entry to 0,0
+# Points not working correctly for custom

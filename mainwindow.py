@@ -115,6 +115,8 @@ class MainWindowUI(QMainWindow):
         
         self.ui.show()
         
+        # Set to none, only create when needed and can check if it's created yet
+        self.wall_window = None
         #self.wall_window = WallWindowUI()
 
 
@@ -311,8 +313,8 @@ class MainWindowUI(QMainWindow):
 
     # Add new wall dialog
     def add_wall (self):
-        self.wall_window = WallWindowUI(self.config, self.gconfig, self.builder)
-        #wall_window = WallWindowUI()
-        #self.wall_window.show()
-        #wall_window.exec()
+        if self.wall_window == None:
+            self.wall_window = WallWindowUI(self, self.config, self.gconfig, self.builder)
+        else:
+            self.wall_window.show()
         print ("Wall window launched")

@@ -30,13 +30,14 @@ class WallWindowUI(QMainWindow):
     #load_complete_signal = Signal()
     #name_warning_signal = Signal()
        
-    def __init__(self, config, gconfig, builder):
+    def __init__(self, parent, config, gconfig, builder):
     #def __init__(self):
         super().__init__()
         
         # Connect signal handler
         #self.load_complete_signal.connect(self.load_complete)
         #self.name_warning_signal.connect(self.name_warning)
+        self.parent = parent
         
         self.ui = loader.load(os.path.join(basedir, "wallwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
@@ -178,6 +179,8 @@ class WallWindowUI(QMainWindow):
     # Show entire window
     def show(self):
         self.ui.show()
+        self.ui.activateWindow()
+        self.ui.raise_()
         
     # hide entire windows
     def hide(self):
@@ -185,11 +188,14 @@ class WallWindowUI(QMainWindow):
         
     # Cancel button is pressed
     def cancel(self):
+        self.reset()
         self.hide()
     
-    # Reset is not used as this is reset when launched
-    # Left here in case a reset button is added
+    # Reset back to default state - called after cancel or OK
+    # so next time window opened it's back to defaults
     def reset(self):
+        # Set to 0 (rectangle)
+        self.ui.wallTypeCombo.setCurrentIndex(0)
         # Set all values to mm and got to rectangle
         for row in range (0, self.max_rows):
             self.wall_elements["input_x"][row].setText("mm")
@@ -203,12 +209,13 @@ class WallWindowUI(QMainWindow):
         # Validates entries
         wall_data = {
             'name' : self.ui.nameText.text(),
-            'view' : self.ui.profileCombo.currentText().lower()
+            'view' : self.ui.profileCombo.currentText().lower(),
+            'points' : []
             }
         # Check for points first as that is a critical error, whereas name would be just a warning
         # If simplified interface then try that first
         # Work through the points provided and add as appropriate
-        # Rectangle
+        # Rectangle wall (combo = 0)
         if self.ui.wallTypeCombo.currentIndex() == 0:
             # check we have each of the values
             # width is row 0 - use non scale size
@@ -236,8 +243,83 @@ class WallWindowUI(QMainWindow):
             if height <= 0:
                 QMessageBox.warning(self, "Height is invalid", "Height is not a valid number. Please provide a valid size in mm.")
                 return
-        
-        
+            # Have width and height so convert into points
+            wall_data['points'] = [
+                (0,0), (width, 0), 
+                (width, height), (0, height),
+                (0,0)
+                ]
+        # Apex wall (type = 1)
+        elif self.ui.wallTypeCombo.currentIndex() == 1:
+            # check we have each of the values
+            # width is row 0 - use non scale size
+            width = self.wall_elements["input_x"][0].text()
+            # check it's an integer string and if so convert to int
+            try:
+                width = int(width)
+            except ValueError:
+                QMessageBox.warning(self, "Width not a number", "Width is not a number. Please provide a valid size in mm.")
+                return
+            # Also check it's not a negative number
+            if width <= 0:
+                QMessageBox.warning(self, "Width is invalid", "Width is not a valid number. Please provide a valid size in mm.")
+                return
+            
+            # Do the same with height maximum - row 1
+            height_max = self.wall_elements["input_x"][1].text()
+            # check it's an integer string and if so convert to int
+            try:
+                height_max = int(height_max)
+            except ValueError:
+                QMessageBox.warning(self, "Maximum height not a number", "Maximum height is not a number. Please provide a valid size in mm.")
+                return
+            # Also check it's not a negative number
+            if height_max <= 0:
+                QMessageBox.warning(self, "Maximum height is invalid", "Maximum height is not a valid number. Please provide a valid size in mm.")
+                return
+            # and for height minimum - row 2
+            height_min = self.wall_elements["input_x"][2].text()
+            # check it's an integer string and if so convert to int
+            try:
+                height_min = int(height_min)
+            except ValueError:
+                QMessageBox.warning(self, "Minimum height not a number", "Minimum height is not a number. Please provide a valid size in mm.")
+                return
+            # Also check it's not a negative number
+            if height_min <= 0:
+                QMessageBox.warning(self, "Minimum height is invalid", "Minimum height is not a valid number. Please provide a valid size in mm.")
+                return
+            # Could check that min is less than max, but if not then get an inverted apex (strange, but let user do if they want)
+            #height delta just reduces amount of calculates in generating point and makes it easier to follow
+            height_delta = height_max - height_min
+            # Create an apex wall
+            wall_data['points'] = [
+                (0,height_delta), (int(width/2), 0), (width, height_delta), 
+                (width, height_max), (0, height_max),
+                (0,height_delta)
+                ]
+        # If it's not one of the simplified ones then it's custom
+        # Read in any values that are displayed, ignore any that are not ints and see if we have enough at the end (at least 3)
+        # Both x and y must be numbers for it to be considered valid
+        else:
+            for row in range (0, self.num_rows):
+                this_width = self.wall_elements["input_x"][row].text()
+                this_height = self.wall_elements["input_x"][row].text()
+                # convert to int - if either fail then ignore
+                try:
+                    this_width = int(this_width)
+                    this_height = int(this_height)
+                except ValueError:
+                    continue
+                else:
+                    wall_data['points'].append([this_width, this_height])
+            # Do we have at least 3?
+            if len(wall_data['points']) < 3:
+                QMessageBox.warning(self, "Insufficient points", "Insufficient points entered. Please ensure both x and y are valid sizes in mm.")
+                return
+            # Check if start and last points are equal, if not then complete the rectangle
+            if wall_data['points'][0] != wall_data['points'][len(wall_data['points'])-1]:
+                wall_data['points'].append(wall_data['points'][0])
         
         # If it's a custom view
         #### for row in range (entry_num, self.num_rows):
@@ -247,8 +329,13 @@ class WallWindowUI(QMainWindow):
             wall_data['name'] = "Unknown"
             QMessageBox.warning(self, "Warning name not provided", "A name was not provided for the wall. The wall will be called \"Unknown\"")
             
-        #name, points, view="front"
+        # Add this wall
+        self.builder.add_wall(wall_data)
+        # Update parent
+        self.parent.update_all_views()
         
+        # Reset the window and hide
+        self.reset
         self.hide()
         
     # Used to hide a row when in custom mode
