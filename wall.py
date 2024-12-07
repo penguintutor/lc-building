@@ -137,6 +137,9 @@ class Wall():
     def get_type (self):
         return self.type
     
+    def get_size_string (self):
+        return (f"{self.get_maxwidth()}mm x {self.get_maxheight()}mm")
+    
     def get_maxsize (self):
         return (self.get_maxwidth(), self.get_maxheight())
     
@@ -160,7 +163,7 @@ class Wall():
     # Add a feature - such as a window
     # cuts, etches and outers should all be lists
     # If not set to None then change to [] avoid dangerous default
-    def add_feature (self, startpos, points, cuts=None, etches=None, outers=None):
+    def add_feature (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None):
         # feature number will be next number
         # Will return that assuming that this is successful
         feature_num = len(self.features)
@@ -170,7 +173,7 @@ class Wall():
             etches = []
         if outers == None:
             outers = []
-        self.features.append(Feature(startpos, points, cuts, etches, outers))
+        self.features.append(Feature(feature_type, feature_template, startpos, points, cuts, etches, outers))
         # If want to handle settings can do so here
         # Eg. support textures
         # Update the wall

@@ -123,7 +123,7 @@ for feature in building.get_features():
         height = feature["parameters"]["height"]
         polygon = rect_to_polygon(pos, width, height)
         
-    walls[feature["wall"]].add_feature(pos, polygon,
+    walls[feature["wall"]].add_feature(feature["type"], feature["template"], pos, polygon,
                                        feature["cuts"], feature["etches"], feature["outers"])
     
 # if setting is ignore interlocking then ignore any entries (wall will have il=[])

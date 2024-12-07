@@ -12,7 +12,9 @@ class Feature():
     lf = LaserFactory()
     # x, y is top left
     # points is a polygon to represent exclude areas
-    def __init__ (self, startpos, points, cuts=[], etches=[], outers=[]):
+    def __init__ (self, feature_type, feature_template, startpos, points, cuts=[], etches=[], outers=[]):
+        self.type = feature_type
+        self.template = feature_template
         self.min_x = startpos[0]
         self.min_y = startpos[1]
         self.points = points

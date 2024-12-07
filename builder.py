@@ -112,7 +112,7 @@ class Builder():
                 height = feature["parameters"]["height"]
                 polygon = rect_to_polygon(pos, width, height)
                 
-            self.walls[feature["wall"]].add_feature(pos, polygon,
+            self.walls[feature["wall"]].add_feature(feature["type"], feature["template"], pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"])
             
         #print ("End feature")

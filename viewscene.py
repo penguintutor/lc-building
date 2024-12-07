@@ -29,9 +29,9 @@ class ViewScene():
     def get_obj_from_obj_view(self, selected_obj):
         for i in range (0, len(self.obj_views)):
             if self.obj_views[i].item_group == selected_obj:
-                print (f"*** This object found - obj {i}")
+                #print (f"*** This object found - obj {i}")
                 # objs is the actual object (e.g. wall)
-                print (f" which is {self.objs[i].name}")
+                #print (f" which is {self.objs[i].name}")
                 return (self.objs[i])
         return (None)
         

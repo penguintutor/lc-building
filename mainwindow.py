@@ -356,12 +356,30 @@ class MainWindowUI(QMainWindow):
                     
                 #for i in range (0, len(selected_obs))
             elif (len(selected_objs) == 1):
+                row_count = 3
                 self.ui.infoLabel.setText(f"One object selected")
-                self.ui.infoTable.setRowCount(2)
+                self.ui.infoTable.setRowCount(row_count)
                 self.ui.infoTable.setItem(0,0, QTableWidgetItem("Name"))
                 self.ui.infoTable.setItem(0,1, QTableWidgetItem(selected_objs[0].name))
                 self.ui.infoTable.setItem(1,0, QTableWidgetItem("Type"))
                 self.ui.infoTable.setItem(1,1, QTableWidgetItem(selected_objs[0].type))
+                self.ui.infoTable.setItem(2,0, QTableWidgetItem("Size"))
+                self.ui.infoTable.setItem(2,1, QTableWidgetItem(selected_objs[0].get_size_string()))
+                # Show one line for each texture applied
+                next_row = row_count
+                row_count += len(selected_objs[0].textures)
+                self.ui.infoTable.setRowCount(row_count)
+                for i in range (0, len(selected_objs[0].textures)):
+                    self.ui.infoTable.setItem(next_row,0, QTableWidgetItem(f"Texture {i+1}"))
+                    self.ui.infoTable.setItem(next_row,1, QTableWidgetItem(selected_objs[0].textures[i].style))
+                    next_row += 1
+                # One line for each feature
+                row_count += len(selected_objs[0].features)
+                self.ui.infoTable.setRowCount(row_count)
+                for i in range (0, len(selected_objs[0].features)):
+                    self.ui.infoTable.setItem(next_row,0, QTableWidgetItem(f"Feature {i+1}"))
+                    self.ui.infoTable.setItem(next_row,1, QTableWidgetItem(f"{selected_objs[0].features[i].type} - {selected_objs[0].features[i].template}"))
+                    next_row += 1
             else:
                 self.ui.infoLabel.setText(f"No objects selected")
                 #self.ui.infoTable.setVerticalHeaderLabels(["", ""])
