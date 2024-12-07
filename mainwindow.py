@@ -1,6 +1,6 @@
 import os
 from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QLabel, QTableWidget, QTableWidgetItem
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
@@ -22,6 +22,8 @@ class MainWindowUI(QMainWindow):
     load_complete_signal = Signal()
     file_save_warning_signal = Signal()
     
+
+    
     def __init__(self):
         super().__init__()
         
@@ -31,6 +33,7 @@ class MainWindowUI(QMainWindow):
         # Connect signal handler
         self.load_complete_signal.connect(self.load_complete)
         self.file_save_warning_signal.connect(self.file_save_warning)
+        
         
         self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
@@ -64,6 +67,10 @@ class MainWindowUI(QMainWindow):
         
         if self.gconfig.maximized == True:
             self.ui.showMaximized()
+            
+        # Set width for table column
+        self.ui.infoTable.setColumnWidth(0, 100)
+        self.ui.infoTable.setColumnWidth(1, 200)
               
         # Create scenes ready for holding objects to view
         # Also create view scenes which are then used to draw the particular view on the scene
@@ -73,6 +80,8 @@ class MainWindowUI(QMainWindow):
             #self.scenes[scene_name] = QGraphicsScene()
             self.scenes[scene_name] = ViewGraphicsScene(self)
             self.view_scenes[scene_name] = ViewScene(self.scenes[scene_name], self.builder, self.gconfig, scene_name)
+            # Signal for change in viewgraphicsscene (item selected / deselected)
+            self.scenes[scene_name].focus_changed.connect(self.update_selected_view)
         
         # Default to front view
         self.ui.graphicsView.setScene(self.scenes[self.current_scene])
@@ -317,4 +326,47 @@ class MainWindowUI(QMainWindow):
             self.wall_window = WallWindowUI(self, self.config, self.gconfig, self.builder)
         else:
             self.wall_window.show()
-        print ("Wall window launched")
+        #print ("Wall window launched")
+        
+    # Update based on selection in viewgraphicsscene
+    def update_selected_view (self, selected_items):
+        # Selection are items selected
+        # For normal scenes these are groups (because each wall is composed of groups of items
+        # which are in <ObjView>.item_group
+        # To know which are selected need to query each of the ObjViews in the current <ViewScene>
+        # First check if some items are selection
+        #print (f"Update view {selected_items}")
+        if selected_items != None:
+            selected_objs = []
+            # Call get info to find information on what is selected
+            for this_obj in selected_items:
+                selected_objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj))
+                #print (f"Obj selected: {obj_info}")
+                #print (f"Object type: {obj_info.type}, name: {obj_info.name}")
+            # reset all table rows
+            self.ui.infoTable.setRowCount(0)
+            if (len(selected_objs) > 1):
+                #print ("multi")
+                #self.ui.infoTable.setHorizontalHeaderLabels([f"{len(selected_objs)} selected"])
+                self.ui.infoLabel.setText(f"{len(selected_objs)} objects selected")
+                self.ui.infoTable.setRowCount(len(selected_objs))
+                for i in range (0, len(selected_objs)):
+                    self.ui.infoTable.setItem(i,0, QTableWidgetItem(f"Object {i}"))
+                    self.ui.infoTable.setItem(i,1, QTableWidgetItem(f"{selected_objs[0].type} - {selected_objs[i].name}"))
+                    
+                #for i in range (0, len(selected_obs))
+            elif (len(selected_objs) == 1):
+                self.ui.infoLabel.setText(f"One object selected")
+                self.ui.infoTable.setRowCount(2)
+                self.ui.infoTable.setItem(0,0, QTableWidgetItem("Name"))
+                self.ui.infoTable.setItem(0,1, QTableWidgetItem(selected_objs[0].name))
+                self.ui.infoTable.setItem(1,0, QTableWidgetItem("Type"))
+                self.ui.infoTable.setItem(1,1, QTableWidgetItem(selected_objs[0].type))
+            else:
+                self.ui.infoLabel.setText(f"No objects selected")
+                #self.ui.infoTable.setVerticalHeaderLabels(["", ""])
+        else:
+            #print ("Setting none selected")
+            self.ui.infoLabel.setText(f"No objects selected")
+            #self.ui.infoTable.setHorizontalHeaderLabels(["None selected"])
+            #self.ui.infoTable.setVerticalHeaderLabels(["", ""])

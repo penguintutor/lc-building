@@ -85,7 +85,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="viewButtonVLayout" stretch="8,4">
+       <layout class="QVBoxLayout" name="viewButtonVLayout" stretch="8,0,4">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -104,8 +104,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
-             <width>279</width>
+             <y>-864</y>
+             <width>284</width>
              <height>1489</height>
             </rect>
            </property>
@@ -309,23 +309,49 @@
          </widget>
         </item>
         <item>
-         <widget class="QTableWidget" name="tableWidget">
-          <property name="maximumSize">
+         <widget class="QLabel" name="infoLabel">
+          <property name="text">
+           <string>No objects selected</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="infoTable">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
            <size>
             <width>300</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>350</width>
             <height>16777215</height>
            </size>
           </property>
-          <row>
+          <property name="showGrid">
+           <bool>false</bool>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderHighlightSections">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <column>
            <property name="text">
-            <string>Object Name</string>
+            <string>Label</string>
            </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>Object Type</string>
-           </property>
-          </row>
+          </column>
           <column>
            <property name="text">
             <string>Value</string>
@@ -512,7 +538,8 @@
   </action>
   <action name="actionSave_as">
    <property name="icon">
-    <iconset theme="document-save-as"/>
+    <iconset theme="document-save-as">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Save as</string>

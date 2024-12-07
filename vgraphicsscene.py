@@ -4,13 +4,19 @@
 # otherwise be past direct to higher level widgets
 from PySide6.QtWidgets import QGraphicsScene
 from PySide6.QtGui import QWheelEvent
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
+#from wallwindow import WallWindowUI
 
 class ViewGraphicsScene (QGraphicsScene):
+    
+    focus_changed = Signal(list)
 
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
+        
+        # Triggers when a selection is changed within the scene
+        self.selectionChanged.connect(self.new_focus)
         
     ## Code to handle CTRL & Scroll Wheel for zoom
     def wheelEvent(self, event):
@@ -25,4 +31,9 @@ class ViewGraphicsScene (QGraphicsScene):
         if num_pixels < 0 :
             self.main_window.zoom_out()
         event.accept()
+        
 
+    def new_focus(self):
+        selected_items = self.selectedItems()
+        #print (f"Focus changed {selected_items}")
+        self.focus_changed.emit(selected_items)

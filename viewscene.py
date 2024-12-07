@@ -25,6 +25,16 @@ class ViewScene():
         self.scene.clear()
         self.add_walls()
         
+    # searches for obj view and returns the corresponding objs
+    def get_obj_from_obj_view(self, selected_obj):
+        for i in range (0, len(self.obj_views)):
+            if self.obj_views[i].item_group == selected_obj:
+                print (f"*** This object found - obj {i}")
+                # objs is the actual object (e.g. wall)
+                print (f" which is {self.objs[i].name}")
+                return (self.objs[i])
+        return (None)
+        
     # Add walls to the scene
     def add_walls(self):
         #print ("Add walls")

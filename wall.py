@@ -28,6 +28,9 @@ class Wall():
     settings = {}
     
     def __init__ (self, name, points, view="front", position=[0,0]):
+        # type is set as a wall - but allows us to check as may have different type
+        # in future (eg. "exterior_object" - which could be porch support or something similar)
+        self.type = "wall"
         self.name = name
         self.points = points
         self.polygon = Polygon(points)

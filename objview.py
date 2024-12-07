@@ -22,6 +22,10 @@ class ObjView():
         self.item_group.setFlag(QGraphicsItem.ItemIsSelectable)
         self.offset = coords
         #print (f"Offset {self.offset}")
+        
+        #print (f"Obj view item is {self}")
+        #print (f"Item group is {self.item_group}")
+        
                 
     def set_offset(self, offset):
         self.offset = offset

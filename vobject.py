@@ -1,3 +1,6 @@
+# Not currently used - Is this required???
+# Instead viewscene has objs and obj_views which are kept in sync (same number)
+
 # Used to maintain association of images on GUI to which object in Builder class
 
 
