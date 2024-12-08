@@ -138,7 +138,7 @@ class Wall():
         return self.type
     
     def get_size_string (self):
-        return (f"{self.get_maxwidth()}mm x {self.get_maxheight()}mm")
+        return (f"{int(self.get_maxwidth()):,d}mm x {int(self.get_maxheight()):,d}mm")
     
     def get_maxsize (self):
         return (self.get_maxwidth(), self.get_maxheight())

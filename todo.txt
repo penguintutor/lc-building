@@ -3,6 +3,10 @@
 Replace hardcoded material thickness / interlocking with setting
 
 
+## In Main Window 
+Show status bar when loading a large file
+
+
 ## In add wall window
 Handle scale conversion to mm and vice versa
 Warn and reset values when switching between custom and simplified
@@ -12,5 +16,4 @@ Handle selection of scale
 - when reset go back to default
 Switching to custom set first entry to 0,0
 Set Enter key to press OK
-
 

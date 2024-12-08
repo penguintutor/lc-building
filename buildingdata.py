@@ -157,7 +157,7 @@ class BuildingData ():
         wall_data = []
         # No walls just return
         if (not "walls" in self.data):
-            print ("No walls")
+            #print ("No walls")
             return[]
         for wall in self.data["walls"]:
             # Basic error check for minimum number of parameters
@@ -181,15 +181,16 @@ class BuildingData ():
     
     def get_interlocking(self):
         if (not "interlocking" in self.data):
-            print ("No interlocking")
+            #print ("No interlocking")
             return []
         return self.data["interlocking"]
     
     # Returns roofs after parsing tokens
+    # Note that these will be just walls in future versions
     def get_roofs(self):
         roof_data = []
         if (not "roofs" in self.data):
-            print ("No roofs")
+            #print ("No roofs")
             return []
         for roof in self.data["roofs"]:
             # Basic error check for minimum number of parameters
@@ -213,7 +214,7 @@ class BuildingData ():
     
     def get_textures(self):
         if (not "textures" in self.data):
-            print ("No textures")
+            #print ("No textures")
             return []
         return self.data["textures"]
     

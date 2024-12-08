@@ -131,7 +131,7 @@ class MainWindowUI(QMainWindow):
 
     def open_file_dialog(self):
         filename = QFileDialog.getOpenFileName(self.parent(), "Open building file", "", "Building file (*.json);;All (*.*)")
-        print (f'Selected file {filename}')
+        #print (f'Selected file {filename}')
         # possibly check for valid file
         if filename[0] == '':
             print ("No filename specified")
@@ -160,7 +160,7 @@ class MainWindowUI(QMainWindow):
     # Prompt user for file to safe as
     def save_as_dialog(self):
         filename = QFileDialog.getSaveFileName(self, "Save building file", "", "Building file (*.json);;All (*.*)", "Building file (*.json)", QFileDialog.DontConfirmOverwrite)
-        print (f"Filename is {filename}")
+        #print (f"Filename is {filename}")
         this_filename = filename[0]
         # If no suffix/extension then add here
         # Basic check for extension using os.path.splitext
@@ -177,9 +177,10 @@ class MainWindowUI(QMainWindow):
             # Confirm with user to delete
             confirm_box = QMessageBox.question(self, "File already exists", f"The file:\n{this_filename} already exists.\n\nDo you want to replace this file?")
             if confirm_box == QMessageBox.Yes:
-                print ("Yes replace file")
+                #print ("Yes replace file")
+                pass
             else:
-                print ("No do not replace")
+                #print ("No do not replace")
                 return
         
         if this_filename == '':
@@ -237,7 +238,7 @@ class MainWindowUI(QMainWindow):
     def load_complete(self):
         # Reenable file actions
         self.enable_file_actions()
-        print ("Updating GUI")
+        #print ("Updating GUI")
         self.update_all_views()
         #print (f"Items {self.view_scenes[self.current_scene].scene.items()}")
         #print (f"Group {self.view_scenes[self.current_scene].obj_views[0].item_group}")
@@ -319,6 +320,8 @@ class MainWindowUI(QMainWindow):
         self.view_scenes[new_scene].update()
         self.ui.graphicsView.setScene(self.scenes[self.current_scene])
         self.ui.graphicsView.show()
+        # Update table to show nothing selected
+        self.update_selected_view(None)
 
     # Add new wall dialog
     def add_wall (self):
@@ -334,8 +337,11 @@ class MainWindowUI(QMainWindow):
         # For normal scenes these are groups (because each wall is composed of groups of items
         # which are in <ObjView>.item_group
         # To know which are selected need to query each of the ObjViews in the current <ViewScene>
+
+        # reset all table rows
+        self.ui.infoTable.setRowCount(0)
+        
         # First check if some items are selection
-        #print (f"Update view {selected_items}")
         if selected_items != None:
             selected_objs = []
             # Call get info to find information on what is selected
@@ -343,8 +349,6 @@ class MainWindowUI(QMainWindow):
                 selected_objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj))
                 #print (f"Obj selected: {obj_info}")
                 #print (f"Object type: {obj_info.type}, name: {obj_info.name}")
-            # reset all table rows
-            self.ui.infoTable.setRowCount(0)
             if (len(selected_objs) > 1):
                 #print ("multi")
                 #self.ui.infoTable.setHorizontalHeaderLabels([f"{len(selected_objs)} selected"])
@@ -382,6 +386,7 @@ class MainWindowUI(QMainWindow):
                     next_row += 1
             else:
                 self.ui.infoLabel.setText(f"No objects selected")
+                
                 #self.ui.infoTable.setVerticalHeaderLabels(["", ""])
         else:
             #print ("Setting none selected")

@@ -65,16 +65,13 @@ class Builder():
     # Deletes any existing entries
     def process_data(self):
         
-        print ("\n\nBuilder processing data")
+        #print ("\n\nBuilder processing data")
         settings = self.building.get_settings()
         if len(settings) > 0:
             # Add settings to the class
             for setting in settings.keys():
                 Wall.settings[setting] = settings[setting]
         
-        #    print ("Settings loaded")
-        #else:
-        #    print ("No settings")
         
         self.walls = []
         all_walls = self.building.get_walls()
@@ -138,4 +135,4 @@ class Builder():
                 reverse = il["secondary"][2]
             self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
     
-        print ("Builder processing data complete\n\n")
+        #print ("Builder processing data complete\n\n")

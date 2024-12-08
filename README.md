@@ -95,3 +95,9 @@ taken into consideration.
 Small scales (smaller than HO/OO) may have problems when dealing with small
 size shapes. These may need to be edit in Inkscape before burning, or choose
 an "N friendly" template
+
+### Delay in updating the info box
+Under some circumstances when an object is selected there may be a delay before
+the information box in the bottom right is updated. It is unknown why this is, 
+perhaps related to internal redrawing of the object when it receives focus. It is 
+not known to have another other impact on the software operation.
