@@ -23,8 +23,6 @@ basedir = os.path.dirname(__file__)
 
 app_title = "Add Wall / Roof"
 
-#class WallWindowUI(QObject):
-#class WallWindowUI(QWidget):
 class WallWindowUI(QMainWindow):
     
     #load_complete_signal = Signal()
@@ -228,8 +226,8 @@ class WallWindowUI(QMainWindow):
             except ValueError:
                 QMessageBox.warning(self, "Width not a number", "Width is not a number. Please provide a valid size in mm.")
                 return
-            # Also check it's not a negative number
-            if width <= 0:
+            # Also check it's not a negative number, or ridiculously large (over 100m)
+            if width <= 0 or width > 10000:
                 QMessageBox.warning(self, "Width is invalid", "Width is not a valid number. Please provide a valid size in mm.")
                 return
             
@@ -241,8 +239,8 @@ class WallWindowUI(QMainWindow):
             except ValueError:
                 QMessageBox.warning(self, "Height not a number", "Height is not a number. Please provide a valid size in mm.")
                 return
-            # Also check it's not a negative number
-            if height <= 0:
+            # Also check it's not a negative number, or ridiculously large (over 100m)
+            if height <= 0 or height > 10000:
                 QMessageBox.warning(self, "Height is invalid", "Height is not a valid number. Please provide a valid size in mm.")
                 return
             # Have width and height so convert into points
@@ -262,8 +260,8 @@ class WallWindowUI(QMainWindow):
             except ValueError:
                 QMessageBox.warning(self, "Width not a number", "Width is not a number. Please provide a valid size in mm.")
                 return
-            # Also check it's not a negative number
-            if width <= 0:
+            # Also check it's not a negative number, or ridiculously large (over 100m)
+            if width <= 0 or width > 10000:
                 QMessageBox.warning(self, "Width is invalid", "Width is not a valid number. Please provide a valid size in mm.")
                 return
             
@@ -275,8 +273,8 @@ class WallWindowUI(QMainWindow):
             except ValueError:
                 QMessageBox.warning(self, "Maximum height not a number", "Maximum height is not a number. Please provide a valid size in mm.")
                 return
-            # Also check it's not a negative number
-            if height_max <= 0:
+            # Also check it's not a negative number, or ridiculously large (over 100m)
+            if height <= 0 or height > 10000:
                 QMessageBox.warning(self, "Maximum height is invalid", "Maximum height is not a valid number. Please provide a valid size in mm.")
                 return
             # and for height minimum - row 2
@@ -287,8 +285,8 @@ class WallWindowUI(QMainWindow):
             except ValueError:
                 QMessageBox.warning(self, "Minimum height not a number", "Minimum height is not a number. Please provide a valid size in mm.")
                 return
-            # Also check it's not a negative number
-            if height_min <= 0:
+            # Also check it's not a negative number, or ridiculously large (over 100m)
+            if height <= 0 or height > 10000:
                 QMessageBox.warning(self, "Minimum height is invalid", "Minimum height is not a valid number. Please provide a valid size in mm.")
                 return
             # Could check that min is less than max, but if not then get an inverted apex (strange, but let user do if they want)

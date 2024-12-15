@@ -82,6 +82,9 @@ class MainWindowUI(QMainWindow):
             self.view_scenes[scene_name] = ViewScene(self.scenes[scene_name], self.builder, self.gconfig, scene_name)
             # Signal for change in viewgraphicsscene (item selected / deselected)
             self.scenes[scene_name].focus_changed.connect(self.update_selected_view)
+        # One more scene which is called "walledit" which is used to edit a particular wall
+        self.scenes["walledit"] = ViewGraphicsScene(self)
+        self.view_scenes['walledit'] = ViewScene(self.scenes["walledit"], self.builder, self.gconfig, "walledit")
         
         # Default to front view
         self.ui.graphicsView.setScene(self.scenes[self.current_scene])
@@ -121,12 +124,63 @@ class MainWindowUI(QMainWindow):
         
         # Action buttons
         self.ui.addWallButton.pressed.connect(self.add_wall)
+        self.ui.copyWallButton.pressed.connect(self.copy_wall)
+        self.ui.editWallButton.pressed.connect(self.edit_wall)
+        
+        self.set_left_buttons("default")
         
         self.ui.show()
         
         # Set to none, only create when needed and can check if it's created yet
         self.wall_window = None
         #self.wall_window = WallWindowUI()
+        
+    def copy_wall(self):
+        # Current selected objects (note these are groups containing walls and features / textures etc.)
+        # Should  be one selected (otherwise the button should be disabled - but check)
+        selected_items = self.scenes[self.current_scene].get_selected()
+        # If no items selected then just return
+        if selected_items == None:
+            return
+        else:
+            # Now get the selected objs from the selected items (ie. get the wall from the view)
+            selected_objs = []
+            # Call get info to find information on what is selected
+            for this_obj in selected_items:
+                selected_objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj))
+            # Should only be one selected (don't support copying multiple walls together)
+            if len(selected_objs) == 1:
+                print ("Copy selected")
+                print (f"Name: {selected_objs[0].name}")
+                print (f"Type: {selected_objs[0].type}") 
+                #self.ui.infoLabel.setText(f"One object selected")
+                #self.ui.infoTable.setRowCount(row_count)
+                #self.ui.infoTable.setItem(0,0, QTableWidgetItem("Name"))
+                #self.ui.infoTable.setItem(0,1, QTableWidgetItem(selected_objs[0].name))
+                #self.ui.infoTable.setItem(1,0, QTableWidgetItem("Type"))
+                #self.ui.infoTable.setItem(1,1, QTableWidgetItem(selected_objs[0].type))
+                #self.ui.infoTable.setItem(2,0, QTableWidgetItem("Size"))
+        return
+        ###here
+    
+    def edit_wall(self):
+        pass
+
+    # Set which of the left menu buttons are hidden / disabled
+    # status = default (top level - add button (enabled) / copy button (disabled) / edit wall (disabled)
+    # status = wallselect when single wall selected (top level - copy button active and edit wall active)
+    def set_left_buttons(self, status):
+        if status == "default" or status == "wallselect":
+            self.ui.addWallButton.show()
+            self.ui.addWallButton.setEnabled(True)
+            self.ui.copyWallButton.show()
+            self.ui.addFeatureButton.hide()
+            if status == "wallselect":
+                self.ui.copyWallButton.setEnabled(True)
+                self.ui.editWallButton.setEnabled(True)
+            else:
+                self.ui.copyWallButton.setEnabled(False)
+                self.ui.editWallButton.setEnabled(False)
 
 
     def open_file_dialog(self):
@@ -357,8 +411,10 @@ class MainWindowUI(QMainWindow):
                 for i in range (0, len(selected_objs)):
                     self.ui.infoTable.setItem(i,0, QTableWidgetItem(f"Object {i}"))
                     self.ui.infoTable.setItem(i,1, QTableWidgetItem(f"{selected_objs[0].type} - {selected_objs[i].name}"))
+                
+                # Disable edit button as more than one selected
+                self.set_left_buttons("default")
                     
-                #for i in range (0, len(selected_obs))
             elif (len(selected_objs) == 1):
                 row_count = 3
                 self.ui.infoLabel.setText(f"One object selected")
@@ -384,8 +440,11 @@ class MainWindowUI(QMainWindow):
                     self.ui.infoTable.setItem(next_row,0, QTableWidgetItem(f"Feature {i+1}"))
                     self.ui.infoTable.setItem(next_row,1, QTableWidgetItem(f"{selected_objs[0].features[i].type} - {selected_objs[0].features[i].template}"))
                     next_row += 1
+                    
+                self.set_left_buttons("wallselect")
             else:
                 self.ui.infoLabel.setText(f"No objects selected")
+                self.set_left_buttons("default")
                 
                 #self.ui.infoTable.setVerticalHeaderLabels(["", ""])
         else:

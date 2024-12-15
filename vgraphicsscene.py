@@ -31,7 +31,10 @@ class ViewGraphicsScene (QGraphicsScene):
         if num_pixels < 0 :
             self.main_window.zoom_out()
         event.accept()
-        
+
+    def get_selected(self):
+        return self.selectedItems()
+
 
     def new_focus(self):
         selected_items = self.selectedItems()

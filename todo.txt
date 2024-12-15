@@ -17,3 +17,22 @@ Handle selection of scale
 Switching to custom set first entry to 0,0
 Set Enter key to press OK
 
+
+# Track updates 
+Warn if open etc.
+Also add "New" button
+
+# Avoid overlap
+When adding wall then prevent it from overlapping existing (by default)
+
+
+# Copy wall
+Handle this (selection complete)
+
+# Edit wall 
+Implement this (use wall identification from copy wall)
+
+
+# Future 
+Show selected objects better
+

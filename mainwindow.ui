@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
+    <width>1029</width>
     <height>678</height>
    </rect>
   </property>
@@ -33,6 +33,13 @@
          <widget class="QPushButton" name="copyWallButton">
           <property name="text">
            <string>Copy Wall</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="editWallButton">
+          <property name="text">
+           <string>Edit Wall</string>
           </property>
          </widget>
         </item>
@@ -104,9 +111,9 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-864</y>
+             <y>0</y>
              <width>284</width>
-             <height>1489</height>
+             <height>1506</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -370,8 +377,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1024</width>
-     <height>22</height>
+     <width>1029</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
