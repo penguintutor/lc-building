@@ -59,7 +59,26 @@ class Builder():
     def add_wall(self, wall_data):
         # Todo Calculate position
         position = [0,0]
-        self.walls.append(Wall(wall_data['name'], wall_data['points'], wall_data['view'], position)) 
+        self.walls.append(Wall(wall_data['name'], wall_data['points'], wall_data['view'], position))
+        
+    def copy_wall(self, wall_to_copy):
+        position = [0,0]
+        # Copy the wall object (excluding features etc. - do that afterwards)
+        self.walls.append(Wall(wall_to_copy.name+" (Copy)", wall_to_copy.points, wall_to_copy.view, position))
+        # new_wall is the last added entry
+        new_wall = self.walls[-1]
+        # Copy features
+        for this_feature in wall_to_copy.get_features():
+            #new_wall.add_feature (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None):
+            new_wall.add_feature(*(this_feature.get_entry()))
+        # Copy textures
+        for this_texture in wall_to_copy.get_textures():
+            texture_details = this_texture.get_entry()
+            # When adding texture to wall it takes different order to Texture constructor
+            # Thsi reorders them (see comment in add_texture in wall for more details)
+            new_wall.add_texture(texture_details[1], texture_details[0], texture_details[2])
+        # Do not copy interlocking (does not make sense to do so)
+        
         
     # After loading data this converts into builder objects
     # Deletes any existing entries

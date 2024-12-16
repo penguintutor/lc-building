@@ -23,6 +23,7 @@ class Feature():
         for cut in cuts:
             if cut == []:
                 break
+            #print (f"Creating cut {cut[0]} , {cut[1]}")
             self.cuts.append(Feature.lf.create_cut(cut[0], cut[1], (self.min_x, self.min_y)))
         # Do the same for etches
         self.etches = []
@@ -42,6 +43,29 @@ class Feature():
             self.outers.append(Feature.lf.create_outer(outer[0], outer[1], (self.min_x, self.min_y)))
         
             
+    def get_entry(self):
+        return ((self.type, self.template, (self.min_x, self.min_y), self.points, self.cuts_as_list(), self.etches_as_list(), self.outers_as_list()))
+        
+    # returns the cuts as basic list of objects - eg. in same format as used by constructor
+    # Cut type (eg. rect) followed by list containing strings or values (must work with eval string after subsitution)
+    # "rect" [x, y, width, height]
+    def cuts_as_list(self):
+        cut_list = []
+        for this_cut in self.cuts:
+            cut_list.append(this_cut.unformat())
+        return cut_list
+    
+    def etches_as_list(self):
+        etch_list = []
+        for this_etch in self.etches:
+            etch_list.append(this_etch.unformat())
+        return etch_list
+    
+    def outers_as_list(self):
+        outer_list = []
+        for this_outer in self.outers:
+            outer_list.append(this_outer.unformat())
+        return outer_list
         
     # if changing start then need to update cuts so use setters
     def set_start(self, start):

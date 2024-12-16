@@ -24,6 +24,9 @@ class Texture():
         self.disable = False   # Allows to disable completely if not required
         self.excludes = []     # Excludes is replaced each time get_etches is called to ensure always updated
             
+    def get_entry(self):
+        return ((self.points, self.style, self.settings))
+            
     # Returns the texture as etches
     # excludes is a list of polygons for areas to exclude texture from
     # ie. Features - doors windows etc.

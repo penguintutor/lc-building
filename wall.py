@@ -52,6 +52,12 @@ class Wall():
         self.etches = []
         self.outers = []
         self.update()
+        
+    def get_features (self):
+        return self.features
+    
+    def get_textures (self):
+        return self.textures
 
 
     # Updates cuts, etches and outers
@@ -150,10 +156,13 @@ class Wall():
     def get_maxheight (self):
         return self.polygon.bounds[3] - self.polygon.bounds[1]
        
+    # Note that this is different order to texture constructor as
+    # in constructor type is optional - but not in here
     def add_texture (self, type, area, settings):
         # If no area / zone provided then use wall
         if area == []:
             area = self.points
+        # reordered here when passed to constructor
         self.textures.append(Texture(area, type, settings))
         self.update()
         #print (f"Added Texture {type}")

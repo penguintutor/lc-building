@@ -58,6 +58,10 @@ class CutLine(Cut):
         self.start = start
         self.end = end
         super().__init__("line", internal_offset)
+        
+    # unformat returns (type, [list_of_values]) 
+    def unformat(self):
+        return (("line", (self.start, self.end)))
 
 
     def __str__(self):
@@ -99,6 +103,10 @@ class CutRect(Cut):
         self.size = size
         super().__init__("rect", internal_offset)
         
+    # uformat returns (type, [list_of_values]) 
+    def unformat(self):
+        return (("rect", (self.start, self.size)))
+        
     def __str__(self):
         return f'Cut {self.type} from {self.start} size {self.size} io {self.io}'
           
@@ -125,6 +133,10 @@ class CutPolygon(Cut):
     def __init__(self, points, internal_offset=(0,0)):
         self.points = points
         super().__init__("polygon", internal_offset)
+        
+    # unformat returns (type, [list_of_values]) 
+    def unformat(self):
+        return (("polygon", self.points))
         
     # Add internal offset to points
     def get_points(self):
@@ -170,7 +182,11 @@ class EtchLine(Etch):
         # If set to None (default) then look at class variable global_etch_width
         self.etch_width = etch_width
         super().__init__("line", internal_offset)
-        
+    
+    # unformat returns (type, [list_of_values]) 
+    def unformat(self):
+        return (("line", (self.start, self.end)))
+    
     def __str__(self):
         return f'Etch {self.type} from {self.start} to {self.end} io {self.io}'
         
@@ -303,6 +319,10 @@ class EtchRect(Etch):
         self.size = size
         super().__init__("rect", internal_offset)
     
+    # uformat returns (type, [list_of_values]) 
+    def unformat(self):
+        return (("rect", (self.start, self.size)))
+    
     def get_start(self):
         return (self.start[0]+self.io[0], self.start[1]+self.io[1])
     
@@ -331,6 +351,10 @@ class EtchPolygon(Etch):
         self.strength = strength
         self.points = points
         super().__init__("polygon", internal_offset)
+        
+    # unformat returns (type, [list_of_values]) 
+    def unformat(self):
+        return (("polygon", self.points))
         
     def get_points(self):
         new_points = []
@@ -377,6 +401,10 @@ class OuterLine(Outer):
         self.end = end
         super().__init__("line", internal_offset)
         
+    # unformat returns (type, [list_of_values]) 
+    def unformat(self):
+        return (("line", (self.start, self.end)))
+        
     def get_args(self):
         return [self.start, self.end]
     
@@ -416,6 +444,10 @@ class OuterRect(Outer):
         self.size = size
         super().__init__("rect", internal_offset)
         
+    # uformat returns (type, [list_of_values]) 
+    def unformat(self):
+       return (("rect", (self.start, self.size))) 
+        
     def get_args(self):
         return [self.start, self.size]
     
@@ -442,6 +474,10 @@ class OuterPolygon(Outer):
         self.strength = strength
         self.points = points
         super().__init__("polygon", internal_offset)
+        
+    # unformat returns (type, [list_of_values]) 
+    def unformat(self):
+        return (("polygon", self.points))
         
     def get_args(self):
         return self.points

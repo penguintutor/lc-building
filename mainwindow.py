@@ -160,6 +160,12 @@ class MainWindowUI(QMainWindow):
                 #self.ui.infoTable.setItem(1,0, QTableWidgetItem("Type"))
                 #self.ui.infoTable.setItem(1,1, QTableWidgetItem(selected_objs[0].type))
                 #self.ui.infoTable.setItem(2,0, QTableWidgetItem("Size"))
+                # Copy in builder
+                self.builder.copy_wall(selected_objs[0])
+                # Add to scene
+                #### To do make sure added to scene (handled by builder???)
+                #### To do refresh after copy
+                
         return
         ###here
     
