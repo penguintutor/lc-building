@@ -5,6 +5,7 @@ from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
 from viewscene import ViewScene
+from editscene import EditScene
 from lcconfig import LCConfig
 from gconfig import GConfig
 from vgraphicsscene import ViewGraphicsScene
@@ -84,7 +85,7 @@ class MainWindowUI(QMainWindow):
             self.scenes[scene_name].focus_changed.connect(self.update_selected_view)
         # One more scene which is called "walledit" which is used to edit a particular wall
         self.scenes["walledit"] = ViewGraphicsScene(self)
-        self.view_scenes['walledit'] = ViewScene(self.scenes["walledit"], self.builder, self.gconfig, "walledit")
+        self.view_scenes['walledit'] = EditScene(self.scenes["walledit"], self.builder, self.gconfig, "walledit")
         
         # Default to front view
         self.ui.graphicsView.setScene(self.scenes[self.current_scene])
@@ -153,24 +154,31 @@ class MainWindowUI(QMainWindow):
                 print ("Copy selected")
                 print (f"Name: {selected_objs[0].name}")
                 print (f"Type: {selected_objs[0].type}") 
-                #self.ui.infoLabel.setText(f"One object selected")
-                #self.ui.infoTable.setRowCount(row_count)
-                #self.ui.infoTable.setItem(0,0, QTableWidgetItem("Name"))
-                #self.ui.infoTable.setItem(0,1, QTableWidgetItem(selected_objs[0].name))
-                #self.ui.infoTable.setItem(1,0, QTableWidgetItem("Type"))
-                #self.ui.infoTable.setItem(1,1, QTableWidgetItem(selected_objs[0].type))
-                #self.ui.infoTable.setItem(2,0, QTableWidgetItem("Size"))
                 # Copy in builder
                 self.builder.copy_wall(selected_objs[0])
-                # Add to scene
-                #### To do make sure added to scene (handled by builder???)
-                #### To do refresh after copy
-                
+                # Update the scene
+                self.update_view(self.current_scene)                
         return
-        ###here
+
     
     def edit_wall(self):
-        pass
+        selected_items = self.scenes[self.current_scene].get_selected()
+        # If no items selected then just return
+        if selected_items == None:
+            return
+        else:
+            # Now get the selected objs from the selected items (ie. get the wall from the view)
+            selected_objs = []
+            # Call get info to find information on what is selected
+            for this_obj in selected_items:
+                selected_objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj))
+            # Should only be one selected (don't support copying multiple walls together)
+            if len(selected_objs) != 1:
+                return
+        # Now have a single object selected (wall)
+        self.current_scene = 'walledit'
+        self.change_scene(self.current_scene)
+        
 
     # Set which of the left menu buttons are hidden / disabled
     # status = default (top level - add button (enabled) / copy button (disabled) / edit wall (disabled)
@@ -300,9 +308,6 @@ class MainWindowUI(QMainWindow):
         self.enable_file_actions()
         #print ("Updating GUI")
         self.update_all_views()
-        #print (f"Items {self.view_scenes[self.current_scene].scene.items()}")
-        #print (f"Group {self.view_scenes[self.current_scene].obj_views[0].item_group}")
-        #print (f"Group Items {self.view_scenes[self.current_scene].obj_views[0].item_group.items()}")
 
     # Whenever performing file action then disable other file actions to prevent duplicates / conflicting
     def disable_file_actions(self):
@@ -359,8 +364,6 @@ class MainWindowUI(QMainWindow):
         # Show the main screen
         self.ui.graphicsView.show()
         
-    #def scene_scroll (self, in_out):
-    #    print (f"Scroll received {in_out}")
         
     def view_front (self):
         self.change_scene('front')

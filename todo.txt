@@ -27,7 +27,8 @@ When adding wall then prevent it from overlapping existing (by default)
 
 
 # Copy wall
-Handle this (selection complete)
+Prevent overlapping 
+Possibly - rename copied walls (1) etc. instead of (copy)
 
 # Edit wall 
 Implement this (use wall identification from copy wall)
