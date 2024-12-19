@@ -48,6 +48,8 @@ class Wall():
         #self.type = "wall"
         # Move these to variables so that they are cached within the wall class
         # Only update when update_xxx is called
+        # These are for all features and textures - can get separately using get_wall_cuts / etches etc.
+        # Which will generate as needed rather than for the whole object
         self.cut_lines = []
         self.etches = []
         self.outers = []
@@ -65,18 +67,23 @@ class Wall():
         self.update_cuts()
         self.update_etches()
         self.update_outers()
-
-    # Generate all the cuts and store in self.cuts
-    # For performance reasons call this initially then just use get_cuts
-    # but if update then run this again before running get_cuts
-    def update_cuts (self):
+        
+    # Gets only cuts associated with the wall itself (not features / textures)
+    # Used by wall edit also internally by update_cuts
+    # Optionally include interlocking (default to True)
+    # Otherwise show as standard lines
+    def get_wall_cuts (self, interlock=True):
+        # First get edges then generate cuts
+        # cut lines is the one that is returned
+        # this can either be used directly (eg. in edit wall)
+        # or saved into self.cut_lines through an update
         cut_edges = []
+        cut_lines = []
         # Start at 1 (2nd point) end of first edge
         for i in range(1, len(self.points)):
             cut_edges.append([self.points[i-1], self.points[i]])
         
         # Convert edges into lines
-        self.cut_lines = []
         for i in range(0, len(cut_edges)):
             # Do any interlocks apply to this edge if so apply interlocks
             # copy edge into list for applying transformations
@@ -85,15 +92,16 @@ class Wall():
             end_line = this_edge_segments[0][1]
             edge_ils = None
             
-            #print (f"Il {self.il}")
-            
-            for il in self.il:
-                if il.get_edge() == i:
-                    #print (f"Interlock on {i}")
-                    # add interlocks to this edge
-                    edge_ils = il
+            # Only handle interlocking if not False
+            if (interlock == True):
+                for il in self.il:
+                    if il.get_edge() == i:
+                        # add interlocks to this edge
+                        edge_ils = il
+                        
             # Now sort into order to apply
             # Must not overlap, but only check startpos rather than end
+            # Note if interlock = false then we don't have added any edge_ils so don't need to check here
             if edge_ils != None:
                 # remove last segment to perform transformations on it
                 remaining_edge_segment = this_edge_segments.pop()
@@ -101,12 +109,21 @@ class Wall():
                 this_edge_segments.extend(edge_ils.add_interlock_line(start_line, end_line, remaining_edge_segment))
                 # Convert to line objects
                 for this_segment in this_edge_segments:
-                    self.cut_lines.append(CutLine(this_segment[0], this_segment[1]))
+                    cut_lines.append(CutLine(this_segment[0], this_segment[1]))
                     #print (f" Adding il segment {i} {this_segment[0]} , {this_segment[1]}")
             else:
                 # otherwise just append his one edge
-                self.cut_lines.append(CutLine(cut_edges[i][0], cut_edges[i][1]))
+                cut_lines.append(CutLine(cut_edges[i][0], cut_edges[i][1]))
                 #print (f"  Adding normal edge {i} : {cut_edges[i][0]} , {cut_edges[i][1]}")
+        return cut_lines
+                
+
+    # Generate all the cuts and store in self.cuts
+    # For performance reasons call this initially then just use get_cuts
+    # but if update then run this again before running get_cuts
+    def update_cuts (self):
+        self.cut_lines = self.get_wall_cuts ()
+
         # Add cuts from features
         feature_cuts = self._get_cuts_features()
         if feature_cuts != None:
