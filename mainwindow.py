@@ -128,6 +128,9 @@ class MainWindowUI(QMainWindow):
         self.ui.copyWallButton.pressed.connect(self.copy_wall)
         self.ui.editWallButton.pressed.connect(self.edit_wall)
         
+        # Checkboxes
+        self.ui.interlockCheckBox.checkStateChanged.connect(self.read_checkbox)
+        
         self.set_left_buttons("default")
         
         self.ui.show()
@@ -463,3 +466,13 @@ class MainWindowUI(QMainWindow):
             self.ui.infoLabel.setText(f"No objects selected")
             #self.ui.infoTable.setHorizontalHeaderLabels(["None selected"])
             #self.ui.infoTable.setVerticalHeaderLabels(["", ""])
+            
+        
+    # Call if checkbox changed
+    # Update settings then call appropriate update
+    def read_checkbox (self):
+        # interlocking view option
+        self.gconfig.checkbox['il'] = self.ui.interlockCheckBox.isChecked()
+        # request update of viewgraphics
+        self.update_view(self.current_scene)
+        

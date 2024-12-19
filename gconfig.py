@@ -48,3 +48,7 @@ class GConfig():
         # based on view
         # Normally don't want this set
         self.view_etch_as_polygon = False
+        
+        # temporary settings - based on checkbox settings from mainwindow
+        # il is Interlocking (whether to display or not)
+        self.checkbox = {'il': False}

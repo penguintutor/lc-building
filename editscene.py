@@ -42,9 +42,32 @@ class EditScene(ViewScene):
         self.objs = [self.wall]
         self.obj_views = [ObjView(self.scene, self.gconfig, coords = [0,0])]
         # just get cuts related to wall
-        cuts = self.wall.get_wall_cuts()
+        # param is optional (whether to display interlocking)
+        cuts = self.wall.get_wall_cuts(self.gconfig.checkbox['il'])
         for cut in cuts:
             self.obj_views[0].add_cut(cut)
+            
+        # Add features
+        for feature in self.wall.get_features():
+            self.objs.append(feature)
+            # Does the coords need to be updated?
+            self.obj_views.append(ObjView(self.scene, self.gconfig, coords = [0,0]))
+            
+            # Add cuts / outers / etches to the obj_view
+            cuts = feature.get_cuts()
+            for cut in cuts:
+                self.obj_views[len(self.obj_views)-1].add_cut(cut)
+                
+            outers = feature.get_outers()
+            if outers != None:
+                for outer in outers:
+                    self.obj_views[len(self.obj_views)-1].add_outer(outer)
+            
+            etches = feature.get_etches()
+            if etches != None:
+                for etch in etches:
+                    self.obj_views[len(self.obj_views)-1].add_etch(etch)
+            
 
         
     # Add walls to the scene

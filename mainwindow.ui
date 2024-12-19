@@ -63,6 +63,32 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>View options</string>
+          </property>
+          <widget class="QCheckBox" name="interlockCheckBox">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>20</y>
+             <width>111</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Interlocking</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
