@@ -11,6 +11,8 @@ from viewscene import ViewScene
 class EditScene(ViewScene):
     def __init__(self, scene, builder, gconfig, view_name):
         super().__init__(scene, builder, gconfig, view_name)
+        # We can only have one wall but must be added using edit_wall
+        self.wall = None
         
        
     # Clear scene and then add walls
@@ -18,14 +20,35 @@ class EditScene(ViewScene):
         self.scene.clear()
         self.add_walls()
         
-    # Add wall (not plural as in the viewscene
-    # Takes object to add
-    def add_wall(self, wall):
-        # Here
-        pass
+    # Add wall to edit
+    # Takes object to edit, removes existing objects and replaces with this
+    # must be called before using this - otherwise we have an empty screen
+    def edit_wall(self, wall):
+        self.wall = wall
+        self.update()
+        
+    # Add wall adds the wall (and components) to the scene
+    # Used to update
+    def add_walls(self):
+        # If wall not set then return
+        if self.wall == None:
+            print ("No wall to edit")
+            return
+        
+        # override existing objs - set the wall obj as the first item
+        # whereas other scenes have multiple walls which are groups, this uses
+        # multiple objects representing features
+        # textures are handled separately *** todo ***
+        self.objs = [self.wall]
+        self.obj_views = [ObjView(self.scene, self.gconfig, coords = [0,0])]
+        # just get cuts related to wall
+        cuts = self.wall.get_wall_cuts()
+        for cut in cuts:
+            self.obj_views[0].add_cut(cut)
+
         
     # Add walls to the scene
-    def add_walls(self):
+    def _old_add_walls(self):
         #print ("Add walls")
         # Get all the walls from builder
         walls = self.builder.get_walls_view(self.view_name)

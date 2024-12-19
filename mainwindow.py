@@ -177,6 +177,7 @@ class MainWindowUI(QMainWindow):
                 return
         # Now have a single object selected (wall)
         self.current_scene = 'walledit'
+        self.view_scenes[self.current_scene].edit_wall(selected_objs[0])
         self.change_scene(self.current_scene)
         
 
@@ -394,6 +395,7 @@ class MainWindowUI(QMainWindow):
             self.wall_window.show()
         #print ("Wall window launched")
         
+    # Updates table showing status of objects
     # Update based on selection in viewgraphicsscene
     def update_selected_view (self, selected_items):
         # Selection are items selected
