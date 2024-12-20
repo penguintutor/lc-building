@@ -46,6 +46,14 @@ class EditScene(ViewScene):
         cuts = self.wall.get_wall_cuts(self.gconfig.checkbox['il'])
         for cut in cuts:
             self.obj_views[0].add_cut(cut)
+        # Add texture if enabled
+        if self.gconfig.checkbox['texture']:
+        #    for texture in self.wall.get_textures():
+        #        for etch in texture.get_etches():
+        #            self.obj_views[0].add_etch(etch)
+            for etch in self.wall.get_texture_etches():
+                self.obj_views[0].add_etch(etch)
+                
             
         # Add features
         for feature in self.wall.get_features():

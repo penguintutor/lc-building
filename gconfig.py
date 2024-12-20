@@ -51,4 +51,7 @@ class GConfig():
         
         # temporary settings - based on checkbox settings from mainwindow
         # il is Interlocking (whether to display or not)
-        self.checkbox = {'il': False}
+        self.checkbox = {
+            'il': False,
+            'texture': True
+            }

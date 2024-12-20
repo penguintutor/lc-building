@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1029</width>
+    <width>1055</width>
     <height>678</height>
    </rect>
   </property>
@@ -74,18 +74,47 @@
           <property name="title">
            <string>View options</string>
           </property>
-          <widget class="QCheckBox" name="interlockCheckBox">
+          <widget class="QWidget" name="verticalLayoutWidget">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>20</y>
-             <width>111</width>
-             <height>25</height>
+             <width>121</width>
+             <height>181</height>
             </rect>
            </property>
-           <property name="text">
-            <string>Interlocking</string>
-           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QCheckBox" name="interlockCheckBox">
+              <property name="text">
+               <string>Interlocking</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="textureCheckBox">
+              <property name="text">
+               <string>Texture</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>
@@ -403,7 +432,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1029</width>
+     <width>1055</width>
      <height>24</height>
     </rect>
    </property>

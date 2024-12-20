@@ -130,6 +130,7 @@ class MainWindowUI(QMainWindow):
         
         # Checkboxes
         self.ui.interlockCheckBox.checkStateChanged.connect(self.read_checkbox)
+        self.ui.textureCheckBox.checkStateChanged.connect(self.read_checkbox)
         
         self.set_left_buttons("default")
         
@@ -138,6 +139,12 @@ class MainWindowUI(QMainWindow):
         # Set to none, only create when needed and can check if it's created yet
         self.wall_window = None
         #self.wall_window = WallWindowUI()
+        
+        # Update gconfig based on checkboxes - may need to load these values in future
+        # interlocking view option
+        self.gconfig.checkbox['il'] = self.ui.interlockCheckBox.isChecked()
+        # texture view option
+        self.gconfig.checkbox['texture'] = self.ui.textureCheckBox.isChecked()
         
     def copy_wall(self):
         # Current selected objects (note these are groups containing walls and features / textures etc.)
@@ -473,6 +480,8 @@ class MainWindowUI(QMainWindow):
     def read_checkbox (self):
         # interlocking view option
         self.gconfig.checkbox['il'] = self.ui.interlockCheckBox.isChecked()
+        # texture view option
+        self.gconfig.checkbox['texture'] = self.ui.textureCheckBox.isChecked()
         # request update of viewgraphics
         self.update_view(self.current_scene)
         

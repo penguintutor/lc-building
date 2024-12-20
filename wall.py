@@ -138,6 +138,9 @@ class Wall():
     def get_etches (self):
         return self.etches
     
+    def get_texture_etches (self):
+        return self._texture_to_etches()
+    
     # Implement this at the Wall level
     def update_etches (self):
         self.etches = self._texture_to_etches()
