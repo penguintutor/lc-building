@@ -12,14 +12,16 @@ from PySide6.QtWidgets import QGraphicsItem
 # Each objectview is a wall (or similar)
 # Create as an object group and move items into it
 class ObjView():
-    def __init__ (self, scene, settings, coords = [0,0]):
+    def __init__ (self, scene, settings, coords = [0,0], moveable=True):
         self.settings = settings
         self.scene = scene
         # Item Group (create later after creating first cut)
         #self.item_group = None
         self.item_group = self.scene.createItemGroup([])
-        self.item_group.setFlag(QGraphicsItem.ItemIsMovable)
-        self.item_group.setFlag(QGraphicsItem.ItemIsSelectable)
+        # If wall edit then wall is not selectable or moveable
+        if moveable:
+            self.item_group.setFlag(QGraphicsItem.ItemIsMovable)
+            self.item_group.setFlag(QGraphicsItem.ItemIsSelectable)
         self.offset = coords
         #print (f"Offset {self.offset}")
         

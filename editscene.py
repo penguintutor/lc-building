@@ -15,10 +15,10 @@ class EditScene(ViewScene):
         self.wall = None
         
        
-    # Clear scene and then add walls
+    # Clear scene and then add wall
     def update(self):
         self.scene.clear()
-        self.add_walls()
+        self.add_wall()
         
     # Add wall to edit
     # Takes object to edit, removes existing objects and replaces with this
@@ -29,7 +29,7 @@ class EditScene(ViewScene):
         
     # Add wall adds the wall (and components) to the scene
     # Used to update
-    def add_walls(self):
+    def add_wall(self):
         # If wall not set then return
         if self.wall == None:
             print ("No wall to edit")
@@ -40,7 +40,8 @@ class EditScene(ViewScene):
         # multiple objects representing features
         # textures are handled separately *** todo ***
         self.objs = [self.wall]
-        self.obj_views = [ObjView(self.scene, self.gconfig, coords = [0,0])]
+        # Create a view object, but set it not moveable
+        self.obj_views = [ObjView(self.scene, self.gconfig, coords = [0,0], moveable=False)]
         # just get cuts related to wall
         # param is optional (whether to display interlocking)
         cuts = self.wall.get_wall_cuts(self.gconfig.checkbox['il'])
@@ -58,7 +59,7 @@ class EditScene(ViewScene):
         # Add features
         for feature in self.wall.get_features():
             self.objs.append(feature)
-            # Does the coords need to be updated?
+            # coords is the start of the wall
             self.obj_views.append(ObjView(self.scene, self.gconfig, coords = [0,0]))
             
             # Add cuts / outers / etches to the obj_view
@@ -75,40 +76,6 @@ class EditScene(ViewScene):
             if etches != None:
                 for etch in etches:
                     self.obj_views[len(self.obj_views)-1].add_etch(etch)
-            
-
-        
-    # Add walls to the scene
-    def _old_add_walls(self):
-        #print ("Add walls")
-        # Get all the walls from builder
-        walls = self.builder.get_walls_view(self.view_name)
-        #print (f"Adding {len(walls)} walls")
-        for wall in walls:
-            self.objs.append (wall)
-            # Create objview to abstract out the drawing
-            # Uses lasercutter config lcconfig - could have heirarchical in future - allow override for graphics display
-            # Note currently put at 0,0 - this will overwrite need to work out positioning
-            self.obj_views.append(ObjView(self.scene, self.gconfig, coords = wall.position))
-            # Now draw them on the scene
-            # Etches first, then outers then walls - this then shows overlap in that order
-            # Also typically will want to output in that order (although that is under control of laser cut software)
-
-            # Get the etching
-            etches = wall.get_etches()
-            if etches != None:
-                for etch in etches:
-                    self.obj_views[len(self.obj_views)-1].add_etch(etch)
-                    
-            # Get the outers (show different pen)
-            outers = wall.get_outers()
-            if outers != None:
-                for outer in outers:
-                    self.obj_views[len(self.obj_views)-1].add_outer(outer)
-                    
-            cuts = wall.get_cuts()
-            for cut in cuts:
-                self.obj_views[len(self.obj_views)-1].add_cut(cut)
  
                     
     def clear(self):

@@ -5,6 +5,9 @@ Replace hardcoded material thickness / interlocking with setting
 
 ## In Main Window 
 Show status bar when loading a large file
+Handle checkboxes (different for if edit walls rather than view scene)
+Make view scene honor checkboxes
+Save positions of windows
 
 
 ## In add wall window
@@ -31,7 +34,10 @@ Prevent overlapping
 Possibly - rename copied walls (1) etc. instead of (copy)
 
 # Edit wall 
-Implement this (use wall identification from copy wall)
+Make it obvious in wall edit mode (not sure how best to achieve)
+Update feature co-ords whenever feature it is moved
+Refresh view whenever feature is moved
+Ability to add / delete features 
 
 
 # Future 
