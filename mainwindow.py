@@ -83,6 +83,7 @@ class MainWindowUI(QMainWindow):
             self.view_scenes[scene_name] = ViewScene(self.scenes[scene_name], self.builder, self.gconfig, scene_name)
             # Signal for change in viewgraphicsscene (item selected / deselected)
             self.scenes[scene_name].focus_changed.connect(self.update_selected_view)
+
         # One more scene which is called "walledit" which is used to edit a particular wall
         self.scenes["walledit"] = ViewGraphicsScene(self)
         self.view_scenes['walledit'] = EditScene(self.scenes["walledit"], self.builder, self.gconfig, "walledit")
@@ -145,6 +146,16 @@ class MainWindowUI(QMainWindow):
         self.gconfig.checkbox['il'] = self.ui.interlockCheckBox.isChecked()
         # texture view option
         self.gconfig.checkbox['texture'] = self.ui.textureCheckBox.isChecked()
+    
+    # Check for items in current scene have moved - do we need to update current screen
+    def check_obj_moved (self):
+        moved = False
+        for obj in self.view_scenes[self.current_scene].obj_views:
+            #print (f"** Checking for objects at {self.view_scenes[self.current_scene]} - scene {self.current_scene}")
+            #print (f"Objs are {self.view_scenes[self.current_scene].obj_views}")
+            if obj.has_moved():
+                moved = True
+        return moved
         
     def copy_wall(self):
         # Current selected objects (note these are groups containing walls and features / textures etc.)
@@ -404,7 +415,18 @@ class MainWindowUI(QMainWindow):
         else:
             self.wall_window.show()
         #print ("Wall window launched")
+    
+    # Update the selected scene
+    #def update_scene (self):
+    #    self.view_scenes[self.current_scene].update()
         
+    # Check to see if any objects in current scene have moved
+    # and if so 
+    # Update the selected scene
+    def check_moved_update (self):
+        if self.check_obj_moved():
+            self.view_scenes[self.current_scene].update()
+    
     # Updates table showing status of objects
     # Update based on selection in viewgraphicsscene
     def update_selected_view (self, selected_items):

@@ -42,7 +42,13 @@ class Feature():
                 break
             self.outers.append(Feature.lf.create_outer(outer[0], outer[1], (self.min_x, self.min_y)))
         
-            
+    def move_rel(self, pos):
+        #print (f'Current {self.min_x}, {self.min_y}')
+        self.min_x += pos[0]
+        self.min_y += pos[1]
+        #print (f'New {self.min_x}, {self.min_y}')
+        self.update_pos()
+        
     def get_entry(self):
         return ((self.type, self.template, (self.min_x, self.min_y), self.points, self.cuts_as_list(), self.etches_as_list(), self.outers_as_list()))
         
@@ -76,9 +82,12 @@ class Feature():
     # If start changes then update cuts and etches
     def update_pos(self):
         # Also set all cuts to new start
-        for cut in cuts:
+        for cut in self.cuts:
             cut.set_internal_offset((self.min_x, self.min_y))
-        
+        for etch in self.etches:
+            etch.set_internal_offset((self.min_x, self.min_y))
+        for outer in self.outers:
+            outer.set_internal_offset((self.min_x, self.min_y))
     # Get area to exclude
     #def get_area (self):
     #    return (self.min_x, self.min_y, self.max_x, self.max_y)

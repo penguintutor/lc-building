@@ -7,6 +7,7 @@ from texture import Texture
 from feature import Feature
 from objview import ObjView
 from viewscene import ViewScene
+from laser import Laser
 
 class EditScene(ViewScene):
     def __init__(self, scene, builder, gconfig, view_name):
@@ -17,8 +18,21 @@ class EditScene(ViewScene):
        
     # Clear scene and then add wall
     def update(self):
+        # check for moved objeects
+        self.update_feature_pos()
+        # clear scene
         self.scene.clear()
+        # add wall and features
         self.add_wall()
+        
+    # For each of the features get current pos from obj view and update feature
+    def update_feature_pos(self):
+        for i in range (1, len(self.objs)):
+            view_new_pos = self.obj_views[i].new_pos
+            if view_new_pos != (0,0):
+                # convert view pos to mm pos
+                view_new_pos = Laser.vs.reverse_convert(view_new_pos)
+                self.objs[i].move_rel(view_new_pos)
         
     # Add wall to edit
     # Takes object to edit, removes existing objects and replaces with this
@@ -55,9 +69,12 @@ class EditScene(ViewScene):
             for etch in self.wall.get_texture_etches():
                 self.obj_views[0].add_etch(etch)
                 
-            
+        #print (f"Wall pos is {self.obj_views[0].get_pos()}")
+                
+        print ("* Adding Features")
         # Add features
         for feature in self.wall.get_features():
+            print (f"Adding wall feature {feature}")
             self.objs.append(feature)
             # coords is the start of the wall
             self.obj_views.append(ObjView(self.scene, self.gconfig, coords = [0,0]))
@@ -76,6 +93,8 @@ class EditScene(ViewScene):
             if etches != None:
                 for etch in etches:
                     self.obj_views[len(self.obj_views)-1].add_etch(etch)
+                    
+        print (f"Feature pos is {self.obj_views[1].get_pos()}")
  
                     
     def clear(self):

@@ -47,8 +47,7 @@ class Scale():
     # Perform conversion from mm to scale mm
     # Normally do before convert to pixels
     def scale_convert(self, mm_value):
-        scale_mm = mm_value / self.scales[self.scale]
-        return scale_mm
+        return (mm_value / self.scales[self.scale])
     
     # Does the opposite of scale convert - use when you need to keep
     # exact size (eg. material thickness) - apply this then when it's
@@ -60,8 +59,12 @@ class Scale():
     # Normally use after converting to scale mm to convert to pixel size for SVG file
     # Preferable than using mm in svg due to problems with translation with some apps
     def mm_to_pixel(self, mm_value):
-        pixel_value = mm_value * self.mm_to_pixel_factor
-        return pixel_value
+        return (mm_value * self.mm_to_pixel_factor)
+    
+    # Convert from pixels to mm
+    def pixel_to_mm(self, pixel_value):
+        return (pixel_value / self.mm_to_pixel_factor)
+        
     
     # Plural of mm_to_pixel - convert all entries in tuple or list
     def mms_to_pixels(self, mm_values):

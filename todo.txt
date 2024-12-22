@@ -35,8 +35,7 @@ Possibly - rename copied walls (1) etc. instead of (copy)
 
 # Edit wall 
 Make it obvious in wall edit mode (not sure how best to achieve)
-Update feature co-ords whenever feature it is moved
-Refresh view whenever feature is moved
+Refresh texture exclusion area (Feature points) when updating a feature position
 Ability to add / delete features 
 
 

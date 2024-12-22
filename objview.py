@@ -22,15 +22,33 @@ class ObjView():
         if moveable:
             self.item_group.setFlag(QGraphicsItem.ItemIsMovable)
             self.item_group.setFlag(QGraphicsItem.ItemIsSelectable)
+            self.item_group.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
         self.offset = coords
+        # Save the current position
+        self.pos = self.item_group.pos().toPoint()
+        # Update new_pos when moved
+        self.new_pos = (0,0)
+        
+        
+    # Check if moved - and update position if moved 
+    def has_moved(self):
+        #print (f"This object {self}")
+        new_pos = self.item_group.pos().toPoint()
         #print (f"Offset {self.offset}")
+        #print (f"Current pos {self.pos}, new pos {new_pos}, scene pos {self.item_group.scenePos()}")
+        if new_pos != self.pos:
+            self.new_pos = (new_pos.x(), new_pos.y())
+            return True
+        return False
         
-        #print (f"Obj view item is {self}")
-        #print (f"Item group is {self.item_group}")
-        
+    def get_pos(self):
+        return self.item_group.pos()
                 
     def set_offset(self, offset):
         self.offset = offset
+        
+    def itemChange(self, change, value):
+        print (f"Item change {change}, {value}")
 
     # To prevent repetition then cuts, edges and outers are split into 2 types
     # standard_object = treat as a line / cut

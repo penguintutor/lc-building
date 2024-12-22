@@ -23,6 +23,8 @@ class ViewScene():
     # Clear scene and then add walls
     def update(self):
         self.scene.clear()
+        self.objs = []
+        self.obj_views = []
         self.add_walls()
         
     # searches for obj view and returns the corresponding objs
@@ -38,6 +40,7 @@ class ViewScene():
         
     # Add walls to the scene
     def add_walls(self):
+        # Delete old objects and add new
         #print ("Add walls")
         # Get all the walls from builder
         walls = self.builder.get_walls_view(self.view_name)
