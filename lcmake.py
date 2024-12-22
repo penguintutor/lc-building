@@ -117,11 +117,11 @@ for feature in building.get_features():
     if ("exclude" in feature["parameters"].keys()):
         # For each point then make relative to the pos
         for this_point in feature["parameters"]["exclude"]:
-            polygon.append((this_point[0]+pos[0], this_point[1]+pos[1]))
+            polygon.append((this_point[0], this_point[1]))
     else:
         width = feature["parameters"]["width"]
         height = feature["parameters"]["height"]
-        polygon = rect_to_polygon(pos, width, height)
+        polygon = rect_to_polygon((0,0), width, height)
         
     walls[feature["wall"]].add_feature(feature["type"], feature["template"], pos, polygon,
                                        feature["cuts"], feature["etches"], feature["outers"])

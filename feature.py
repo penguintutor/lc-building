@@ -8,6 +8,7 @@ from laserfactory import *
 # Cut type (eg. rect) followed by list containing strings or values (must work with eval string after subsitution)
 # "rect" [x, y, width, height]
 # Features must NOT overlap - unpredictable results in textures if do
+# Note points should exclude startpos
 class Feature():
     lf = LaserFactory()
     # x, y is top left
@@ -17,6 +18,8 @@ class Feature():
         self.template = feature_template
         self.min_x = startpos[0]
         self.min_y = startpos[1]
+        # avoid access points directly - as doesn't take into consideration startpos
+        # instea use get_exclude() which returns points with min_x, min_y applied
         self.points = points
         # Cuts needs to be converted into laser cut objects
         self.cuts = []
@@ -41,6 +44,13 @@ class Feature():
             if outer == []:
                 break
             self.outers.append(Feature.lf.create_outer(outer[0], outer[1], (self.min_x, self.min_y)))
+        
+    # Returns points (exlusion area) after applying min_x, min_y
+    def get_points(self):
+        return_points = []
+        for point in self.points:
+            return_points.append((self.min_x+point[0], self.min_y+point[1]))
+        return return_points
         
     def move_rel(self, pos):
         #print (f'Current {self.min_x}, {self.min_y}')
@@ -92,8 +102,8 @@ class Feature():
     #def get_area (self):
     #    return (self.min_x, self.min_y, self.max_x, self.max_y)
     
-    def get_points (self):
-        return self.points
+    def get_exclude (self):
+        return self.get_points()
         
     # Creates cuts based around simple rectangle.
     # cut out for the entire window / door etc. no sills eg. shed window

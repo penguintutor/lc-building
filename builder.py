@@ -120,13 +120,13 @@ class Builder():
             polygon = []
             # If no points provided then convert rectangle into a polygon
             if ("exclude" in feature["parameters"].keys()):
-                # For each point then make relative to the pos
+                # Updated how these are calculated should now be relative to start position
                 for this_point in feature["parameters"]["exclude"]:
-                    polygon.append((this_point[0]+pos[0], this_point[1]+pos[1]))
+                    polygon.append((this_point[0], this_point[1]))
             else:
                 width = feature["parameters"]["width"]
                 height = feature["parameters"]["height"]
-                polygon = rect_to_polygon(pos, width, height)
+                polygon = rect_to_polygon((0,0), width, height)
                 
             self.walls[feature["wall"]].add_feature(feature["type"], feature["template"], pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"])

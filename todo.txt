@@ -35,7 +35,7 @@ Possibly - rename copied walls (1) etc. instead of (copy)
 
 # Edit wall 
 Make it obvious in wall edit mode (not sure how best to achieve)
-Refresh texture exclusion area (Feature points) when updating a feature position
+Force refresh on relevant scene when exiting edit wall
 Ability to add / delete features 
 
 
