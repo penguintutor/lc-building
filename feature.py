@@ -21,6 +21,9 @@ class Feature():
         # avoid access points directly - as doesn't take into consideration startpos
         # instea use get_exclude() which returns points with min_x, min_y applied
         self.points = points
+        # Maintain history of actions for future undo - not currently supported - todo
+        # History is a list of lists - each entry [action (eg. move), old data (eg. points)]
+        self.history = []
         # Cuts needs to be converted into laser cut objects
         self.cuts = []
         for cut in cuts:
@@ -45,6 +48,7 @@ class Feature():
                 break
             self.outers.append(Feature.lf.create_outer(outer[0], outer[1], (self.min_x, self.min_y)))
         
+        
     # Returns points (exlusion area) after applying min_x, min_y
     def get_points(self):
         return_points = []
@@ -53,6 +57,8 @@ class Feature():
         return return_points
         
     def move_rel(self, pos):
+        # Store current position in history
+        self.history.append(["move", [self.min_x, self.min_y]])
         #print (f'Current {self.min_x}, {self.min_y}')
         self.min_x += pos[0]
         self.min_y += pos[1]
@@ -85,6 +91,7 @@ class Feature():
         
     # if changing start then need to update cuts so use setters
     def set_start(self, start):
+        self.history.append(["move", [self.min_x, self.min_y]])
         self.min_x = start[0]
         self.min_y = start[1]
         self.update_pos()

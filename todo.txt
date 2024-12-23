@@ -8,6 +8,8 @@ Show status bar when loading a large file
 Handle checkboxes (different for if edit walls rather than view scene)
 Make view scene honor checkboxes
 Save positions of windows
+- try:
+	item.setPos(QPointF(50, 50)) 
 
 
 ## In add wall window

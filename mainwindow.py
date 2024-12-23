@@ -129,6 +129,10 @@ class MainWindowUI(QMainWindow):
         self.ui.copyWallButton.pressed.connect(self.copy_wall)
         self.ui.editWallButton.pressed.connect(self.edit_wall)
         
+        # Action buttons when edit wall
+        self.ui.closeButton.pressed.connect(self.close_edit)
+        self.ui.addFeatureButton.pressed.connect(self.add_feature)
+        
         # Checkboxes
         self.ui.interlockCheckBox.checkStateChanged.connect(self.read_checkbox)
         self.ui.textureCheckBox.checkStateChanged.connect(self.read_checkbox)
@@ -205,11 +209,14 @@ class MainWindowUI(QMainWindow):
     # Set which of the left menu buttons are hidden / disabled
     # status = default (top level - add button (enabled) / copy button (disabled) / edit wall (disabled)
     # status = wallselect when single wall selected (top level - copy button active and edit wall active)
+    # status = walledit - when edit wall option
     def set_left_buttons(self, status):
         if status == "default" or status == "wallselect":
             self.ui.addWallButton.show()
             self.ui.addWallButton.setEnabled(True)
             self.ui.copyWallButton.show()
+            self.ui.editWallButton.show()
+            self.ui.closeButton.hide()
             self.ui.addFeatureButton.hide()
             if status == "wallselect":
                 self.ui.copyWallButton.setEnabled(True)
@@ -217,6 +224,12 @@ class MainWindowUI(QMainWindow):
             else:
                 self.ui.copyWallButton.setEnabled(False)
                 self.ui.editWallButton.setEnabled(False)
+        elif status == "walledit":
+            self.ui.addWallButton.hide()
+            self.ui.copyWallButton.hide()
+            self.ui.editWallButton.hide()
+            self.ui.closeButton.show()
+            self.ui.addFeatureButton.show()
 
 
     def open_file_dialog(self):
@@ -407,6 +420,19 @@ class MainWindowUI(QMainWindow):
         self.ui.graphicsView.show()
         # Update table to show nothing selected
         self.update_selected_view(None)
+        # Update left menu based on type of scene (eg. direction view / edit wall)
+        if new_scene == "walledit":
+            self.set_left_buttons("walledit")
+        else:
+            self.set_left_buttons("default") 
+            
+    # Set left menu based on whether view or edit
+    #def left_menu_edit(self):
+    #    self.set_left_buttons("editwall")
+    
+    
+    #def left_menu_wall(self):
+    #     self.set_left_buttons("default")   
 
     # Add new wall dialog
     def add_wall (self):
@@ -507,3 +533,12 @@ class MainWindowUI(QMainWindow):
         # request update of viewgraphics
         self.update_view(self.current_scene)
         
+    # Close the current window (eg edit wall)
+    def close_edit (self):
+        self.view_scenes[self.current_scene].wall.update()
+        self.change_scene(self.view_scenes[self.current_scene].get_wall_scene())
+        
+
+    # Add feature when in edit wall
+    def add_feature (self):
+        pass

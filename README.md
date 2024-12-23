@@ -101,3 +101,8 @@ Under some circumstances when an object is selected there may be a delay before
 the information box in the bottom right is updated. It is unknown why this is, 
 perhaps related to internal redrawing of the object when it receives focus. It is 
 not known to have another other impact on the software operation.
+
+### History undo etc. not yet implemented
+Changes are implemented immediately, but there is not currently a way to undo those changes, 
+other than not saving them. 
+Data is included in some of the functions and is likely to be included in future. Note that the history of edits is independant so changes to different parts may have unintentional consequences.

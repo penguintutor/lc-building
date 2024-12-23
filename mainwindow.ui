@@ -44,6 +44,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="closeButton">
+          <property name="text">
+           <string>Close</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="addFeatureButton">
           <property name="text">
            <string>Add Feature</string>
@@ -168,7 +175,7 @@
              <x>0</x>
              <y>0</y>
              <width>284</width>
-             <height>1506</height>
+             <height>1489</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -433,7 +440,7 @@
      <x>0</x>
      <y>0</y>
      <width>1055</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

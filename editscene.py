@@ -41,6 +41,11 @@ class EditScene(ViewScene):
         self.wall = wall
         self.update()
         
+    # Gets tthe scene that the wall is part of
+    def get_wall_scene(self):
+        return self.wall.view
+        
+        
     # Add wall adds the wall (and components) to the scene
     # Used to update
     def add_wall(self):
@@ -71,10 +76,8 @@ class EditScene(ViewScene):
                 
         #print (f"Wall pos is {self.obj_views[0].get_pos()}")
                 
-        print ("* Adding Features")
         # Add features
         for feature in self.wall.get_features():
-            print (f"Adding wall feature {feature}")
             self.objs.append(feature)
             # coords is the start of the wall
             self.obj_views.append(ObjView(self.scene, self.gconfig, coords = [0,0]))
@@ -94,7 +97,7 @@ class EditScene(ViewScene):
                 for etch in etches:
                     self.obj_views[len(self.obj_views)-1].add_etch(etch)
                     
-        print (f"Feature pos is {self.obj_views[1].get_pos()}")
+        #print (f"Feature pos is {self.obj_views[1].get_pos()}")
  
                     
     def clear(self):
