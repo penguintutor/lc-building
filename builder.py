@@ -55,10 +55,10 @@ class Builder():
                 view_walls.append(wall)
         return view_walls
     
-    # Update walls - eg. if interlock setting changed then reflect against all walls
-    def update_walls(self, interlock):
+    # Update walls - eg. if interlock or texture setting changed then reflect against all walls
+    def update_walls(self, interlock, texture):
         for wall in self.walls:
-            wall.update(interlock)
+            wall.update(interlock, texture)
         
     # Takes a dictionary with the wall data where points is a list within the dictionary
     # Wall args are: name, points, view="front", position=[0,0]

@@ -43,6 +43,7 @@ class Wall():
         #self.max_width = width
         #self.max_height = height
         self.show_interlock = False # Do we show interlocking - set using update
+        self.show_textures = True # Do we show textures - set using update
         self.material = "smooth"
         self.il = []              # Interlocking - only one allowed per edge, but multiple allowed on a wall
         self.textures = []        # Typically one texture per wall, but can have multiple if zones used - must not overlap
@@ -68,9 +69,11 @@ class Wall():
 
     # Updates cuts, etches and outers
     # Interlock = None, keep current, otherwise update
-    def update (self, interlock=None):
+    def update (self, interlock=None, texture=None):
         if interlock != None:
             self.show_interlock = interlock
+        if texture != None:
+            self.show_textures = texture
         self.update_cuts()
         self.update_etches()
         self.update_outers()
@@ -211,10 +214,6 @@ class Wall():
         if outers == None:
             outers = []
         self.features.append(Feature(feature_type, feature_template, startpos, points, cuts, etches, outers))
-        # If want to handle settings can do so here
-        # Eg. support textures
-        # Update the wall
-        self.update()
         return feature_num
 
     # Add a feature - such as a window
@@ -239,9 +238,10 @@ class Wall():
         exclude_areas = []
         for feature in self.features:
             exclude_areas.append(feature.get_points())
-        for texture in self.textures:
-            # Each texture can have one or more etches
-            etches.extend(texture.get_etches(exclude_areas))
+        if self.show_textures:
+            for texture in self.textures:
+                # Each texture can have one or more etches
+                etches.extend(texture.get_etches(exclude_areas))
         return etches
         
 
