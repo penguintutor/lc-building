@@ -27,6 +27,7 @@ class Builder():
     def load_file(self, filename):
         result = self.building.load_file(filename)
         # If successfully load then clear existing data and regenerate
+        print ("File loaded - processing data")
         if result[0] == True:
             self.process_data()
         return result
@@ -53,6 +54,11 @@ class Builder():
                 #print ("Adding wall here ")
                 view_walls.append(wall)
         return view_walls
+    
+    # Update walls - eg. if interlock setting changed then reflect against all walls
+    def update_walls(self, interlock):
+        for wall in self.walls:
+            wall.update(interlock)
         
     # Takes a dictionary with the wall data where points is a list within the dictionary
     # Wall args are: name, points, view="front", position=[0,0]
@@ -94,27 +100,46 @@ class Builder():
         
         self.walls = []
         all_walls = self.building.get_walls()
+        
+        num_walls = len(all_walls)
+        current_wall = 0
         for wall in all_walls:
-        #    print ("Loading Wall")
+            percent_loaded = int((current_wall/num_walls)*100)
+            print (f"Reading in walls {percent_loaded}%")
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2], wall[3]))
+            current_wall += 1
+            
+        if num_walls > 0:
+            print ("Reading in walls 100%")
         
         # Add roofs (loads differently but afterwards is handled as a wall)
         for roof in self.building.get_roofs():
-        #    print (f"Roof {roof}")
+            # These are to be replaced in future so does not include the same % complete updates
+            print ("Adding roof")
             self.walls.append(Wall(roof[0], roof[1], roof[2], roof[3]))
             
-        for texture in self.building.get_textures():
+        textures = self.building.get_textures()
+        num_textures = len(textures)
+        current_texture = 0
+        for texture in textures:
+            percent_loaded = int((current_texture/num_textures)*100)
+            print (f"Applying textures {percent_loaded}%")
             # If not area then default to entire wall
             area = []
-        #    print (" Adding texture")
             if 'area' in texture:
                 area = texture['area']
-            self.walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"] )
+            self.walls[texture["wall"]].add_texture_towall(texture["type"], area, texture["settings"] )
+            current_texture += 1
+        if num_textures > 0:
+            print ("Applying textures 100%")
         
-
-        for feature in self.building.get_features():
-        #    print ("Adding feature")
+        features = self.building.get_features()
+        num_features = len(features)
+        current_feature = 0
+        for feature in features:
+            percent_loaded = int((current_feature/num_features)*100)
+            print (f"Adding features {percent_loaded}%")
             # Features takes a polygon, but may be represented as more basic rectangle.
             pos = feature["parameters"]["pos"]
             polygon = []
@@ -128,10 +153,12 @@ class Builder():
                 height = feature["parameters"]["height"]
                 polygon = rect_to_polygon((0,0), width, height)
                 
-            self.walls[feature["wall"]].add_feature(feature["type"], feature["template"], pos, polygon,
+            self.walls[feature["wall"]].add_feature_towall(feature["type"], feature["template"], pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"])
-            
-        #print ("End feature")
+            current_feature += 1
+        if num_features > 0:
+            print (f"Adding features 100%")
+        
             
         # Although there is a setting to ignore interlocking still load it here to preserve
         for il in self.building.get_interlocking():
@@ -153,5 +180,16 @@ class Builder():
             if len(il["secondary"]) > 2:
                 reverse = il["secondary"][2]
             self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
+        
+        # Now force update as used non updating functions to add features / textures
+        num_walls = len(self.walls)
+        current_wall = 0
+        for wall in self.walls:
+            percent_loaded = int((current_wall/num_walls)*100)
+            print (f"Rendering walls {percent_loaded}%")
+            wall.update()
+            current_wall += 1
+        if num_walls > 0:
+            print ("Rendering walls 100%")
     
         #print ("Builder processing data complete\n\n")

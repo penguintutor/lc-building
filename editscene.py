@@ -62,8 +62,7 @@ class EditScene(ViewScene):
         # Create a view object, but set it not moveable
         self.obj_views = [ObjView(self.scene, self.gconfig, coords = [0,0], moveable=False)]
         # just get cuts related to wall
-        # param is optional (whether to display interlocking)
-        cuts = self.wall.get_wall_cuts(self.gconfig.checkbox['il'])
+        cuts = self.wall.get_wall_cuts()
         for cut in cuts:
             self.obj_views[0].add_cut(cut)
         # Add texture if enabled

@@ -524,10 +524,14 @@ class MainWindowUI(QMainWindow):
             
         
     # Call if checkbox changed
-    # Update settings then call appropriate update
+    # Update settings then call appropriate update 
     def read_checkbox (self):
-        # interlocking view option
-        self.gconfig.checkbox['il'] = self.ui.interlockCheckBox.isChecked()
+        interlock = self.ui.interlockCheckBox.isChecked()
+        # If interlock setting changed then update all walls
+        if interlock != self.gconfig.checkbox['il']:
+            # interlocking view option
+            self.gconfig.checkbox['il'] = interlock
+            self.builder.update_walls(interlock)
         # texture view option
         self.gconfig.checkbox['texture'] = self.ui.textureCheckBox.isChecked()
         # request update of viewgraphics

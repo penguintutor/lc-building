@@ -23,6 +23,9 @@ from shapely import Polygon
 # Interlocking starts at bottom left and works along the line
 # As such all lines need to be in direction away from bottom left
 
+# Note that methods ending _towall should only be used during a load or where update is being called afterwards
+# Is used internally and for performance reasons can be used by file load etc.
+
 class Wall():
     
     settings = {}
@@ -39,6 +42,7 @@ class Wall():
         #print (f"Position {self.position}")
         #self.max_width = width
         #self.max_height = height
+        self.show_interlock = False # Do we show interlocking - set using update
         self.material = "smooth"
         self.il = []              # Interlocking - only one allowed per edge, but multiple allowed on a wall
         self.textures = []        # Typically one texture per wall, but can have multiple if zones used - must not overlap
@@ -63,16 +67,18 @@ class Wall():
 
 
     # Updates cuts, etches and outers
-    def update (self):
+    # Interlock = None, keep current, otherwise update
+    def update (self, interlock=None):
+        if interlock != None:
+            self.show_interlock = interlock
         self.update_cuts()
         self.update_etches()
         self.update_outers()
         
     # Gets only cuts associated with the wall itself (not features / textures)
     # Used by wall edit also internally by update_cuts
-    # Optionally include interlocking (default to True)
-    # Otherwise show as standard lines
-    def get_wall_cuts (self, interlock=True):
+    def get_wall_cuts (self):
+        #print ("Getting wall cuts")
         # First get edges then generate cuts
         # cut lines is the one that is returned
         # this can either be used directly (eg. in edit wall)
@@ -85,6 +91,7 @@ class Wall():
         
         # Convert edges into lines
         for i in range(0, len(cut_edges)):
+            #print ("Converting edges into lines")
             # Do any interlocks apply to this edge if so apply interlocks
             # copy edge into list for applying transformations
             this_edge_segments = [cut_edges[i]]
@@ -93,7 +100,7 @@ class Wall():
             edge_ils = None
             
             # Only handle interlocking if not False
-            if (interlock == True):
+            if (self.show_interlock == True):
                 for il in self.il:
                     if il.get_edge() == i:
                         # add interlocks to this edge
@@ -123,7 +130,6 @@ class Wall():
     # but if update then run this again before running get_cuts
     def update_cuts (self):
         self.cut_lines = self.get_wall_cuts ()
-
         # Add cuts from features
         feature_cuts = self._get_cuts_features()
         if feature_cuts != None:
@@ -176,23 +182,25 @@ class Wall():
     def get_maxheight (self):
         return self.polygon.bounds[3] - self.polygon.bounds[1]
        
-    # Note that this is different order to texture constructor as
-    # in constructor type is optional - but not in here
-    def add_texture (self, type, area, settings):
+    
+    def add_texture_towall (self, type, area, settings):
         # If no area / zone provided then use wall
         if area == []:
             area = self.points
         # reordered here when passed to constructor
         self.textures.append(Texture(area, type, settings))
-        self.update()
-        #print (f"Added Texture {type}")
+        
+    # Note that this is different order to texture constructor as
+    # in constructor type is optional - but not in here
+    def add_texture (self, type, area, settings):
+        self.add_texture_towall (type, area, settings)
+        # Only update etches as that is limit of textures
+        self.update_etches()
 
-       
-
-    # Add a feature - such as a window
-    # cuts, etches and outers should all be lists
-    # If not set to None then change to [] avoid dangerous default
-    def add_feature (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None):
+    # This is internal method - or one to be used when loading from file
+    # Does not perform update - also used by add_feature but then performs update
+    # If using this then must perform update after loading
+    def add_feature_towall (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None):
         # feature number will be next number
         # Will return that assuming that this is successful
         feature_num = len(self.features)
@@ -206,6 +214,14 @@ class Wall():
         # If want to handle settings can do so here
         # Eg. support textures
         # Update the wall
+        self.update()
+        return feature_num
+
+    # Add a feature - such as a window
+    # cuts, etches and outers should all be lists
+    # If not set to None then change to [] avoid dangerous default
+    def add_feature (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None):
+        feature_num = self.add_feature_towall (feature_type, feature_template, startpos, points, cuts, etches, outers)
         self.update()
         return feature_num
     
