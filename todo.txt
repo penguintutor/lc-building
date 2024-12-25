@@ -5,11 +5,14 @@ Replace hardcoded material thickness / interlocking with setting
 
 ## In Main Window 
 Show status bar when loading a large file
+Show updating status when ticking / unticking interlocking / texture
 Handle checkboxes (different for if edit walls rather than view scene)
 Make view scene honor checkboxes
 Save positions of windows
 - try:
 	item.setPos(QPointF(50, 50)) 
+When clicking edit but nothing selected 
+warning - select object first
 
 
 ## In add wall window
@@ -39,6 +42,7 @@ Possibly - rename copied walls (1) etc. instead of (copy)
 Make it obvious in wall edit mode (not sure how best to achieve)
 Force refresh on relevant scene when exiting edit wall
 Ability to add / delete features 
+
 
 
 # Future 

@@ -25,7 +25,7 @@ class EditScene(ViewScene):
         # add wall and features
         self.add_wall()
         
-    # For each of the features get current pos from obj view and update feature
+    ## For each of the features get current pos from obj view and update feature
     def update_feature_pos(self):
         for i in range (1, len(self.objs)):
             view_new_pos = self.obj_views[i].new_pos

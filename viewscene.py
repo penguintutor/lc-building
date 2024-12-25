@@ -5,6 +5,7 @@ from wall import Wall
 from texture import Texture
 from feature import Feature
 from objview import ObjView
+from laser import Laser
 
 class ViewScene():
     def __init__(self, scene, builder, gconfig, view_name):
@@ -21,11 +22,24 @@ class ViewScene():
         
        
     # Clear scene and then add walls
-    def update(self):
-        self.scene.clear()
-        self.objs = []
-        self.obj_views = []
-        self.add_walls()
+    def update(self, full=True):
+        print ("Update")
+        self.update_obj_pos()
+        if full == True:
+            self.scene.clear()
+            self.objs = []
+            self.obj_views = []
+            self.add_walls()
+        
+        
+    # For each of the objects get current pos from obj view and update feature
+    def update_obj_pos(self):
+        for i in range (1, len(self.objs)):
+            view_new_pos = self.obj_views[i].new_pos
+            if view_new_pos != (0,0):
+                # convert view pos to mm pos
+                #view_new_pos = Laser.vs.reverse_convert(view_new_pos)
+                self.objs[i].move_rel(view_new_pos)        
         
     # searches for obj view and returns the corresponding objs
     # ie. from view object get the builder object (eg. wall)

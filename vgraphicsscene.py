@@ -24,7 +24,7 @@ class ViewGraphicsScene (QGraphicsScene):
     # check to see if any of the items have moved in which case update
     # Detect mouse release to check if need to update positions
     def mouseReleaseEvent(self, event):
-        #print ("Mouse released")
+        print ("Mouse released")
         # Has anything moved
         self.main_window.check_moved_update()
         event.ignore()
