@@ -76,7 +76,7 @@
           ["width + roof_left_overlap + roof_right_overlap", "depth / 2 + depth * 0.2 + roof_rear_overlap"],
           ["0", "depth / 2 + depth * 0.2 + roof_rear_overlap"],
           ["0", "0"]
-          ], "top", [200, 200]
+          ], "top", [0, 400]
       ]
 
     ],

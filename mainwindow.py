@@ -451,7 +451,10 @@ class MainWindowUI(QMainWindow):
     # Update the selected scene
     def check_moved_update (self):
         if self.check_obj_moved():
-            self.view_scenes[self.current_scene].update()
+            # If it's a wall edit then need to update view
+            if self.current_scene == "walledit":
+                self.view_scenes[self.current_scene].update()
+        
     
     # Updates table showing status of objects
     # Update based on selection in viewgraphicsscene

@@ -1,5 +1,6 @@
 # Draws the view onto the scene - eg. front walls
 # Pulls in relevant objects from builder (eg. walls) and then uses ObjViews to draw
+from PySide6.QtCore import QPoint, QPointF
 from builder import Builder
 from wall import Wall
 from texture import Texture
@@ -22,14 +23,13 @@ class ViewScene():
         
        
     # Clear scene and then add walls
-    def update(self, full=True):
-        print ("Update")
+    def update(self):
+        #print (f"Update view scene {self.view_name}")
         self.update_obj_pos()
-        if full == True:
-            self.scene.clear()
-            self.objs = []
-            self.obj_views = []
-            self.add_walls()
+        self.scene.clear()
+        self.objs = []
+        self.obj_views = []
+        self.add_walls()
         
         
     # For each of the objects get current pos from obj view and update feature
@@ -64,7 +64,10 @@ class ViewScene():
             # Create objview to abstract out the drawing
             # Uses lasercutter config lcconfig - could have heirarchical in future - allow override for graphics display
             # Note currently put at 0,0 - this will overwrite need to work out positioning
-            self.obj_views.append(ObjView(self.scene, self.gconfig, coords = wall.position))
+            #self.obj_views.append(ObjView(self.scene, self.gconfig, coords = wall.position))
+            self.obj_views.append(ObjView(self.scene, self.gconfig))
+            # position using setPos
+            
             # Now draw them on the scene
             # Etches first, then outers then walls - this then shows overlap in that order
             # Also typically will want to output in that order (although that is under control of laser cut software)
@@ -84,6 +87,11 @@ class ViewScene():
             cuts = wall.get_cuts()
             for cut in cuts:
                 self.obj_views[len(self.obj_views)-1].add_cut(cut)
+            
+            # Set position after adding graphics items
+            #print (f"Setting {wall.name} to {wall.position}")
+            self.obj_views[len(self.obj_views)-1].item_group.setPos(QPoint(*wall.position))
+            #print (f"New posion {self.obj_views[len(self.obj_views)-1].item_group.pos()}")
  
                     
     def clear(self):

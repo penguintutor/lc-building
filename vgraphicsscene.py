@@ -14,6 +14,7 @@ class ViewGraphicsScene (QGraphicsScene):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
+        self.setItemIndexMethod(QGraphicsScene.NoIndex)
         
         # Triggers when a selection is changed within the scene
         self.selectionChanged.connect(self.new_focus)
@@ -24,10 +25,11 @@ class ViewGraphicsScene (QGraphicsScene):
     # check to see if any of the items have moved in which case update
     # Detect mouse release to check if need to update positions
     def mouseReleaseEvent(self, event):
-        print ("Mouse released")
+        # Pass the event to the QGraphicScene method - otherwise unable to select other objects
+        super().mouseReleaseEvent (event)
+        #print ("Mouse released")
         # Has anything moved
         self.main_window.check_moved_update()
-        event.ignore()
         
     ## Code to handle CTRL & Scroll Wheel for zoom
     def wheelEvent(self, event):

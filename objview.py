@@ -24,8 +24,11 @@ class ObjView():
             self.item_group.setFlag(QGraphicsItem.ItemIsSelectable)
             self.item_group.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
         self.offset = coords
+        # Test override offset - instead use graphicsscene to manage position
+        self.offset = (0,0)
         # Save the current position
         self.pos = self.item_group.pos().toPoint()
+        #print (f"Item position {self.pos}")
         # Update new_pos when moved
         self.new_pos = (0,0)
         
