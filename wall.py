@@ -61,20 +61,31 @@ class Wall():
         self.outers = []
         self.update()
         
+    def __str__(self):
+        return f"Wall: {self.name}"
+        
     def get_features (self):
         return self.features
     
     def get_textures (self):
         return self.textures
 
+    # Normally use absolute position rather than relative as that is
+    # what we get from the viewscene
+    def move_pos(self, pos):
+        # only add to history if changed
+        if self.position != pos:
+            self.history.append(["move", self.position])
+            self.position = pos
+
     def move_rel(self, pos):
-        print (f"Move from {self.position}")
+        #print (f"Move from {self.position}")
         # Store current position in history
         self.history.append(["move", self.position])
         #print (f'Current {self.min_x}, {self.min_y}')
         self.position[0] += pos[0]
         self.position[1] += pos[1]
-        print (f"New pos {self.position}")
+        #print (f"New pos {self.position}")
         
 
         #print (f'New {self.min_x}, {self.min_y}')

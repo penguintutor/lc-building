@@ -4,7 +4,7 @@
 
 # Uses laser module and all classes (eg. cuts)
 from laser import *
-from PySide6.QtCore import QPointF
+from PySide6.QtCore import QPoint, QPointF
 from PySide6.QtGui import QPolygonF
 from PySide6.QtWidgets import QGraphicsItem
 
@@ -27,25 +27,33 @@ class ObjView():
         # Test override offset - instead use graphicsscene to manage position
         self.offset = (0,0)
         # Save the current position
-        self.pos = self.item_group.pos().toPoint()
+        pos_point = self.item_group.pos().toPoint()
+        self.pos = [pos_point.x(), pos_point.y()]
         #print (f"Item position {self.pos}")
         # Update new_pos when moved
-        self.new_pos = (0,0)
-        
+        #self.new_pos = (0,0)
         
     # Check if moved - and update position if moved 
     def has_moved(self):
         #print (f"This object {self}")
-        new_pos = self.item_group.pos().toPoint()
+        new_pos_point = self.item_group.pos().toPoint()
+        new_pos = [new_pos_point.x(), new_pos_point.y()]
         #print (f"Offset {self.offset}")
         #print (f"Current pos {self.pos}, new pos {new_pos}, scene pos {self.item_group.scenePos()}")
         if new_pos != self.pos:
-            self.new_pos = (new_pos.x(), new_pos.y())
+            #print ("Moved")
+            #self.new_pos = (new_pos.x(), new_pos.y())
+            self.pos = new_pos
             return True
         return False
         
+    def set_pos(self, pos):
+        self.pos = pos
+        self.item_group.setPos(QPoint(*pos))
+        
     def get_pos(self):
-        return self.item_group.pos()
+        # Perhaps regenerate at this point??
+        return self.pos()
                 
     def set_offset(self, offset):
         self.offset = offset
@@ -94,6 +102,7 @@ class ObjView():
             this_object = self.scene.addPolygon(polygon, pen_obj) 
             #print (f"Polygon points {polygon}")
         self.item_group.addToGroup(this_object)
+        #print ("Standard object added {self.pos}")
 
         
     # Etch is treated as a special case where type is line and want to convert to polygon

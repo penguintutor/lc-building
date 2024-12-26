@@ -2,17 +2,15 @@
 
 Replace hardcoded material thickness / interlocking with setting
 
+# Need to move some refresh to background or status updates
+# Eg. update all scense / edit wall
 
 ## In Main Window 
 Show status bar when loading a large file
 Show updating status when ticking / unticking interlocking / texture
 Handle checkboxes (different for if edit walls rather than view scene)
 Make view scene honor checkboxes
-Save positions of windows
-- try:
-	item.setPos(QPointF(50, 50)) 
-When clicking edit but nothing selected 
-warning - select object first
+When clicking edit but nothing selected give a warning - select object first
 
 
 ## In add wall window

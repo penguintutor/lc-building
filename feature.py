@@ -48,6 +48,8 @@ class Feature():
                 break
             self.outers.append(Feature.lf.create_outer(outer[0], outer[1], (self.min_x, self.min_y)))
         
+    def __str__(self):
+        return f"Feature: {self.type}"
         
     # Returns points (exlusion area) after applying min_x, min_y
     def get_points(self):

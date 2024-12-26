@@ -26,13 +26,14 @@ class EditScene(ViewScene):
         self.add_wall()
         
     ## For each of the features get current pos from obj view and update feature
+    # When moving a feature then it is relative to the wall (which is at 0,0),
+    # and we need to convert to mm before applying to object
     def update_feature_pos(self):
         for i in range (1, len(self.objs)):
-            view_new_pos = self.obj_views[i].new_pos
-            if view_new_pos != (0,0):
-                # convert view pos to mm pos
-                view_new_pos = Laser.vs.reverse_convert(view_new_pos)
-                self.objs[i].move_rel(view_new_pos)
+            view_new_pos = self.obj_views[i].pos
+            # convert view pos to mm pos
+            view_new_pos = Laser.vs.reverse_convert(view_new_pos)
+            self.objs[i].move_rel(view_new_pos)
         
     # Add wall to edit
     # Takes object to edit, removes existing objects and replaces with this

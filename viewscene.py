@@ -33,13 +33,13 @@ class ViewScene():
         
         
     # For each of the objects get current pos from obj view and update feature
+    # This is based on view position - so is absolute co-ordinates
+    # No need to convert to mm etc.
     def update_obj_pos(self):
-        for i in range (1, len(self.objs)):
-            view_new_pos = self.obj_views[i].new_pos
-            if view_new_pos != (0,0):
-                # convert view pos to mm pos
-                #view_new_pos = Laser.vs.reverse_convert(view_new_pos)
-                self.objs[i].move_rel(view_new_pos)        
+        for i in range (0, len(self.objs)):
+            #print (f"Updating {self.objs[i]} pos {self.obj_views[i].pos}")
+            self.objs[i].move_pos(self.obj_views[i].pos)
+
         
     # searches for obj view and returns the corresponding objs
     # ie. from view object get the builder object (eg. wall)
@@ -89,8 +89,9 @@ class ViewScene():
                 self.obj_views[len(self.obj_views)-1].add_cut(cut)
             
             # Set position after adding graphics items
-            #print (f"Setting {wall.name} to {wall.position}")
-            self.obj_views[len(self.obj_views)-1].item_group.setPos(QPoint(*wall.position))
+            #print (f"Setting {wall} to {wall.position}")
+            self.obj_views[len(self.obj_views)-1].set_pos(wall.position)
+            #self.obj_views[len(self.obj_views)-1].item_group.setPos(QPoint(*wall.position))
             #print (f"New posion {self.obj_views[len(self.obj_views)-1].item_group.pos()}")
  
                     

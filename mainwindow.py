@@ -454,6 +454,7 @@ class MainWindowUI(QMainWindow):
             # If it's a wall edit then need to update view
             if self.current_scene == "walledit":
                 self.view_scenes[self.current_scene].update()
+            # Todo if not wall edit then still need to refresh position - but not do a full update
         
     
     # Updates table showing status of objects
