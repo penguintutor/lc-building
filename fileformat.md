@@ -36,7 +36,9 @@ Also includes values related to textures. These are only set when required for t
 * brick_width
 * brick_etch (mortar thickness)
 
-## Parameters (buildings only)
+## Parameters (buildings / building templates only)
+### Typically used in building templates these are used to generate the actual values
+### But are not generally saved as calculated values are used instead
 All values including both defaults and typical
 added as actual values
 
@@ -91,9 +93,10 @@ When texture is applied it starts from bottom left and keep applying upwards.
 Features include doors and windows. Typically their area will be excluded from wall textures.
 Then can contain cuts (always cut), etches (always etches) or outers (etch / cut depending on the outertype setting).These can be defined as line, rects, or polygon. 
 
-Has a pos which indicates start point (top left) and all inner features are relative to that. Assuming bounding box is a rectangle then uses width, height to create a rectangle as the exclusion area. Alternatives use "exclude" followed by polygon for exclusion area (in which case width / height are ignored). If polygon is used then points should be relative to the pos
+Has a pos which indicates start point (top left) and all inner features are relative to that. Assuming bounding box is a rectangle then uses width, height to create a rectangle as the exclusion area. Alternatives use "exclude" followed by polygon for exclusion area (in which case width / height are ignored). If polygon is used then points should be relative to the pos.
+Future templates should use exclude in preference to width and height and future saves may replace width and height with points.
 
-Any texture has to be defined explictly eg. as etches as would not normally apply a texture to a feature.
+Any texture has to be defined explictly (eg. as etches) as would not normally apply a texture to a feature.
 
 All values in features must be in mm (does not support tokens at the moment)
 

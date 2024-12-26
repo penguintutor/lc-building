@@ -69,6 +69,39 @@ class Wall():
     
     def get_textures (self):
         return self.textures
+    
+    # Provides summary of wall for save
+    # Also need to get any textures, interlocking and features separately
+    def get_save_data (self):
+        return [self.name, self.points, self.view, self.position]
+    
+    def get_save_textures (self, wall_num):
+        save_textures = []
+        for texture in self.textures:
+            save_textures.append({
+                "type" : texture.style,
+                "wall" : wall_num,
+                "settings": texture.settings
+                })
+        return save_textures
+    
+    # Todo - convert cuts, outers and etches to list forma
+    def get_save_features (self, wall_num):
+        save_features = []
+        for feature in self.features:
+            save_features.append({
+                "type": feature.type,
+                "template": feature.template,
+                "wall": wall_num,
+                "parameters": {
+                    "pos": [feature.min_x, feature.min_y],
+                    "exclude": feature.points
+                    },
+                "cuts": feature.cuts,
+                "etches": feature.etches,
+                "outers": feature.outers
+                })
+        return save_features
 
     # Normally use absolute position rather than relative as that is
     # what we get from the viewscene

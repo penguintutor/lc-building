@@ -18,6 +18,8 @@ class Builder():
         # Create empty building data instance - can load or edit
         self.building = BuildingData(self.config)
         
+        self.building_info = {}
+        
         # Create instance of self.walls
         self.walls = []
         self.process_data()
@@ -36,13 +38,46 @@ class Builder():
     # Overwrites existing file
     # If want to confirm to overwrite check before calling this
     def save_file(self, filename):
+        print ("Builder save")
         #Todo update building at this point
+        # create newdata dictionary with all current data
+        # Start with building summary information (main data) which is a dictionary
+        newdata = self.building_info
+        newdata['settings'] = self.settings
+        
+        wall_data = []
+        texture_data = []
+        wall_num = 0
+        for wall in self.walls:
+            print ("Getting walls")
+            wall_data.append(wall.get_save_data())
+            print ("Getting textures")
+            textures = wall.get_save_textures(wall_num)
+            print (f"Textures are {textures}")
+            for texture in textures:
+                texture_data.append (texture)
+            print ("Getting Features")
+            features = wall.get_save_features(wall_num)
+            print (f"Features are {features}")
+            for feature in features:
+                feature_data.append (feature)
+            wall_num += 1
+            
+        print ("Adding data")
+        newdata['walls'] = wall_data
+        newdata['textures'] = texture_data
+        newdata['features'] = feature_data
+        
+        # Todo add interlocking (not part of wall)
+        
+        print (f"New data:\n {newdata}")
+        
         
         
         ####***************************####
         
         # eg. position of walls
-        return self.building.save_file(filename)
+        #return self.building.save_file(filename, newdata)
         
     # Get the walls that match a certain view
     def get_walls_view(self, view):
@@ -91,12 +126,13 @@ class Builder():
     def process_data(self):
         
         #print ("\n\nBuilder processing data")
-        settings = self.building.get_settings()
-        if len(settings) > 0:
+        self.settings = self.building.get_settings()
+        if len(self.settings) > 0:
             # Add settings to the class
-            for setting in settings.keys():
-                Wall.settings[setting] = settings[setting]
+            for setting in self.settings.keys():
+                Wall.settings[setting] = self.settings[setting]
         
+        self.building_info = self.building.get_main_data()
         
         self.walls = []
         all_walls = self.building.get_walls()

@@ -42,6 +42,13 @@ Force refresh on relevant scene when exiting edit wall
 Ability to add / delete features 
 
 
+# Textures
+Need to track if entire wall or whether to save polygon 
+(ie. if not specified then entire wall and don't need to save points, but
+if only specific area then do need to save - Not currently handled)
+
+# Save 
+Implement this - need to perform some conversions (cuts, etc.) and then actually save the data
 
 # Future 
 Show selected objects better

@@ -1,4 +1,4 @@
-# Take template data and store in BuildingData
+# Read and write BuildingData files
 import json
 import re
 from lcconfig import LCConfig
@@ -10,7 +10,7 @@ def is_number(s):
     except ValueError:
         return False
 
-default_pos = [50, 50]
+default_pos = [0, 0]
 
 # Views must be one of these or default to front
 #allowed_views = ["front", "right", "rear", "left", "top", "bottom"]
@@ -98,10 +98,15 @@ class BuildingData ():
     
     # Save current data to file
     # Overwrites existing file
-    def save_file (self, filename):
+    # If newdata not set then write back current data, otherwise write back
+    # Note this is data in buildingdata rather than updated data in builder, so
+    # most likely want to specify newdata
+    def save_file (self, filename, newdata = None):
         # Updates filename with new filename
         self.filename = filename
-        json_data = json.dumps(self.data)
+        if newdata == None:
+            newdata = self.data
+        json_data = json.dumps(newdata)
         try:
             with open(filename, 'w') as datafile:
                 datafile.write(json_data)
@@ -131,6 +136,7 @@ class BuildingData ():
             else:
                 return_data[key] = ""
         return return_data
+    
         
     # Defaults are things that are often changed to get different size of building
     # eg. depth, width, wall_height, roof_height, roof_depth & roof_width
