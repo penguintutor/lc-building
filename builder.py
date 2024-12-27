@@ -9,6 +9,7 @@ from wall import Wall
 from texture import Texture
 from feature import Feature
 from interlocking import Interlocking
+from interlockinggroup import InterlockingGroup
 from lcconfig import LCConfig
 
 class Builder():
@@ -22,6 +23,11 @@ class Builder():
         
         # Create instance of self.walls
         self.walls = []
+        # Also need to track interlocking features seperately
+        # Note interlocking is based on order of self.walls - so if change
+        # walls (eg. delete a wall) then need to update the walls in interlocking
+        # including remove interlocking that relies on that wall (primary and secondary)
+        self.interlocking_groups = []
         self.process_data()
 
     # Loads a new file overwriting all data
@@ -29,16 +35,17 @@ class Builder():
     def load_file(self, filename):
         result = self.building.load_file(filename)
         # If successfully load then clear existing data and regenerate
-        print ("File loaded - processing data")
         if result[0] == True:
+            print ("File loaded - processing data")
             self.process_data()
+        print ("File load failed")
         return result
         
     # Saves the file
     # Overwrites existing file
     # If want to confirm to overwrite check before calling this
     def save_file(self, filename):
-        print ("Builder save")
+        #print ("Builder save")
         #Todo update building at this point
         # create newdata dictionary with all current data
         # Start with building summary information (main data) which is a dictionary
@@ -47,37 +54,52 @@ class Builder():
         
         wall_data = []
         texture_data = []
+        feature_data = []
+        
         wall_num = 0
         for wall in self.walls:
-            print ("Getting walls")
+            #print ("Getting walls")
             wall_data.append(wall.get_save_data())
-            print ("Getting textures")
+            #print ("Getting textures")
             textures = wall.get_save_textures(wall_num)
-            print (f"Textures are {textures}")
+            #print (f"Textures are {textures}")
             for texture in textures:
                 texture_data.append (texture)
-            print ("Getting Features")
+            #print ("Getting Features")
             features = wall.get_save_features(wall_num)
-            print (f"Features are {features}")
+            #print (f"Features are {features}")
             for feature in features:
                 feature_data.append (feature)
             wall_num += 1
             
-        print ("Adding data")
+        #print ("Adding data")
         newdata['walls'] = wall_data
         newdata['textures'] = texture_data
         newdata['features'] = feature_data
         
-        # Todo add interlocking (not part of wall)
-        
-        print (f"New data:\n {newdata}")
-        
-        
-        
-        ####***************************####
-        
-        # eg. position of walls
-        #return self.building.save_file(filename, newdata)
+        # Add interlocking (not part of wall)
+        il_data = []
+        # Get wall and edge from both, but other parameters from primary only (should be the same)
+        for il_group in self.interlocking_groups:
+            primary_entry = [il_group.primary_wall, il_group.primary_il.edge]
+            if il_group.primary_il.reverse == True:
+                primary_entry.append("reverse")
+            secondary_entry = [il_group.secondary_wall, il_group.secondary_il.edge]
+            if il_group.secondary_il.reverse == True:
+                secondary_entry.append("reverse")
+            il_data.append({
+                "primary": primary_entry,
+                "secondary": secondary_entry,
+                "step": il_group.primary_il.step,
+                "start": il_group.primary_il.start
+                })
+        newdata['interlocking'] = il_data
+                
+        #print (f"New data:\n {newdata}")
+        # Save details
+        result = self.building.save_file(filename, newdata)
+        print (f"Save completed - {result}")
+        return result
         
     # Get the walls that match a certain view
     def get_walls_view(self, view):
@@ -125,19 +147,22 @@ class Builder():
     # Deletes any existing entries
     def process_data(self):
         
-        #print ("\n\nBuilder processing data")
+        print ("\n\nBuilder processing data")
         self.settings = self.building.get_settings()
         if len(self.settings) > 0:
             # Add settings to the class
             for setting in self.settings.keys():
                 Wall.settings[setting] = self.settings[setting]
         
+        print ("Get main info")
         self.building_info = self.building.get_main_data()
         
+        print ("Get walls")
         self.walls = []
         all_walls = self.building.get_walls()
         
         num_walls = len(all_walls)
+        print (f"Num walls {num_walls}")
         current_wall = 0
         for wall in all_walls:
             percent_loaded = int((current_wall/num_walls)*100)
@@ -199,7 +224,8 @@ class Builder():
         # Although there is a setting to ignore interlocking still load it here to preserve
         for il in self.building.get_interlocking():
         #    print ("Adding interlocking")
-            # Add both primary and secondary for each entry
+            # Great interlocking group which tracks these in case they are edited
+            # Also add both primary and secondary walls for each entry
             # parameters are optional (defines start and end positions of interlocking section)
             # These are the optional parameters which are appended
             parameter_keys = ["start", "end"]
@@ -211,11 +237,16 @@ class Builder():
             reverse = ""
             if len(il["primary"]) > 2:
                 reverse = il["primary"][2]
+            primary_wall = il["primary"][0]
+            primary_il = Interlocking(il["step"], il["primary"][1], "primary", reverse, parameters)
             self.walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, parameters)
             reverse = ""
             if len(il["secondary"]) > 2:
                 reverse = il["secondary"][2]
+            secondary_wall = il["secondary"][0]
+            secondary_il = Interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
             self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
+            self.interlocking_groups.append(InterlockingGroup(primary_wall, primary_il, secondary_wall, secondary_il))
         
         # Now force update as used non updating functions to add features / textures
         num_walls = len(self.walls)

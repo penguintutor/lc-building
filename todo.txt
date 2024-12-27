@@ -48,7 +48,7 @@ Need to track if entire wall or whether to save polygon
 if only specific area then do need to save - Not currently handled)
 
 # Save 
-Implement this - need to perform some conversions (cuts, etc.) and then actually save the data
+Saved file cannot be read in
 
 # Future 
 Show selected objects better

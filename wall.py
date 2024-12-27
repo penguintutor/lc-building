@@ -97,9 +97,9 @@ class Wall():
                     "pos": [feature.min_x, feature.min_y],
                     "exclude": feature.points
                     },
-                "cuts": feature.cuts,
-                "etches": feature.etches,
-                "outers": feature.outers
+                "cuts": feature.cuts_as_list(),
+                "etches": feature.etches_as_list(),
+                "outers": feature.outers_as_list()
                 })
         return save_features
 

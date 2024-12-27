@@ -163,7 +163,7 @@ class BuildingData ():
         wall_data = []
         # No walls just return
         if (not "walls" in self.data):
-            #print ("No walls")
+            print ("No walls")
             return[]
         for wall in self.data["walls"]:
             # Basic error check for minimum number of parameters
@@ -182,6 +182,7 @@ class BuildingData ():
                 #print (f"Position defined {wall[3]}")
                 position = wall[3]
                 
+            print ("Processing tokens")
             wall_data.append((wall[0], self.process_multiple_tokens(wall[1]), view, position))
         return wall_data
     

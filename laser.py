@@ -66,7 +66,7 @@ class CutLine(Cut):
 
     def __str__(self):
         return f'Cut {self.type} from {self.start} to {self.end} io {self.io}'
-
+    
     # Get start value converted by scale and into pixels
     # If supplied offset is in pixels relative to start of object
     def get_start_pixels(self, offset=(0,0)):
