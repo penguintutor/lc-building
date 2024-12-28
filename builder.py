@@ -38,7 +38,8 @@ class Builder():
         if result[0] == True:
             print ("File loaded - processing data")
             self.process_data()
-        print ("File load failed")
+        else:
+            print ("File load failed")
         return result
         
     # Saves the file
@@ -147,22 +148,22 @@ class Builder():
     # Deletes any existing entries
     def process_data(self):
         
-        print ("\n\nBuilder processing data")
+        #print ("\n\nBuilder processing data")
         self.settings = self.building.get_settings()
         if len(self.settings) > 0:
             # Add settings to the class
             for setting in self.settings.keys():
                 Wall.settings[setting] = self.settings[setting]
         
-        print ("Get main info")
+        #print ("Get main info")
         self.building_info = self.building.get_main_data()
         
-        print ("Get walls")
+        #print ("Get walls")
         self.walls = []
         all_walls = self.building.get_walls()
         
         num_walls = len(all_walls)
-        print (f"Num walls {num_walls}")
+        #print (f"Num walls {num_walls}")
         current_wall = 0
         for wall in all_walls:
             percent_loaded = int((current_wall/num_walls)*100)
@@ -177,7 +178,7 @@ class Builder():
         # Add roofs (loads differently but afterwards is handled as a wall)
         for roof in self.building.get_roofs():
             # These are to be replaced in future so does not include the same % complete updates
-            print ("Adding roof")
+            #print ("Adding roof")
             self.walls.append(Wall(roof[0], roof[1], roof[2], roof[3]))
             
         textures = self.building.get_textures()

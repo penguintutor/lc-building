@@ -43,6 +43,7 @@ class BuildingData ():
     def process_multiple_tokens (self, token_strings):
         new_list = []
         for this_string in token_strings:
+            #print (f"Processing {this_string}")
             # if this_string is actually a list then call recursively
             if type(this_string) is list:
                 new_list.append(self.process_multiple_tokens (this_string))
@@ -74,6 +75,20 @@ class BuildingData ():
         
     # Process token and perform eval to return as a number
     def process_token (self, token_string):
+        # First check if it is already a number
+        # Try int first as it's most likely an positive integer
+        try:
+            value = int (token_string)
+            return value
+        except ValueError:
+            # print ("Not an int")
+            pass
+        try:
+            value = float (token_string)
+            return value
+        except ValueError:
+            # print ("Not a float")
+            pass
         new_string = self.process_token_str(token_string)
         value = eval(new_string)
         return value
@@ -182,7 +197,7 @@ class BuildingData ():
                 #print (f"Position defined {wall[3]}")
                 position = wall[3]
                 
-            print ("Processing tokens")
+            #print ("Processing tokens")
             wall_data.append((wall[0], self.process_multiple_tokens(wall[1]), view, position))
         return wall_data
     
