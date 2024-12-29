@@ -12,6 +12,7 @@ from vgraphicsscene import ViewGraphicsScene
 import webbrowser
 import resources
 from wallwindow import WallWindowUI
+from addfeaturewindow import AddFeatureWindowUI
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
@@ -143,8 +144,8 @@ class MainWindowUI(QMainWindow):
         
         # Set to none, only create when needed and can check if it's created yet
         self.wall_window = None
-        #self.wall_window = WallWindowUI()
-        
+        self.add_feature_window = None
+
         # Update gconfig based on checkboxes - may need to load these values in future
         # interlocking view option
         self.gconfig.checkbox['il'] = self.ui.interlockCheckBox.isChecked()
@@ -426,13 +427,6 @@ class MainWindowUI(QMainWindow):
         else:
             self.set_left_buttons("default") 
             
-    # Set left menu based on whether view or edit
-    #def left_menu_edit(self):
-    #    self.set_left_buttons("editwall")
-    
-    
-    #def left_menu_wall(self):
-    #     self.set_left_buttons("default")   
 
     # Add new wall dialog
     def add_wall (self):
@@ -546,4 +540,7 @@ class MainWindowUI(QMainWindow):
 
     # Add feature when in edit wall
     def add_feature (self):
-        pass
+        if self.add_feature_window == None:
+            self.add_feature_window = AddFeatureWindowUI(self, self.config, self.gconfig, self.builder)
+        else:
+            self.add_feature_window.show()

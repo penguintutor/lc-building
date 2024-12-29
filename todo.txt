@@ -3,7 +3,7 @@
 Replace hardcoded material thickness / interlocking with setting
 
 # Need to move some refresh to background or status updates
-# Eg. update all scense / edit wall
+# Eg. update all scenes / edit wall
 
 ## In Main Window 
 Show status bar when loading a large file
@@ -36,6 +36,9 @@ When adding wall then prevent it from overlapping existing (by default)
 Prevent overlapping 
 Possibly - rename copied walls (1) etc. instead of (copy)
 
+# Delete wall
+Note need to update any interlockinggroups to refer to new wall references
+
 # Edit wall 
 Make it obvious in wall edit mode (not sure how best to achieve)
 Force refresh on relevant scene when exiting edit wall
@@ -47,8 +50,8 @@ Need to track if entire wall or whether to save polygon
 (ie. if not specified then entire wall and don't need to save points, but
 if only specific area then do need to save - Not currently handled)
 
-# Save 
-Saved file cannot be read in
+# Track history - with undo and redo
+Currently history is saved on objects - need to save in main windows / edit window instead
 
 # Future 
 Show selected objects better
