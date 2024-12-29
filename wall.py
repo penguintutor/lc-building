@@ -10,6 +10,7 @@ from interlocking import Interlocking
 from laser import *
 from helpers import *
 from shapely import Polygon
+import json
 
 # Texture is generated as part of get_etch,
 # This means that if a feature is added as long as it
@@ -280,7 +281,42 @@ class Wall():
         feature_num = self.add_feature_towall (feature_type, feature_template, startpos, points, cuts, etches, outers)
         self.update()
         return feature_num
-    
+
+    # Add feature loaded from file
+    def add_feature_file (self, filename):
+        #print (f"Adding feature from file {filename}")
+        # Keep reference to filename loaded
+        try:
+            with open(filename, 'r') as datafile:
+                feature_data = json.load(datafile)
+        except Exception as err:
+            print (f"Error {err}")
+            return
+        # Simple check did we get a name
+        if 'name' not in feature_data.keys():
+            print ("Invalid feature file")
+            return
+        # Create feature object
+        # set pos to be near top left - then can be moved by user
+        pos = (50, 50)
+        # if exclude not set then calculate from width and height
+        if "exclude" in feature_data.keys():
+            points = feature_data['exclude']
+        else:
+            width = feature_data['parameters']['width']
+            height = feature_data['parameters']['height']
+            points = [
+                [0,0],
+                [width,0],
+                [width, height],
+                [0, height],
+                [0,0]
+                ]
+                
+        self.add_feature (feature_data["type"], feature_data["template"], pos, points, feature_data['cuts'], feature_data['etches'], feature_data['outers'])
+        # Send signal to editscene to refresh
+
+
     # add any interlock rules for the edges
     # edges are number from 0 (top left) in clockwise direction
     # parameters should be a dictionary if supplied

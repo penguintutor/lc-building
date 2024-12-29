@@ -24,8 +24,6 @@ class MainWindowUI(QMainWindow):
     load_complete_signal = Signal()
     file_save_warning_signal = Signal()
     
-
-    
     def __init__(self):
         super().__init__()
         
@@ -414,6 +412,9 @@ class MainWindowUI(QMainWindow):
     def view_bottom (self):
         self.change_scene('bottom')
 
+    def update_current_scene (self):
+        self.view_scenes[self.current_scene].update()
+
     def change_scene (self, new_scene):
         self.current_scene = new_scene
         self.view_scenes[new_scene].update()
@@ -541,6 +542,7 @@ class MainWindowUI(QMainWindow):
     # Add feature when in edit wall
     def add_feature (self):
         if self.add_feature_window == None:
-            self.add_feature_window = AddFeatureWindowUI(self, self.config, self.gconfig, self.builder)
+            self.add_feature_window = AddFeatureWindowUI(self, self.config, self.gconfig, self.builder, self.view_scenes['walledit'].wall)
         else:
+            self.add_feature_window.set_wall(self.view_scenes['walledit'].wall)
             self.add_feature_window.show()

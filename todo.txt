@@ -11,6 +11,7 @@ Show updating status when ticking / unticking interlocking / texture
 Handle checkboxes (different for if edit walls rather than view scene)
 Make view scene honor checkboxes
 When clicking edit but nothing selected give a warning - select object first
+When quit chosen ask if save
 
 
 ## In add wall window
@@ -44,6 +45,11 @@ Make it obvious in wall edit mode (not sure how best to achieve)
 Force refresh on relevant scene when exiting edit wall
 Ability to add / delete features 
 
+# Add Feature
+Show name instead of filename when adding feature
+perhaps show icons?
+Also apply filters based on type
+
 
 # Textures
 Need to track if entire wall or whether to save polygon 
@@ -54,5 +60,5 @@ if only specific area then do need to save - Not currently handled)
 Currently history is saved on objects - need to save in main windows / edit window instead
 
 # Future 
-Show selected objects better
+Show selected objects better 
 

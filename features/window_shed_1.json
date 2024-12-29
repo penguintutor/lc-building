@@ -1,0 +1,22 @@
+{
+	"name": "Shed Window 1",      	  
+    "type": "window",
+	"template": "window_shed_1",
+	"parameters": 
+        {
+          "width": 400, 
+          "height": 555
+        },
+      "cuts":
+        [
+          ["rect", [[0, 0], [400, 555]]]
+        ],
+      "etches":
+        [
+          []
+        ],
+      "outers":
+        [
+          []
+        ]
+}
