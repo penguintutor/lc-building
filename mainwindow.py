@@ -94,6 +94,7 @@ class MainWindowUI(QMainWindow):
         self.ui.actionOpen.triggered.connect(self.open_file_dialog)
         self.ui.actionSave.triggered.connect(self.save_file)
         self.ui.actionSave_as.triggered.connect(self.save_as_dialog)
+        self.ui.actionExport.triggered.connect(self.export_dialog)
         self.ui.actionExit.triggered.connect(QCoreApplication.quit)
         # Edit Menu
         self.ui.actionAdd_Wall.triggered.connect(self.add_wall)
@@ -294,6 +295,41 @@ class MainWindowUI(QMainWindow):
         # Reach here then it's saving in a new file (not overwrite)
         self.threadpool.start(self.file_save)
 
+    # Export file (eg. SVG for laser cutter)
+    def export_dialog(self):
+        filename = QFileDialog.getSaveFileName(self, "Export building file", "", "SVG file (*.svg);;All (*.*)", "SVG file (*.svg)", QFileDialog.DontConfirmOverwrite)
+        #print (f"Filename is {filename}")
+        this_filename = filename[0]
+        # If no suffix/extension then add here
+        # Basic check for extension using os.path.splitext
+        file_and_ext = os.path.splitext(this_filename)
+        # If there is an extension then just continue (don't check it matches), but if not then add .json
+        if (file_and_ext[1] == ""):
+            this_filename += ".svg"
+        # Check if file exists
+        file_info = QFileInfo(this_filename)
+        # Due to problem with getSaveFilename and suffix need to create own message box
+        # Otherwise whilst the dialog box will check for file replace it will provide filename with suffix added, but only
+        # check filename without suffix.
+        if file_info.exists():
+            # Confirm with user to delete
+            confirm_box = QMessageBox.question(self, "File already exists", f"The file:\n{this_filename} already exists.\n\nDo you want to replace this file?")
+            if confirm_box == QMessageBox.Yes:
+                #print ("Yes replace file")
+                pass
+            else:
+                #print ("No do not replace")
+                return
+        
+        if this_filename == '':
+            print ("No filename specified for save")
+            return
+        self.export_filename = this_filename
+
+        self.ui.statusbar.showMessage ("Exporting as "+self.export_filename)
+        # Reach here then it's saving in a new file (not overwrite)
+        self.threadpool.start(self.file_export)
+
     # Performs the actual save (normally triggered in a threadpool)
     def file_save(self):
         print (f"Saving file {self.new_filename}")
@@ -305,6 +341,19 @@ class MainWindowUI(QMainWindow):
         # If not then give an error message - need to pass back to GUI thread
         else:
             self.status_message = f"Unable to save {self.new_filename}.\n\nError: {success[1]}"
+            self.file_save_warning_signal.emit()
+            
+    # Performs the actual save (normally triggered in a threadpool)
+    def file_export(self):
+        print (f"Exporting file {self.export_filename}")
+        # Todo implement this
+        success = self.builder.export_file(self.export_filename)
+        # If successful then confirm new filename
+        if success[0] == True:
+            pass
+        # If not then give an error message - need to pass back to GUI thread
+        else:
+            self.status_message = f"Unable to export {self.new_filename}.\n\nError: {success[1]}"
             self.file_save_warning_signal.emit()
             
     def file_save_warning(self):
