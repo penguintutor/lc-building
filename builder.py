@@ -105,57 +105,58 @@ class Builder():
     # If want to confirm to overwrite check before calling this
     def export_file(self, filename):
         # create newdata dictionary with all current data
+        # Not perform anymore - instead need to update current data into building data
         # Start with building summary information (main data) which is a dictionary
-        newdata = self.building_info
-        newdata['settings'] = self.settings
-        
-        wall_data = []
-        texture_data = []
-        feature_data = []
-        
-        wall_num = 0
-        for wall in self.walls:
-            #print ("Getting walls")
-            wall_data.append(wall.get_save_data())
-            #print ("Getting textures")
-            textures = wall.get_save_textures(wall_num)
-            #print (f"Textures are {textures}")
-            for texture in textures:
-                texture_data.append (texture)
-            #print ("Getting Features")
-            features = wall.get_save_features(wall_num)
-            #print (f"Features are {features}")
-            for feature in features:
-                feature_data.append (feature)
-            wall_num += 1
-            
-        #print ("Adding data")
-        newdata['walls'] = wall_data
-        newdata['textures'] = texture_data
-        newdata['features'] = feature_data
-        
-        # Add interlocking (not part of wall)
-        il_data = []
-        # Get wall and edge from both, but other parameters from primary only (should be the same)
-        for il_group in self.interlocking_groups:
-            primary_entry = [il_group.primary_wall, il_group.primary_il.edge]
-            if il_group.primary_il.reverse == True:
-                primary_entry.append("reverse")
-            secondary_entry = [il_group.secondary_wall, il_group.secondary_il.edge]
-            if il_group.secondary_il.reverse == True:
-                secondary_entry.append("reverse")
-            il_data.append({
-                "primary": primary_entry,
-                "secondary": secondary_entry,
-                "step": il_group.primary_il.step,
-                "start": il_group.primary_il.start
-                })
-        newdata['interlocking'] = il_data
-                
-        #print (f"New data:\n {newdata}")
-        # Save details
-        result = self.building.export_file(filename, newdata)
-        print (f"Export completed - {result}")
+#         newdata = self.building_info
+#         newdata['settings'] = self.settings
+#         
+#         wall_data = []
+#         texture_data = []
+#         feature_data = []
+#         
+#         wall_num = 0
+#         for wall in self.walls:
+#             #print ("Getting walls")
+#             wall_data.append(wall.get_save_data())
+#             #print ("Getting textures")
+#             textures = wall.get_save_textures(wall_num)
+#             #print (f"Textures are {textures}")
+#             for texture in textures:
+#                 texture_data.append (texture)
+#             #print ("Getting Features")
+#             features = wall.get_save_features(wall_num)
+#             #print (f"Features are {features}")
+#             for feature in features:
+#                 feature_data.append (feature)
+#             wall_num += 1
+#             
+#         #print ("Adding data")
+#         newdata['walls'] = wall_data
+#         newdata['textures'] = texture_data
+#         newdata['features'] = feature_data
+#         
+#         # Add interlocking (not part of wall)
+#         il_data = []
+#         # Get wall and edge from both, but other parameters from primary only (should be the same)
+#         for il_group in self.interlocking_groups:
+#             primary_entry = [il_group.primary_wall, il_group.primary_il.edge]
+#             if il_group.primary_il.reverse == True:
+#                 primary_entry.append("reverse")
+#             secondary_entry = [il_group.secondary_wall, il_group.secondary_il.edge]
+#             if il_group.secondary_il.reverse == True:
+#                 secondary_entry.append("reverse")
+#             il_data.append({
+#                 "primary": primary_entry,
+#                 "secondary": secondary_entry,
+#                 "step": il_group.primary_il.step,
+#                 "start": il_group.primary_il.start
+#                 })
+#         newdata['interlocking'] = il_data
+#                 
+#         #print (f"New data:\n {newdata}")
+#         # Save details
+#         result = self.building.export_file(filename, newdata)
+        result = self.building.export_file(filename)
         return result
         
     # Get the walls that match a certain view

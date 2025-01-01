@@ -2,6 +2,17 @@
 import json
 import re
 from lcconfig import LCConfig
+from laser import *
+from scale import *
+from svgout import *
+from wall import *
+from features import *
+from texture import *
+from buildingtemplate import *
+from featuretemplate import *
+from interlocking import *
+from helpers import *
+
 
 def is_number(s):
     try:
@@ -130,17 +141,12 @@ class BuildingData ():
         return (True, "")
     
     # Exports file as an svg
-    def export_file (self, filename, newdata = None):
+    # todo
+    # Need to ensure building data is updated first
+    def export_file (self, filename):
         print (f"Starting export in building data filename {filename}")
-        # todo - does this do anything?
-        if newdata == None:
-            newdata = self.data
-        
-        print ("Reading values")
-        
+
         bdata = self.get_values()
-        
-        print (f"Values are {bdata}")
         
         # todo read this from GUI somehow
         scale = "OO"
@@ -157,41 +163,39 @@ class BuildingData ():
         # Eg. size of a small laser cutter / 3D printer
         doc_size_mm = (600, 600)
 
-        print ("Creating scale object")
         sc = Scale(scale)
-
         # Pass scale instance to laser class
         Laser.sc = sc
         
         material_thickness = bdata["material_thickness"]
-        scale_material = sc.reverse_scale_convert(material_thickness)
+        scale_material = int(sc.reverse_scale_convert(material_thickness))
         # Set material thickness for Interlocking (class variable)
         Interlocking.material_thickness = scale_material
         # Set default etchline width
-        EtchLine.global_etch_width = config.etch_line_width
+        EtchLine.global_etch_width = self.config.etch_line_width
 
         Wall.settings["outertype"] = bdata["outertype"]
 
         # Convert configuration into SVG settings for output
         svgsettings = {}
         
+        # Leave some print statements in - otherwise do not know if progressing
+        # Todo Future add progress bar
         print ("Creating SVG document format")
 
         svgsettings['docsize'] = sc.mms_to_pixels(doc_size_mm)
-        svgsettings["strokewidth"] = config.stroke_width
-        svgsettings["cutstroke"] = svgwrite.rgb(*config.cut_stroke)
+        svgsettings["strokewidth"] = self.config.stroke_width
+        svgsettings["cutstroke"] = svgwrite.rgb(*self.config.cut_stroke)
 
         # Convert config colors into svgwrite values
         etch_strokes = []
-        for stroke_color in config.etch_strokes:
+        for stroke_color in self.config.etch_strokes:
             etch_strokes.append(svgwrite.rgb(*stroke_color))
 
         svgsettings["etchstrokes"] = etch_strokes
-        svgsettings["etchfill"] = config.etch_fill
-        svgsettings["etchaspolygon"] = config.etch_as_polygon
+        svgsettings["etchfill"] = self.config.etch_fill
+        svgsettings["etchaspolygon"] = self.config.etch_as_polygon
         svg = SVGOut(filename, svgsettings)
-
-        print ("Loading walls")
 
         walls = []
         for wall in self.get_walls():
@@ -228,6 +232,7 @@ class BuildingData ():
             
         # if setting is ignore interlocking then ignore any entries (wall will have il=[])
         if bdata['interlocking'].lower() == "true":
+            print ("Getting interlocking")
             # otherwise add
             for il in self.get_interlocking():
                 # Add both primary and secondary for each entry
@@ -248,8 +253,7 @@ class BuildingData ():
                     reverse = il["secondary"][2]
                 walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
             
-            
-           
+        print ("Creating output")   
         # Create output
         # Track wall number for simple progress chart
         num_walls = len(walls)
@@ -283,10 +287,13 @@ class BuildingData ():
             if num_objectsect_size[1] > current_height :
                 current_height = num_objectsect_size[1]
             wall_num += 1
-            if (progress == "percent"):
-                print (f"{round((wall_num/num_walls) * 100)} % complete")
+            # Print status
+            print (f"{round((wall_num/num_walls) * 100)} % complete")
+        print ("Data compiled - saving")
                     
         svg.save()
+        
+        print ("Save complete")
     
     # Sets all the data entries - used when loading a template 
     # Overwrites all data
