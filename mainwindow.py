@@ -212,27 +212,43 @@ class MainWindowUI(QMainWindow):
     # Set which of the left menu buttons are hidden / disabled
     # status = default (top level - add button (enabled) / copy button (disabled) / edit wall (disabled)
     # status = wallselect when single wall selected (top level - copy button active and edit wall active)
-    # status = walledit - when edit wall option
+    # status = walledit - when edit wall option / walleditfeature if a feature is selected in wall edit
     def set_left_buttons(self, status):
         if status == "default" or status == "wallselect":
             self.ui.addWallButton.show()
-            self.ui.addWallButton.setEnabled(True)
+            #self.ui.addWallButton.setEnabled(True)
             self.ui.copyWallButton.show()
             self.ui.editWallButton.show()
+            self.ui.deleteWallButton.show()
             self.ui.closeButton.hide()
+            self.ui.wallPropertiesButton.hide()
+            self.ui.wallTexturesButton.hide()
             self.ui.addFeatureButton.hide()
+            self.ui.deleteFeatureButton.hide()
             if status == "wallselect":
                 self.ui.copyWallButton.setEnabled(True)
                 self.ui.editWallButton.setEnabled(True)
+                self.ui.deleteWallButton.setEnabled(True)
             else:
                 self.ui.copyWallButton.setEnabled(False)
                 self.ui.editWallButton.setEnabled(False)
-        elif status == "walledit":
+                self.ui.deleteWallButton.setEnabled(False)
+        elif status.startswith("walledit"):
             self.ui.addWallButton.hide()
             self.ui.copyWallButton.hide()
             self.ui.editWallButton.hide()
+            self.ui.deleteWallButton.hide()
             self.ui.closeButton.show()
+            self.ui.wallPropertiesButton.show()
+            self.ui.wallTexturesButton.show()
             self.ui.addFeatureButton.show()
+            self.ui.deleteFeatureButton.show()
+            # If in walledit and a feature is selected
+            if status == "walleditfeature":
+                self.ui.deleteFeatureButton.setEnabled(True)
+            else:
+                self.ui.deleteFeatureButton.setEnabled(False)
+            
 
 
     def open_file_dialog(self):
