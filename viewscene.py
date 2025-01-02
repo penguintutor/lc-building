@@ -23,7 +23,10 @@ class ViewScene():
         
        
     # Clear scene and then add walls
-    def update(self):
+    # Full update / vs partial update - not needed on scene
+    # but allowed to set full=True - no difference
+    def update(self, full=True):
+        #print ("View update")
         #print (f"Update view scene {self.view_name}")
         self.update_obj_pos()
         self.scene.clear()

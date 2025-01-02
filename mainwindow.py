@@ -157,6 +157,9 @@ class MainWindowUI(QMainWindow):
         for obj in self.view_scenes[self.current_scene].obj_views:
             #print (f"** Checking for objects at {self.view_scenes[self.current_scene]} - scene {self.current_scene}")
             #print (f"Objs are {self.view_scenes[self.current_scene].obj_views}")
+            ##### WARNING this is causing a crash but don't know why when obj doesn't exist
+            #print (f"Obj is {obj}")
+            #if obj!=None and obj.has_moved():
             if obj.has_moved():
                 moved = True
         return moved
@@ -197,7 +200,7 @@ class MainWindowUI(QMainWindow):
             # Call get info to find information on what is selected
             for this_obj in selected_items:
                 selected_objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj))
-            # Should only be one selected (don't support copying multiple walls together)
+            # Should only be one selected (don't support editing multiple walls together)
             if len(selected_objs) != 1:
                 return
         # Now have a single object selected (wall)
@@ -462,10 +465,12 @@ class MainWindowUI(QMainWindow):
         self.change_scene('bottom')
 
     def update_current_scene (self):
+        print ("Update current scene")
         self.view_scenes[self.current_scene].update()
 
     def change_scene (self, new_scene):
         self.current_scene = new_scene
+        # Does this need an update when changing scene?
         self.view_scenes[new_scene].update()
         self.ui.graphicsView.setScene(self.scenes[self.current_scene])
         self.ui.graphicsView.show()
@@ -484,26 +489,23 @@ class MainWindowUI(QMainWindow):
             self.wall_window = WallWindowUI(self, self.config, self.gconfig, self.builder)
         else:
             self.wall_window.show()
-        #print ("Wall window launched")
-    
-    # Update the selected scene
-    #def update_scene (self):
-    #    self.view_scenes[self.current_scene].update()
         
     # Check to see if any objects in current scene have moved
-    # and if so 
+    # and if appropriate refresh display
     # Update the selected scene
     def check_moved_update (self):
         if self.check_obj_moved():
             # If it's a wall edit then need to update view
+            # But only the 
             if self.current_scene == "walledit":
                 self.view_scenes[self.current_scene].update()
-            # Todo if not wall edit then still need to refresh position - but not do a full update
+            # Todo if not wall edit then may still need to refresh position - but not do a full update
         
     
     # Updates table showing status of objects
     # Update based on selection in viewgraphicsscene
     def update_selected_view (self, selected_items):
+        #print (f"Updating view {selected_items}")
         # Selection are items selected
         # For normal scenes these are groups (because each wall is composed of groups of items
         # which are in <ObjView>.item_group

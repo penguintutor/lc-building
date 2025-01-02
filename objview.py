@@ -10,11 +10,15 @@ from PySide6.QtWidgets import QGraphicsItem
 
 # Settings is from gconfig
 # Each objectview is a wall (or similar)
+# type is optional can be used to distinguish between objects
+# eg. so can re-render the texture without effecting other objects
 # Create as an object group and move items into it
 class ObjView():
-    def __init__ (self, scene, settings, coords = [0,0], moveable=True):
+    def __init__ (self, scene, settings, coords = [0,0], type="unknown", moveable=True):
+        #print (f"Creating object moveable {moveable}")
         self.settings = settings
         self.scene = scene
+        self.type = type
         # Item Group (create later after creating first cut)
         #self.item_group = None
         self.item_group = self.scene.createItemGroup([])

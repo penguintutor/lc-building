@@ -107,9 +107,7 @@ class Feature():
             etch.set_internal_offset((self.min_x, self.min_y))
         for outer in self.outers:
             outer.set_internal_offset((self.min_x, self.min_y))
-    # Get area to exclude
-    #def get_area (self):
-    #    return (self.min_x, self.min_y, self.max_x, self.max_y)
+
     
     def get_exclude (self):
         return self.get_points()

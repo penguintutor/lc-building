@@ -48,18 +48,8 @@ class ViewGraphicsScene (QGraphicsScene):
     def get_selected(self):
         return self.selectedItems()
 
-
     def new_focus(self):
         selected_items = self.selectedItems()
         #print (f"Focus changed {selected_items}")
         self.focus_changed.emit(selected_items)
         
-    # Has any of the objects moved
-    # Check all as it also updates position
-    #def has_obj_moved(self):
-    #    return self.main_window.check_obj_moved()
-        #moved = False
-        #for this_obj in self.main_window.get_scene_obj_views():
-        #    if this_obj.has_moved():
-        #        moved = True
-        #return moved

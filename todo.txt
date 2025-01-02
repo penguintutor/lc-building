@@ -12,6 +12,7 @@ Handle checkboxes (different for if edit walls rather than view scene)
 Make view scene honor checkboxes
 When clicking edit but nothing selected give a warning - select object first
 When quit chosen ask if save
+Double click on wall should be same as clicking edit wall
 
 
 ## In add wall window
@@ -43,7 +44,8 @@ Note need to update any interlockinggroups to refer to new wall references
 # Edit wall 
 Make it obvious in wall edit mode (not sure how best to achieve)
 Force refresh on relevant scene when exiting edit wall
-Ability to add / delete features 
+Update summary information when feature selected
+Ability to delete features 
 
 # Add Feature
 Show name instead of filename when adding feature
