@@ -318,3 +318,13 @@ class Builder():
             print ("Rendering walls 100%")
     
         #print ("Builder processing data complete\n\n")
+            
+    def delete_wall (self, wall):
+        for i in range (0, len(self.walls)):
+            if self.walls[i] == wall:
+                print (f"Deleting wall {i}")
+                # todo - delete the wall, delete other objects that reference this wall
+                # including interlocking (remove any direct and update any others to refer to new wall numbers)
+                # delete any textures and features that are applied to this wall
+                return
+        

@@ -128,6 +128,7 @@ class MainWindowUI(QMainWindow):
         self.ui.addWallButton.pressed.connect(self.add_wall)
         self.ui.copyWallButton.pressed.connect(self.copy_wall)
         self.ui.editWallButton.pressed.connect(self.edit_wall)
+        self.ui.deleteWallButton.pressed.connect(self.delete_wall)
         
         # Action buttons when edit wall
         self.ui.closeButton.pressed.connect(self.close_edit)
@@ -208,6 +209,31 @@ class MainWindowUI(QMainWindow):
         self.view_scenes[self.current_scene].edit_wall(selected_objs[0])
         self.change_scene(self.current_scene)
         
+    def delete_wall(self):
+        selected_items = self.scenes[self.current_scene].get_selected()
+        # If no items selected then just return
+        if selected_items == None:
+            return
+        else:
+            # Now get the selected objs from the selected items (ie. get the wall from the view)
+            selected_objs = []
+            # Call get info to find information on what is selected
+            for this_obj in selected_items:
+                selected_objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj))
+            # Should only be one selected (don't support editing multiple walls together)
+            if len(selected_objs) != 1:
+                return
+        # Now have a single object selected (wall)
+        #selected_objs[0]
+        confirm_box = QMessageBox.question(self, "Are you sure?", f"Are you sure you want\nto delete the selected wall?\n{selected_objs[0].name}")
+        if confirm_box == QMessageBox.Yes:
+            #print ("Yes delete wall")
+            self.builder.delete_wall(selected_objs[0])
+            self.update_current_scene()
+        else:
+            #print ("No do not delete")
+            return
+
 
     # Set which of the left menu buttons are hidden / disabled
     # status = default (top level - add button (enabled) / copy button (disabled) / edit wall (disabled)
