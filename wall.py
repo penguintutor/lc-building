@@ -358,3 +358,10 @@ class Wall():
                     feature_etches.extend(new_etches)
         return feature_etches
 
+
+    # Delete interlock on an edge
+    # as stated only one interlock should be applied to an edge, but delete any that reference this edge.
+    def delete_il (self, edge):
+        for this_il in self.il:
+            if this_il.edge == edge:
+                self.il.remove(this_il)

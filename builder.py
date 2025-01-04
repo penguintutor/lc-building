@@ -323,8 +323,22 @@ class Builder():
         for i in range (0, len(self.walls)):
             if self.walls[i] == wall:
                 print (f"Deleting wall {i}")
-                # todo - delete the wall, delete other objects that reference this wall
-                # including interlocking (remove any direct and update any others to refer to new wall numbers)
-                # delete any textures and features that are applied to this wall
+                # Delete any interlocking objects that reference this wall
+                # Must be before deleting wall as walls renumbered afterwards
+                self.delete_wall_il(i)
+                # Delete the wall - also removes textures and features on the wall
+                self.walls.pop(i)
                 return
         
+    # Delete interlocking objects referencing the wall ID
+    # Reduce the number of all subsequent walls by 1
+    def delete_wall_il(self, wall_id):
+        for ilg in self.interlocking_groups:
+            if ilg.primary_wall == wall_id or ilg.secondary_wall == wall_id:
+                # Delete the il entries
+                if ilg.primary_wall != wall_id:
+                    self.walls[ilg.primary_wall].delete_il(ilg.primary_il.edge)
+                if ilg.secondary_wall != wall_id:
+                    self.walls[ilg.secondary_wall].delete_il(ilg.secondary_il.edge)
+                # Delete the group
+                self.interlocking_groups.remove(ilg)

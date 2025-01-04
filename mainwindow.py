@@ -230,6 +230,10 @@ class MainWindowUI(QMainWindow):
             #print ("Yes delete wall")
             self.builder.delete_wall(selected_objs[0])
             self.update_current_scene()
+            # Force refresh of all walls to update any interlocking that has been removed
+            ## Todo - For performance may look at only if view interlocking is turned on
+            ## although that will do nothing for worst case - so is it much of a benefit
+            self.update_all_views()
         else:
             #print ("No do not delete")
             return
