@@ -50,7 +50,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Add New Wall / Roof</string>
+     <string>Add / Edit Wall</string>
     </property>
    </widget>
    <widget class="QDialogButtonBox" name="buttonBox">

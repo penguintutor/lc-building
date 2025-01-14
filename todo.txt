@@ -17,6 +17,8 @@ Refresh (update_all_views) does not always appear to update all walls.
 
 
 ## In add wall window
+* Also handle save
+* Allow change of scene in edit
 Warn and reset values when switching between custom and simplified
 Warn and convert when switching between simplified and custom
 Handle selection of scale

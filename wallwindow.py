@@ -15,13 +15,14 @@ from viewscene import ViewScene
 from lcconfig import LCConfig
 from gconfig import GConfig
 from vgraphicsscene import ViewGraphicsScene
+from wall import Wall
 import webbrowser
 import resources
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
 
-app_title = "Add Wall / Roof"
+app_title = "Add / Edit Wall"
 
 class WallWindowUI(QMainWindow):
     
@@ -36,6 +37,10 @@ class WallWindowUI(QMainWindow):
         #self.load_complete_signal.connect(self.load_complete)
         #self.name_warning_signal.connect(self.name_warning)
         self.parent = parent
+        
+        # Wall if new then this will be None
+        # Otherwise holds the wall that is being edited
+        self.wall = None
         
         self.ui = loader.load(os.path.join(basedir, "wallwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
@@ -121,7 +126,7 @@ class WallWindowUI(QMainWindow):
         # Number of rows displayed in custom view (minimum is 4)
         self.num_rows = 4
         self.min_rows = 4
-        self.max_rows = 10	# Must not be larger than the number of elements in the UI
+        self.max_rows = 10 # Must not be larger than the number of elements in the UI
         
         # When wall type changed then change UI
         self.ui.wallTypeCombo.activated.connect(self.set_view)
@@ -135,7 +140,30 @@ class WallWindowUI(QMainWindow):
         self.simple_interface()
         
         #self.ui.show()
-    
+        
+    # Use when using the window to edit existing wall instead of new
+    def edit_properties (self, wall):
+        self.wall = wall
+        # clear any previous data
+        self.reset()
+        # set to custom interface
+        self.ui.wallTypeCombo.setCurrentIndex(2)
+        self.custom_interface()
+        # Set values based on wall class
+        self.ui.nameText.setText(self.wall.name)
+        row = 0
+        for point in self.wall.points:
+            self.wall_elements["input_x"][row].setText(f"{point[0]}")
+            self.wall_elements["input_y"][row].setText(f"{point[1]}")
+            row += 1
+            if row > 9:
+                break
+        # If there are more than 4 points then enable the fields
+        for i in range (4, len(self.wall.points)-1):
+            self.show_row(i)
+        #todo set profile view
+        self.ui.show()
+        
     
     # If a entry changes then do we need to reflect across others
     def entry_change (self, col, row):
@@ -230,7 +258,6 @@ class WallWindowUI(QMainWindow):
             self.wall_elements["input_y"][self.num_rows-1].setText("mm")
 
         
-            
     # Add an entry inserting below (ie +1 ) current entry and enabling next display
     # Warning if we have maximum entries then the last one will be lost
     def add_entry(self, entry_num):
@@ -265,6 +292,7 @@ class WallWindowUI(QMainWindow):
     
     # Show entire window - for add new window
     def new(self):
+        self.wall = None
         self.ui.show()
         self.ui.activateWindow()
         self.ui.raise_()
@@ -292,6 +320,7 @@ class WallWindowUI(QMainWindow):
         self.simple_interface()
         
     # Accept button is pressed
+    # Todo - allow update as well as new
     def accept(self):
         # Validate data - doesn't matter if some fields are not filled in, but need at least 3 points (triangular wall)
         # Add to builder, then reset and hide window
@@ -363,7 +392,7 @@ class WallWindowUI(QMainWindow):
                 QMessageBox.warning(self, "Maximum height not a number", "Maximum height is not a number. Please provide a valid size in mm.")
                 return
             # Also check it's not a negative number, or ridiculously large (over 100m)
-            if height <= 0 or height > 10000:
+            if height_max <= 0 or height_max > 10000:
                 QMessageBox.warning(self, "Maximum height is invalid", "Maximum height is not a valid number. Please provide a valid size in mm.")
                 return
             # and for height minimum - row 2
@@ -375,7 +404,7 @@ class WallWindowUI(QMainWindow):
                 QMessageBox.warning(self, "Minimum height not a number", "Minimum height is not a number. Please provide a valid size in mm.")
                 return
             # Also check it's not a negative number, or ridiculously large (over 100m)
-            if height <= 0 or height > 10000:
+            if height_min <= 0 or height_min > 10000:
                 QMessageBox.warning(self, "Minimum height is invalid", "Minimum height is not a valid number. Please provide a valid size in mm.")
                 return
             # Could check that min is less than max, but if not then get an inverted apex (strange, but let user do if they want)
@@ -438,7 +467,7 @@ class WallWindowUI(QMainWindow):
         self.wall_elements["delete"][row].hide()
         self.wall_elements["add"][row].hide()
         
-    # Used to hide a row when in custom mode
+    # Used to show a row when in custom mode
     def show_row(self, row):
         self.wall_elements["label"][row].setText(f"Point {row+1}")
         self.wall_elements["label_x"][row].show()

@@ -132,6 +132,7 @@ class MainWindowUI(QMainWindow):
         
         # Action buttons when edit wall
         self.ui.closeButton.pressed.connect(self.close_edit)
+        self.ui.wallPropertiesButton.pressed.connect(self.wall_properties)
         self.ui.addFeatureButton.pressed.connect(self.add_feature)
         
         # Checkboxes
@@ -156,14 +157,16 @@ class MainWindowUI(QMainWindow):
     def check_obj_moved (self):
         moved = False
         for obj in self.view_scenes[self.current_scene].obj_views:
-            #print (f"** Checking for objects at {self.view_scenes[self.current_scene]} - scene {self.current_scene}")
-            #print (f"Objs are {self.view_scenes[self.current_scene].obj_views}")
-            ##### WARNING this is causing a crash but don't know why when obj doesn't exist
-            #print (f"Obj is {obj}")
-            #if obj!=None and obj.has_moved():
             if obj.has_moved():
                 moved = True
         return moved
+        
+    # Launch wall properties (edit) window
+    def wall_properties(self):
+        if self.wall_window == None:
+            self.wall_window = WallWindowUI(self, self.config, self.gconfig, self.builder)
+        self.wall_window.edit_properties(self.view_scenes[self.current_scene].wall)
+        
         
     def copy_wall(self):
         # Current selected objects (note these are groups containing walls and features / textures etc.)
@@ -533,9 +536,8 @@ class MainWindowUI(QMainWindow):
     def add_wall (self):
         if self.wall_window == None:
             self.wall_window = WallWindowUI(self, self.config, self.gconfig, self.builder)
-            self.wall_window.new()
-        else:
-            self.wall_window.new()
+        self.wall_window.new()
+
         
     # Check to see if any objects in current scene have moved
     # and if appropriate refresh display
