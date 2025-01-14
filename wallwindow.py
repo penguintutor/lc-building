@@ -44,6 +44,9 @@ class WallWindowUI(QMainWindow):
         self.gconfig = gconfig
         self.builder = builder
         
+        # Set initially to default scale 
+        self.sc = Scale("OO")
+        
         # Generate lists to allow access to the different fields
         # Simplifies translation and iteration over ui elements
         # Dict for each field and list of num 0 to 9
@@ -58,7 +61,7 @@ class WallWindowUI(QMainWindow):
             exec ("self.wall_elements[\"add\"].append(self.ui.wall_add_"+str(i)+")")
             
         # Enable click actions on delete and add
-        # This has been donemanually for each entry as the lambda function doesn't work
+        # This has been done manually for each entry as the lambda function doesn't work
         # inside the exec function
         self.ui.wall_delete_0.pressed.connect(lambda: self.del_entry(0))
         self.ui.wall_delete_1.pressed.connect(lambda: self.del_entry(1))
@@ -80,6 +83,17 @@ class WallWindowUI(QMainWindow):
         self.ui.wall_add_7.pressed.connect(lambda: self.add_entry(7))
         self.ui.wall_add_8.pressed.connect(lambda: self.add_entry(8))
         self.ui.wall_add_9.pressed.connect(lambda: self.add_entry(9))
+        # Track changes - can read the value in the method, but need to know which entry updated
+        # in case need to update corresponding - eg. if add real size, need to update scale size
+        # only need for the first 3 entries as in custom mode then do scale conversion
+        # Uses textEdited rather than textChanged - so only triggers when changed by user
+        self.ui.wall_input_x_0.textEdited.connect(lambda: self.entry_change('x', 0))
+        self.ui.wall_input_x_1.textEdited.connect(lambda: self.entry_change('x', 1))
+        self.ui.wall_input_x_2.textEdited.connect(lambda: self.entry_change('x', 2))
+        self.ui.wall_input_y_0.textEdited.connect(lambda: self.entry_change('y', 0))
+        self.ui.wall_input_y_1.textEdited.connect(lambda: self.entry_change('y', 1))
+        self.ui.wall_input_y_2.textEdited.connect(lambda: self.entry_change('y', 2))
+
             
         # Set wall type pull down menu
         self.ui.wallTypeCombo.addItem("Rectangular")
@@ -93,6 +107,8 @@ class WallWindowUI(QMainWindow):
         # May want to do this application wide instead of in this menu
         self.ui.scaleCombo.setCurrentIndex(1)
         
+        self.ui.scaleCombo.activated.connect(self.scale_update)
+        
         # Profile view combo box default to front 1st entry
         # Need to convert to lower case when saved
         self.ui.profileCombo.addItem("Front")
@@ -100,7 +116,7 @@ class WallWindowUI(QMainWindow):
         self.ui.profileCombo.addItem("Rear")
         self.ui.profileCombo.addItem("Left")
         self.ui.profileCombo.addItem("Top")
-        self.ui.profileCombo.addItem("Bottom") 
+        self.ui.profileCombo.addItem("Bottom")
         
         # Number of rows displayed in custom view (minimum is 4)
         self.num_rows = 4
@@ -118,7 +134,80 @@ class WallWindowUI(QMainWindow):
         
         self.simple_interface()
         
-        self.ui.show()
+        #self.ui.show()
+    
+    
+    # If a entry changes then do we need to reflect across others
+    def entry_change (self, col, row):
+        # Only need to update if we are not in custom mode (0 and 1)
+        selected = self.ui.wallTypeCombo.currentIndex()
+        if selected > 1:
+            return
+        # Get scale in drop down menu - make sure that scale is set to current factor
+        # Should not have changed, but just check
+        scale = self.ui.scaleCombo.currentText()
+        refresh = False
+        if scale != self.sc.scale:
+            self.sc.set_scale(scale)
+            # if it's not the same then need to update all entries, but continue with this for now
+            # as we which is most important (last changed)
+            refresh = True
+        # if an x value changed then reflect that in the corresponding y (but scaled down)
+        if col == 'x':
+            current_value = self.wall_elements["input_x"][row].text()
+            # check it's a value - using try
+            try:
+                current_value = float(current_value)
+                new_value = int(self.sc.scale_convert(current_value))
+                # The text method should not trigger this again (otherwise we end up in a loop)
+                self.wall_elements["input_y"][row].setText(f"{new_value}")
+            # If it's not a number then ignore (may be change in progress)
+            except ValueError:
+                pass
+        elif col == 'y':
+            current_value = self.wall_elements["input_y"][row].text()
+            # check it's a value - using try
+            try:
+                current_value = float(current_value)
+                new_value = int(self.sc.reverse_scale_convert(current_value))
+                # The text method should not trigger this again (otherwise we end up in a loop)
+                self.wall_elements["input_x"][row].setText(f"{new_value}")
+            # If it's not a number then ignore (may be change in progress)
+            except ValueError:
+                pass
+        if refresh == True:
+            self.scale_update()
+    
+    # Scale has changed - if showing scale (ie. not custom)
+    # then refresh
+    def scale_update(self):
+        # Only need to update if we are not in custom mode (0 and 1)
+        selected = self.ui.wallTypeCombo.currentIndex()
+        if selected > 1:
+            return
+        # Get scale in drop down menu - make sure that scale is set to current factor
+        # Should not have changed, but just check
+        scale = self.ui.scaleCombo.currentText()
+        self.sc.set_scale(scale)
+        # Read the first 3 x entries and create scale version in y
+        for row in range (0, 4):
+            current_value = self.wall_elements["input_x"][row].text()
+            # check it's a value - using try
+            try:
+                current_value = float(current_value)
+                new_value = int(self.sc.scale_convert(current_value))
+                self.wall_elements["input_y"][row].setText(f"{new_value}")
+            # If it's not a number then try going the other way - in case invalid entry in actual
+            except ValueError:
+                current_value = self.wall_elements["input_y"][row].text()
+                # check it's a value - using try
+                try:
+                    current_value = float(current_value)
+                    new_value = int(self.sc.reverse_scale_convert(current_value))
+                    self.wall_elements["input_x"][row].setText(f"{new_value}")
+                # If it's not a number then ignore already tried the other way
+                except ValueError:
+                    pass
     
     
     # Del an entry - delete entry, move others up and if > min remove bottom row
@@ -174,8 +263,8 @@ class WallWindowUI(QMainWindow):
         else:
             self.custom_interface()
     
-    # Show entire window
-    def show(self):
+    # Show entire window - for add new window
+    def new(self):
         self.ui.show()
         self.ui.activateWindow()
         self.ui.raise_()

@@ -533,8 +533,9 @@ class MainWindowUI(QMainWindow):
     def add_wall (self):
         if self.wall_window == None:
             self.wall_window = WallWindowUI(self, self.config, self.gconfig, self.builder)
+            self.wall_window.new()
         else:
-            self.wall_window.show()
+            self.wall_window.new()
         
     # Check to see if any objects in current scene have moved
     # and if appropriate refresh display
