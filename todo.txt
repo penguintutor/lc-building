@@ -16,9 +16,7 @@ Double click on wall should be same as clicking edit wall
 Refresh (update_all_views) does not always appear to update all walls.
 
 
-## In add wall window
-* Also handle save
-* Allow change of scene in edit
+## In add / edit wall window
 Warn and reset values when switching between custom and simplified
 Warn and convert when switching between simplified and custom
 Handle selection of scale
@@ -26,7 +24,7 @@ Handle selection of scale
 - when reset go back to default
 Switching to custom set first entry to 0,0
 Set Enter key to press OK
-
+When returning from an edit - should return to the edit view
 
 # Track updates 
 Warn if open etc.

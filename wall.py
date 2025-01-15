@@ -37,7 +37,7 @@ class Wall():
         self.type = "wall"
         self.name = name
         self.points = points
-        self.polygon = Polygon(points)
+        #self.polygon = Polygon(points)
         self.view = view          # Which side to view it on when in the GUI
         self.position = position  # position within GUI scenes
         #print (f"Position {self.position}")
@@ -238,10 +238,12 @@ class Wall():
     
     # max distance x
     def get_maxwidth (self):
-        return self.polygon.bounds[2] - self.polygon.bounds[0]
+        polygon = Polygon(self.points)
+        return polygon.bounds[2] - polygon.bounds[0]
     
     def get_maxheight (self):
-        return self.polygon.bounds[3] - self.polygon.bounds[1]
+        polygon = Polygon(self.points)
+        return polygon.bounds[3] - polygon.bounds[1]
        
     
     def add_texture_towall (self, type, area, settings):

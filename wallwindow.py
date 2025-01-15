@@ -5,7 +5,7 @@
 # interprets the different types
 
 import os
-from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo, QObject
+from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo, QObject, Qt
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QWidget
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
@@ -16,6 +16,7 @@ from lcconfig import LCConfig
 from gconfig import GConfig
 from vgraphicsscene import ViewGraphicsScene
 from wall import Wall
+import copy
 import webbrowser
 import resources
 
@@ -162,6 +163,10 @@ class WallWindowUI(QMainWindow):
         for i in range (4, len(self.wall.points)-1):
             self.show_row(i)
         #todo set profile view
+        view = self.wall.view
+        #self.ui.profileCombo.currentText().lower()
+        index = self.ui.profileCombo.findText(view,  Qt.MatchFixedString)
+        self.ui.profileCombo.setCurrentIndex(index)
         self.ui.show()
         
     
@@ -446,9 +451,18 @@ class WallWindowUI(QMainWindow):
                 wall_data['name'] = "Unknown"
             else:
                 return
+        
+        # if this is a new wall
+        if self.wall == None:
+            # Add this wall
+            self.builder.add_wall(wall_data)
+        # If this is existing wall then update it
+        else:
+            self.wall.name = wall_data['name']
+            # create copy of the list - rather than pass the list which will be edited in future
+            self.wall.points = copy.deepcopy(wall_data['points'])
+            self.wall.view = wall_data['view']
             
-        # Add this wall
-        self.builder.add_wall(wall_data)
         # Update parent
         self.parent.update_all_views()
         
