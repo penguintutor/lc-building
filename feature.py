@@ -3,6 +3,7 @@
 # Different to an "extra" which is cut separately (eg. decoration that is mounted afterwards)
 from laser import *
 from laserfactory import *
+from shapely import Polygon
 
 # Each cut is defined in templates (and building data)
 # Cut type (eg. rect) followed by list containing strings or values (must work with eval string after subsitution)
@@ -50,7 +51,22 @@ class Feature():
         
     def __str__(self):
         return f"Feature: {self.type}"
-        
+    
+    def get_size_string (self):
+        return (f"{int(self.get_maxwidth()):,d}mm x {int(self.get_maxheight()):,d}mm")
+
+    def get_maxsize (self):
+        return (self.get_maxwidth(), self.get_maxheight())
+    
+    # max distance x
+    def get_maxwidth (self):
+        polygon = Polygon(self.points)
+        return polygon.bounds[2] - polygon.bounds[0]
+    
+    def get_maxheight (self):
+        polygon = Polygon(self.points)
+        return polygon.bounds[3] - polygon.bounds[1]
+
     # Returns points (exlusion area) after applying min_x, min_y
     def get_points(self):
         return_points = []
