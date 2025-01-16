@@ -344,7 +344,7 @@ class Wall():
         feature_cuts = []
         for feature in self.features:
             feature_cuts.extend(feature.get_cuts())
-            if self.settings["outertype"] == "cuts":
+            if "outertype" in self.settings and self.settings["outertype"] == "cuts":
                 new_cuts = feature.get_outers_cuts()
                 if new_cuts != None:
                     feature_cuts.extend(new_cuts)
@@ -354,7 +354,7 @@ class Wall():
         feature_etches = []
         for feature in self.features:
             feature_etches.extend(feature.get_etches())
-            if self.settings["outertype"] == "etches":
+            if "outertype" in self.settings and self.settings["outertype"] == "etches":
                 new_etches = feature.get_outers_etches()
                 if new_etches != None:
                     feature_etches.extend(new_etches)
