@@ -35,6 +35,11 @@ class ViewScene():
         self.add_walls()
         
         
+    # Deletes the object view and the object
+    def del_obj_by_id (self, id):
+        del self.objs[id]
+        del self.obj_views[id]
+        
     # For each of the objects get current pos from obj view and update feature
     # This is based on view position - so is absolute co-ordinates
     # No need to convert to mm etc.
@@ -54,6 +59,18 @@ class ViewScene():
                 #print (f" which is {self.objs[i].name}")
                 return (self.objs[i])
         return (None)
+    
+    # searches for obj view and returns the corresponding id
+    # ie. from view object get the builder object (eg. wall)
+    def get_id_from_obj_view(self, selected_obj):
+        for i in range (0, len(self.obj_views)):
+            if self.obj_views[i].item_group == selected_obj:
+                return i
+        return None
+    
+    def del_obj_from_obj_view(self, selected_obj):
+        id = self.get_id_from_obj_view(selected_obj)
+        
         
     # Add walls to the scene
     def add_walls(self):

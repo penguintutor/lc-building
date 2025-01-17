@@ -36,7 +36,7 @@ class EditScene(ViewScene):
         self.add_wall() # includes textures
         self.add_features() # Add features seperately
         # reselect those that should be selected
-        for i in selected_features:
+        for i in range(0, len(selected_features)):
             self.obj_views[i].item_group.setSelected(True)
 
         

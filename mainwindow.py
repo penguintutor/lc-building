@@ -135,6 +135,7 @@ class MainWindowUI(QMainWindow):
         self.ui.closeButton.pressed.connect(self.close_edit)
         self.ui.wallPropertiesButton.pressed.connect(self.wall_properties)
         self.ui.addFeatureButton.pressed.connect(self.add_feature)
+        self.ui.deleteFeatureButton.pressed.connect(self.delete_feature)
         
         # Checkboxes
         self.ui.interlockCheckBox.checkStateChanged.connect(self.read_checkbox)
@@ -630,3 +631,19 @@ class MainWindowUI(QMainWindow):
         else:
             self.add_feature_window.set_wall(self.view_scenes['walledit'].wall)
             self.add_feature_window.show()
+
+
+    def delete_feature (self):
+        selected_items = self.scenes[self.current_scene].get_selected()
+
+        # First check if some items are selection
+        if selected_items != None and len(selected_items) == 1:
+            # Get the object to remove from the wall
+            obj = self.view_scenes[self.current_scene].get_obj_from_obj_view(selected_items[0])
+            # Delete that obj from the wall
+            # Note only works when in walledit - as that is the one that references the wal
+            self.view_scenes["walledit"].wall.del_feature_obj(obj)
+            # delete from the scene
+            # not required instead just call an update
+            #self.view_scenes["walledit"].del_obj_from_obj_view(selected_items[1])
+            self.view_scenes["walledit"].update()

@@ -294,6 +294,16 @@ class Wall():
             outers = []
         self.features.append(Feature(feature_type, feature_template, startpos, points, cuts, etches, outers))
         return feature_num
+    
+    # Delete a feature by id
+    def del_feature (self, feature_num):
+        del self.features[feature_num]
+        
+    # delete feature by obj
+    def del_feature_obj (self, obj):
+        for i in range (0, len(self.features)):
+            if self.features[i] == obj:
+                del self.features[i]    
 
     # Add a feature - such as a window
     # cuts, etches and outers should all be lists
