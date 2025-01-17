@@ -86,7 +86,7 @@ class MainWindowUI(QMainWindow):
         # One more scene which is called "walledit" which is used to edit a particular wall
         self.scenes["walledit"] = ViewGraphicsScene(self)
         self.view_scenes['walledit'] = EditScene(self.scenes["walledit"], self.builder, self.gconfig, "walledit")
-        self.scenes["walledit"].focus_changed.connect(self.update_selected_view_editwall)
+        self.scenes["walledit"].focus_changed.connect(self.update_selected_view)
         
         # Default to front view
         self.ui.graphicsView.setScene(self.scenes[self.current_scene])
@@ -574,90 +574,34 @@ class MainWindowUI(QMainWindow):
                 self.ui.infoTable.setRowCount(len(selected_objs))
                 for i in range (0, len(selected_objs)):
                     self.ui.infoTable.setItem(i,0, QTableWidgetItem(f"Object {i}"))
-                    self.ui.infoTable.setItem(i,1, QTableWidgetItem(f"{selected_objs[0].type} - {selected_objs[i].name}"))
+                    self.ui.infoTable.setItem(i,1, QTableWidgetItem(f"{selected_objs[i].get_summary()}"))
                 
                 # Disable edit button as more than one selected
-                self.set_left_buttons("default")
-                    
+                if self.current_scene == "walledit":
+                    self.set_left_buttons("walledit")
+                else:
+                    self.set_left_buttons("default")
+
             elif (len(selected_objs) == 1):
-                row_count = 3
                 self.ui.infoLabel.setText(f"One object selected")
-                self.ui.infoTable.setRowCount(row_count)
-                self.ui.infoTable.setItem(0,0, QTableWidgetItem("Name"))
-                self.ui.infoTable.setItem(0,1, QTableWidgetItem(selected_objs[0].name))
-                self.ui.infoTable.setItem(1,0, QTableWidgetItem("Type"))
-                self.ui.infoTable.setItem(1,1, QTableWidgetItem(selected_objs[0].type))
-                self.ui.infoTable.setItem(2,0, QTableWidgetItem("Size"))
-                self.ui.infoTable.setItem(2,1, QTableWidgetItem(selected_objs[0].get_size_string()))
-                # Show one line for each texture applied
-                next_row = row_count
-                row_count += len(selected_objs[0].textures)
-                self.ui.infoTable.setRowCount(row_count)
-                for i in range (0, len(selected_objs[0].textures)):
-                    self.ui.infoTable.setItem(next_row,0, QTableWidgetItem(f"Texture {i+1}"))
-                    self.ui.infoTable.setItem(next_row,1, QTableWidgetItem(selected_objs[0].textures[i].style))
-                    next_row += 1
-                # One line for each feature
-                row_count += len(selected_objs[0].features)
-                self.ui.infoTable.setRowCount(row_count)
-                for i in range (0, len(selected_objs[0].features)):
-                    self.ui.infoTable.setItem(next_row,0, QTableWidgetItem(f"Feature {i+1}"))
-                    self.ui.infoTable.setItem(next_row,1, QTableWidgetItem(f"{selected_objs[0].features[i].type} - {selected_objs[0].features[i].template}"))
-                    next_row += 1
+                info_dict = selected_objs[0].get_summary_dict()
+                current_row = 0
+                self.ui.infoTable.setRowCount(len(info_dict))
+                for this_key in info_dict.keys():
+                    self.ui.infoTable.setItem(current_row,0, QTableWidgetItem(this_key))
+                    self.ui.infoTable.setItem(current_row,1, QTableWidgetItem(info_dict[this_key]))
+                    current_row += 1
                 
-                self.set_left_buttons("wallselect")
+                if self.current_scene == "walledit":
+                    self.set_left_buttons("walleditfeature")
+                else:
+                    self.set_left_buttons("wallselect")
             else:
                 self.ui.infoLabel.setText(f"No objects selected")
-                self.set_left_buttons("default")
-        else:
-            self.ui.infoLabel.setText(f"No objects selected")
-            
-    # As features are different to wall use a different method when in walledit
-    # based on update_selected_view - but number of changes
-    def update_selected_view_editwall (self, selected_items):
-        # Selection are items selected
-        # These are groups (because each feature is composed of groups of items
-        # which are in <ObjView>.item_group
-        # To know which are selected need to query each of the ObjViews in the current <ViewScene>
-
-        # reset all table rows
-        self.ui.infoTable.setRowCount(0)
-
-        # First check if some items are selection
-        if selected_items != None:
-            selected_objs = []
-            # Call get info to find information on what is selected
-            for this_obj in selected_items:
-                selected_objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj))
-                #print (f"Obj selected: {obj_info}")
-                #print (f"Object type: {obj_info.type}, name: {obj_info.name}")
-            if (len(selected_objs) > 1):
-                #print ("multi")
-                #self.ui.infoTable.setHorizontalHeaderLabels([f"{len(selected_objs)} selected"])
-                self.ui.infoLabel.setText(f"{len(selected_objs)} objects selected")
-                self.ui.infoTable.setRowCount(len(selected_objs))
-                for i in range (0, len(selected_objs)):
-                    self.ui.infoTable.setItem(i,0, QTableWidgetItem(f"Object {i}"))
-                    self.ui.infoTable.setItem(i,1, QTableWidgetItem(f"{selected_objs[0].type} - {selected_objs[i].template}"))
-                
-                # Disable edit button as more than one selected
-                self.set_left_buttons("walledit")
-                    
-            elif (len(selected_objs) == 1):
-                row_count = 3
-                self.ui.infoLabel.setText(f"One object selected")
-                self.ui.infoTable.setRowCount(row_count)
-                # If feature then no name - so state Feature
-                self.ui.infoTable.setItem(0,0, QTableWidgetItem("Feature"))
-                self.ui.infoTable.setItem(0,1, QTableWidgetItem(selected_objs[0].template))
-                self.ui.infoTable.setItem(1,0, QTableWidgetItem("Type"))
-                self.ui.infoTable.setItem(1,1, QTableWidgetItem(selected_objs[0].type))
-                self.ui.infoTable.setItem(2,0, QTableWidgetItem("Size"))
-                self.ui.infoTable.setItem(2,1, QTableWidgetItem(selected_objs[0].get_size_string()))
-                self.set_left_buttons("walleditfeature")
-            else:
-                self.ui.infoLabel.setText(f"No objects selected")
-                self.set_left_buttons("walledit")
+                if self.current_scene == "walledit":
+                    self.set_left_buttons("walledit")
+                else:
+                    self.set_left_buttons("default")
         else:
             self.ui.infoLabel.setText(f"No objects selected")
             

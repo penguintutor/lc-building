@@ -64,6 +64,25 @@ class Wall():
         
     def __str__(self):
         return f"Wall: {self.name}"
+    
+    def get_summary (self):
+        return f"{self.type} - {self.name}"
+    
+    # Returns summary of wall as a dictionary
+    def get_summary_dict(self):
+        summary_dict = {
+            "Name": self.name,
+            "Type": self.type,
+            "Size": self.get_size_string()
+            }
+        # Add one line for each texture applied
+        for i in range (0, len(self.textures)):
+            summary_dict[f"Texture {i+1}"] = self.textures[i].style
+        # Add one line for each feature
+        for i in range (0, len(self.features)):
+            summary_dict[f"Feature {i+1}"] = self.features[i].get_summary()
+        return summary_dict
+        
         
     def get_features (self):
         return self.features

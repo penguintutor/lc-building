@@ -52,6 +52,19 @@ class Feature():
     def __str__(self):
         return f"Feature: {self.type}"
     
+    # Don't have a name - return template instead
+    def get_summary (self):
+        return f"{self.type} - {self.template}"
+    
+        # Returns summary of wall as a dictionary
+    def get_summary_dict(self):
+        summary_dict = {
+            "Feature": self.template,
+            "Type": self.type,
+            "Size": self.get_size_string()
+            }
+        return summary_dict
+    
     def get_size_string (self):
         return (f"{int(self.get_maxwidth()):,d}mm x {int(self.get_maxheight()):,d}mm")
 
