@@ -69,7 +69,7 @@
           <item>
            <widget class="QPushButton" name="wallTexturesButton">
             <property name="text">
-             <string>Wall Textures</string>
+             <string>Wall Texture</string>
             </property>
            </widget>
           </item>
@@ -203,7 +203,7 @@
              <x>0</x>
              <y>0</y>
              <width>284</width>
-             <height>1489</height>
+             <height>1506</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -468,7 +468,7 @@
      <x>0</x>
      <y>0</y>
      <width>1055</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

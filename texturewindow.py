@@ -26,12 +26,37 @@ basedir = os.path.dirname(__file__)
 app_title = "Wall texture"
 
 class TextureWindowUI(QMainWindow):
-    
-    #load_complete_signal = Signal()
-    #name_warning_signal = Signal()
+
+    # Dictionary of lists
+    # First entry is the title - user friendly string
+    # Remaining are tuples with setting name, text to be displayed in the gui
+    # followed by default values
+    # 0 = "Texture name", 1 = "field 1" etc.
+    # field 1 & 2 are both 4 digits, 3 is 2 digit (etch)
+    textures = {
+        'none': ["None"],
+        "brick": [
+            "Brick",
+            ("brick_height", "Brick height", "65"),
+            ("brick_width", "Brick width", "103"),
+            ("brick_etch", "Brick etch", "10")
+            ],
+        "wood": [
+            "Wood",
+            ("wood_height", "Wood height", "150"),
+            ("wood_width", "Wood width", "2000"),
+            ("wood_etch", "Wood etch", "10")
+            ],
+        "tile": [
+            "Tile",
+            ("tile_height", "Tile height", "120"),
+            ("tile_width", "Tile width", "300"),
+            ("tile_etch", "Tile etch", "7")
+            ]
+        }
+
        
     def __init__(self, parent, config, gconfig, builder):
-    #def __init__(self):
         super().__init__()
         
         # Connect signal handler
@@ -41,7 +66,7 @@ class TextureWindowUI(QMainWindow):
         
         # Wall if new then this will be None
         # Otherwise holds the wall that is being edited
-        self.wall = None
+        self.texture = None
         
         self.ui = loader.load(os.path.join(basedir, "texturewindow.ui"), None)
         self.ui.setWindowTitle(app_title)
@@ -51,80 +76,91 @@ class TextureWindowUI(QMainWindow):
         self.builder = builder
                    
         # Set wall type pull down menu
-        self.ui.textureCombo.addItem("None")
-        self.ui.textureCombo.addItem("Brick")
-        self.ui.textureCombo.addItem("Wood")
+        for texture_key in self.textures.keys():
+            self.ui.textureCombo.addItem(self.textures[texture_key][0])
         
         # Set to 0 - None
         # If already set then need to change
-        self.ui.textureCombo.setCurrentIndex(1)
+        self.ui.textureCombo.setCurrentIndex(0)
         
         self.ui.textureCombo.activated.connect(self.update_fields)
                
         self.ui.buttonBox.rejected.connect(self.cancel)
         self.ui.buttonBox.accepted.connect(self.accept)
         
+        # shortcuts to the input fields as list for easy index
+        self.labels = [self.ui.texture_label_1, self.ui.texture_label_2, self.ui.texture_label_3]
+        self.inputs = [self.ui.texture_input_1, self.ui.texture_input_2, self.ui.texture_input_3]
+        self.typicals = [self.ui.typical_label_1, self.ui.typical_label_2, self.ui.typical_label_3]
         
         # Set validator for inputs, only allow digits (typically 4)
-        texture_input_1.setInputMask("0000")
-        texture_input_2.setInputMask("0000")
-        texture_input_3.setInputMask("00")
+        self.ui.texture_input_1.setInputMask("0000")
+        self.ui.texture_input_2.setInputMask("0000")
+        self.ui.texture_input_3.setInputMask("00")
         
-        self.texture_select ("None")
-        
+        self.texture_select ("none")
+        print ("Texture window setup")
+
+    # Give the texture type title (eg. Brick)
+    # Returns dictionary key (eg. brick)
+    def texture_to_key (self, texture):
+        for key in self.textures.keys():
+            if self.textures[key][0] == texture:
+                return key
+
+
+    # Reset back to default state - called after cancel or OK
+    # so next time window opened it's back to defaults
+    def reset(self):
+        # Set to 0 None
+        self.ui.textureCombo.setCurrentIndex(0)
+        self.update_fields()
+        # Set fields to blank
+        self.ui.texture_input_1.setText("")
+        self.ui.texture_input_2.setText("")
+        self.ui.texture_input_3.setText("")
+
+    
     # Update field names if combo changed
     def update_fields (self):
         # Get the selected entry
         selected = self.ui.textureCombo.currentText()
-        self.texture_select(selected)
+        # Get the key
+        key = self.texture_to_key(selected)
+        self.texture_select(key)
     
     # Update fields based on texture
-    def texture_select (self, texture):
-        # If none then hide other fields
-        if texture == "None":
-            texture_label_1.setText("")
-            texture_label_2.setText("")
-            texture_label_3.setText("")
-            texture_input_1.hide()
-            texture_input_2.hide()
-            texture_input_3.hide()
-            typical_label_1.hide()
-            typical_label_2.hide()
-            typical_label_3.hide()
-        # If not none then unhide any hidden labels
-        else:
-            texture_input_1.show()
-            texture_input_2.show()
-            texture_input_3.show()
-            typical_label_1.show()
-            typical_label_2.show()
-            typical_label_3.show()
-            # Set label text accordingly
-            if texture == "Brick":
-                texture_input_1.setText("Brick height")
-                texture_input_1.setText("Brick width")
-                texture_input_1.setText("Brick etch")
-                typical_label_1.setText("215mm")
-                typical_label_2.setText("65mm")
-                typical_label_3.setText("10")
-            elif texture == "Wood":
-                texture_input_1.setText("Wood height")
-                texture_input_1.setText("Wood width")
-                texture_input_1.setText("Brick etch")
-                typical_label_1.setText("2000mm")
-                typical_label_2.setText("150mm")
-                typical_label_3.setText("10")
+    def texture_select (self, key):
+        # get number of fields (excluding title)
+        num_fields = len(self.textures[key]) - 1
+        for i in range (0, len(self.labels)):
+            if i >= num_fields:
+                self.labels[i].setText("")
+                self.inputs[i].hide()
+                self.typicals[i].hide()
+            else:
+                self.labels[i].setText(self.textures[key][i+1][1])
+                self.typicals[i].setText(self.textures[key][i+1][2])
+                self.inputs[i].show()
+                self.typicals[i].show()
                 
     
     #Todo HERE - Continue updating *****
     
-    # Use when using the window to edit existing wall instead of new
-    def edit_properties (self, texture):
-        return
-        self.wall = wall
+    # Use when using the window to edit existing texture instead of new
+    # Note that can only edit one texture - but for future support pass textures list
+    def edit_properties (self, textures):
         # clear any previous data
         self.reset()
-        # set to custom interface
+        if textures == None:
+            print ("No textures")
+            self.ui.show()
+            return
+        # Only edit first texture
+        self.texture = textures[0]
+        
+        #Todo - here - continue implementation ****
+        
         self.ui.wallTypeCombo.setCurrentIndex(2)
         self.custom_interface()
         # Set values based on wall class
@@ -163,18 +199,7 @@ class TextureWindowUI(QMainWindow):
         self.reset()
         self.hide()
     
-    # Reset back to default state - called after cancel or OK
-    # so next time window opened it's back to defaults
-    def reset(self):
-        # Set to 0 (rectangle)
-        self.ui.wallTypeCombo.setCurrentIndex(0)
-        # Set title to blank
-        self.ui.nameText.setText("")
-        # Set all values to mm and got to rectangle
-        for row in range (0, self.max_rows):
-            self.wall_elements["input_x"][row].setText("mm")
-            self.wall_elements["input_y"][row].setText("mm")
-        self.simple_interface()
+
         
     # Accept button is pressed
     # Todo - allow update as well as new

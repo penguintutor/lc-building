@@ -96,6 +96,10 @@ Small scales (smaller than HO/OO) may have problems when dealing with small
 size shapes. These may need to be edit in Inkscape before burning, or choose
 an "N friendly" template
 
+### Single texture per wall
+Currently only allows a single texture per wall which covers entire wall.
+For split walls (eg. half brick half render) then split into multiple walls
+
 ### Delay in updating the info box
 Under some circumstances when an object is selected there may be a delay before
 the information box in the bottom right is updated. It is unknown why this is, 

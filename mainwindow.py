@@ -12,6 +12,7 @@ from vgraphicsscene import ViewGraphicsScene
 import webbrowser
 import resources
 from wallwindow import WallWindowUI
+from texturewindow import TextureWindowUI
 from addfeaturewindow import AddFeatureWindowUI
 
 loader = QUiLoader()
@@ -134,6 +135,7 @@ class MainWindowUI(QMainWindow):
         # Action buttons when edit wall
         self.ui.closeButton.pressed.connect(self.close_edit)
         self.ui.wallPropertiesButton.pressed.connect(self.wall_properties)
+        self.ui.wallTexturesButton.pressed.connect(self.texture_properties)
         self.ui.addFeatureButton.pressed.connect(self.add_feature)
         self.ui.deleteFeatureButton.pressed.connect(self.delete_feature)
         
@@ -147,6 +149,7 @@ class MainWindowUI(QMainWindow):
         
         # Set to none, only create when needed and can check if it's created yet
         self.wall_window = None
+        self.texture_window = None
         self.add_feature_window = None
 
         # Update gconfig based on checkboxes - may need to load these values in future
@@ -169,7 +172,14 @@ class MainWindowUI(QMainWindow):
             self.wall_window = WallWindowUI(self, self.config, self.gconfig, self.builder)
         self.wall_window.edit_properties(self.view_scenes[self.current_scene].wall)
         
-        
+    # Launch texture properties (edit) window
+    # Same for add texture and edit texture
+    def texture_properties(self):
+        if self.texture_window == None:
+            self.texture_window = TextureWindowUI(self, self.config, self.gconfig, self.builder)
+        self.texture_window.edit_properties(self.view_scenes[self.current_scene].wall.textures)
+
+
     def copy_wall(self):
         # Current selected objects (note these are groups containing walls and features / textures etc.)
         # Should  be one selected (otherwise the button should be disabled - but check)
