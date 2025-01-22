@@ -34,7 +34,7 @@ class TextureWindowUI(QMainWindow):
     # 0 = "Texture name", 1 = "field 1" etc.
     # field 1 & 2 are both 4 digits, 3 is 2 digit (etch)
     textures = {
-        'none': ["None"],
+        "none": ["None"],
         "brick": [
             "Brick",
             ("brick_height", "Brick height", "65"),
@@ -94,9 +94,10 @@ class TextureWindowUI(QMainWindow):
         self.typicals = [self.ui.typical_label_1, self.ui.typical_label_2, self.ui.typical_label_3]
         
         # Set validator for inputs, only allow digits (typically 4)
-        self.ui.texture_input_1.setInputMask("0000")
-        self.ui.texture_input_2.setInputMask("0000")
-        self.ui.texture_input_3.setInputMask("00")
+        # Mask does not work - instead validate when OK pressed
+        #self.ui.texture_input_1.setInputMask("0000")
+        #self.ui.texture_input_2.setInputMask("0000")
+        #self.ui.texture_input_3.setInputMask("00")
         
         self.texture_select ("none")
         print ("Texture window setup")
@@ -108,6 +109,13 @@ class TextureWindowUI(QMainWindow):
             if self.textures[key][0] == texture:
                 return key
 
+    # Return index position in the textures
+    # used to get position of the pull-down from the name
+    def key_to_index (self, key):
+        for i in range (0, len(self.textures)):
+            if textures[i] == key:
+                return i
+        return -1
 
     # Reset back to default state - called after cancel or OK
     # so next time window opened it's back to defaults
@@ -152,34 +160,29 @@ class TextureWindowUI(QMainWindow):
     def edit_properties (self, textures):
         # clear any previous data
         self.reset()
-        if textures == None:
+        if textures == None or len(textures)<1:
             print ("No textures")
             self.ui.show()
             return
         # Only edit first texture
         self.texture = textures[0]
         
-        #Todo - here - continue implementation ****
+        menu_pos = self.key_to_index(self.texture.style)
+        # This should not be the case but if style is not valid then
+        # current texture is corrupt so leave it empty
+        if menu_pos < 0:
+            return
         
-        self.ui.wallTypeCombo.setCurrentIndex(2)
-        self.custom_interface()
-        # Set values based on wall class
-        self.ui.nameText.setText(self.wall.name)
-        row = 0
-        for point in self.wall.points:
-            self.wall_elements["input_x"][row].setText(f"{point[0]}")
-            self.wall_elements["input_y"][row].setText(f"{point[1]}")
-            row += 1
-            if row > 9:
-                break
-        # If there are more than 4 points then enable the fields
-        for i in range (4, len(self.wall.points)-1):
-            self.show_row(i)
-        #todo set profile view
-        view = self.wall.view
-        #self.ui.profileCombo.currentText().lower()
-        index = self.ui.profileCombo.findText(view,  Qt.MatchFixedString)
-        self.ui.profileCombo.setCurrentIndex(index)
+        self.ui.textureCombo.setCurrentIndex(menu_pos)
+        self.texture_select(menu_pos)
+        
+        # Set values based on texture
+        num_fields = len(self.textures[self.texture.style]) - 1
+        for i in range (1, num_fields):
+            this_key = self.textures[self.texture.style][i][0]
+            this_value = self.texture.get_setting_str(this_key)
+            self.inputs[i].setText(this_value)
+        
         self.ui.show()
         
     

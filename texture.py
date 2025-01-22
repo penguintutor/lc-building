@@ -23,6 +23,13 @@ class Texture():
         self.polygon = Polygon(points)
         self.disable = False   # Allows to disable completely if not required
         self.excludes = []     # Excludes is replaced each time get_etches is called to ensure always updated
+        
+    # Returns a setting value or "" if nt exist
+    def get_setting_str (self, value):
+        if value in self.settings.keys():
+            self.settings[value]
+        else:
+            return ""
             
     def get_entry(self):
         return ((self.points, self.style, self.settings))
