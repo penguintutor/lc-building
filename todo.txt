@@ -12,7 +12,6 @@ Handle checkboxes (different for if edit walls rather than view scene)
 Make view scene honor checkboxes
 When clicking edit but nothing selected give a warning - select object first
 When quit chosen ask if save
-Double click on wall should be same as clicking edit wall
 Refresh (update_all_views) does not always appear to update all walls.
 
 
@@ -45,7 +44,7 @@ Note need to update any interlockinggroups to refer to new wall references
 Make it obvious in wall edit mode (not sure how best to achieve)
 Force refresh on relevant scene when exiting edit wall
 Update summary information when feature selected
-Ability to delete features 
+
 
 # Add Feature
 Show name instead of filename when adding feature
@@ -58,6 +57,8 @@ Possibly future plan
 Need to track if entire wall or whether to save polygon 
 (ie. if not specified then entire wall and don't need to save points, but
 if only specific area then do need to save - Not currently handled)
+Update current edit display when adding / updating texture
+Handle removing texture / perhaps set to "None"
 
 # Track history - with undo and redo
 Currently history is saved on objects - need to save in main windows / edit window instead
