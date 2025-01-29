@@ -177,7 +177,7 @@ class MainWindowUI(QMainWindow):
     def texture_properties(self):
         if self.texture_window == None:
             self.texture_window = TextureWindowUI(self, self.config, self.gconfig, self.builder)
-        self.texture_window.edit_properties(self.view_scenes[self.current_scene].wall.textures)
+        self.texture_window.edit_properties(self.view_scenes[self.current_scene].wall)
 
 
     def copy_wall(self):

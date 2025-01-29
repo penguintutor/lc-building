@@ -1,8 +1,4 @@
-# Window to add / update wall or roof
-# Currently allows creation using different types (eg. rectangle / apex)
-# However all are stored and edited as custom
-# May change in future, but will need a change in file format as well as how wall.py
-# interprets the different types
+# Window to add / update texture to a wall
 
 import os
 from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo, QObject, Qt
@@ -33,6 +29,8 @@ class TextureWindowUI(QMainWindow):
     # followed by default values
     # 0 = "Texture name", 1 = "field 1" etc.
     # field 1 & 2 are both 4 digits, 3 is 2 digit (etch)
+    # These are currently fixed maximum - but if need texture with additional then it will
+    # need an update to the ui as well as search for "len(self.labels)"
     textures = {
         "none": ["None"],
         "brick": [
@@ -64,7 +62,9 @@ class TextureWindowUI(QMainWindow):
         #self.name_warning_signal.connect(self.name_warning)
         self.parent = parent
         
-        # Wall if new then this will be None
+        # Wall should be set when choosing edit properties (launching this window)
+        self.wall = None
+        # Texture may be None if no textures
         # Otherwise holds the wall that is being edited
         self.texture = None
         
@@ -89,6 +89,8 @@ class TextureWindowUI(QMainWindow):
         self.ui.buttonBox.accepted.connect(self.accept)
         
         # shortcuts to the input fields as list for easy index
+        # currently fixed number of fields - if change that then find
+        # anywhere that looks for len(self.labels)
         self.labels = [self.ui.texture_label_1, self.ui.texture_label_2, self.ui.texture_label_3]
         self.inputs = [self.ui.texture_input_1, self.ui.texture_input_2, self.ui.texture_input_3]
         self.typicals = [self.ui.typical_label_1, self.ui.typical_label_2, self.ui.typical_label_3]
@@ -112,9 +114,11 @@ class TextureWindowUI(QMainWindow):
     # Return index position in the textures
     # used to get position of the pull-down from the name
     def key_to_index (self, key):
-        for i in range (0, len(self.textures)):
-            if textures[i] == key:
+        i = 0
+        for this_key in self.textures.keys():
+            if this_key == key:
                 return i
+            i += 1
         return -1
 
     # Reset back to default state - called after cancel or OK
@@ -151,21 +155,20 @@ class TextureWindowUI(QMainWindow):
                 self.typicals[i].setText(self.textures[key][i+1][2])
                 self.inputs[i].show()
                 self.typicals[i].show()
-                
-    
-    #Todo HERE - Continue updating *****
     
     # Use when using the window to edit existing texture instead of new
     # Note that can only edit one texture - but for future support pass textures list
-    def edit_properties (self, textures):
+    def edit_properties (self, wall):
+        self.wall = wall
         # clear any previous data
         self.reset()
-        if textures == None or len(textures)<1:
-            print ("No textures")
+        if wall.textures == None or len(wall.textures)<1:
+            self.texture = None
+            #print ("No textures")
             self.ui.show()
             return
         # Only edit first texture
-        self.texture = textures[0]
+        self.texture = wall.textures[0]
         
         menu_pos = self.key_to_index(self.texture.style)
         # This should not be the case but if style is not valid then
@@ -174,21 +177,21 @@ class TextureWindowUI(QMainWindow):
             return
         
         self.ui.textureCombo.setCurrentIndex(menu_pos)
-        self.texture_select(menu_pos)
+        self.texture_select(self.texture.style)
         
         # Set values based on texture
-        num_fields = len(self.textures[self.texture.style]) - 1
-        for i in range (1, num_fields):
-            this_key = self.textures[self.texture.style][i][0]
+        num_fields = len(self.textures[self.texture.style])-1
+        for i in range (0, num_fields):
+            this_key = self.textures[self.texture.style][i+1][0]
             this_value = self.texture.get_setting_str(this_key)
-            self.inputs[i].setText(this_value)
+            self.inputs[i].setText(str(this_value))
         
         self.ui.show()
         
     
     # Show entire window - for add new window
     def new(self):
-        self.wall = None
+        self.textures = None
         self.ui.show()
         self.ui.activateWindow()
         self.ui.raise_()
@@ -202,241 +205,60 @@ class TextureWindowUI(QMainWindow):
         self.reset()
         self.hide()
     
-
-        
     # Accept button is pressed
-    # Todo - allow update as well as new
+    # If we don't have an existing texture then this is new
+    # Otherwise we need to update the existing texture
     def accept(self):
-        # Validate data - doesn't matter if some fields are not filled in, but need at least 3 points (triangular wall)
+        # Validate data 
         # Add to builder, then reset and hide window
         # Validates entries
-        wall_data = {
-            'name' : self.ui.nameText.text(),
-            'view' : self.ui.profileCombo.currentText().lower(),
-            'points' : []
-            }
-        # Check for points first as that is a critical error, whereas name would be just a warning
-        # If simplified interface then try that first
-        # Work through the points provided and add as appropriate
-        # Rectangle wall (combo = 0)
-        if self.ui.wallTypeCombo.currentIndex() == 0:
-            # check we have each of the values
-            # width is row 0 - use non scale size
-            width = self.wall_elements["input_x"][0].text()
-            # check it's an integer string and if so convert to int
-            try:
-                width = int(width)
-            except ValueError:
-                QMessageBox.warning(self, "Width not a number", "Width is not a number. Please provide a valid size in mm.")
-                return
-            # Also check it's not a negative number, or ridiculously large (over 100m)
-            if width <= 0 or width > 10000:
-                QMessageBox.warning(self, "Width is invalid", "Width is not a valid number. Please provide a valid size in mm.")
-                return
-            
-            # Do the same with height - row 1
-            height = self.wall_elements["input_x"][1].text()
-            # check it's an integer string and if so convert to int
-            try:
-                height = int(height)
-            except ValueError:
-                QMessageBox.warning(self, "Height not a number", "Height is not a number. Please provide a valid size in mm.")
-                return
-            # Also check it's not a negative number, or ridiculously large (over 100m)
-            if height <= 0 or height > 10000:
-                QMessageBox.warning(self, "Height is invalid", "Height is not a valid number. Please provide a valid size in mm.")
-                return
-            # Have width and height so convert into points
-            wall_data['points'] = [
-                (0,0), (width, 0), 
-                (width, height), (0, height),
-                (0,0)
-                ]
-        # Apex wall (type = 1)
-        elif self.ui.wallTypeCombo.currentIndex() == 1:
-            # check we have each of the values
-            # width is row 0 - use non scale size
-            width = self.wall_elements["input_x"][0].text()
-            # check it's an integer string and if so convert to int
-            try:
-                width = int(width)
-            except ValueError:
-                QMessageBox.warning(self, "Width not a number", "Width is not a number. Please provide a valid size in mm.")
-                return
-            # Also check it's not a negative number, or ridiculously large (over 100m)
-            if width <= 0 or width > 10000:
-                QMessageBox.warning(self, "Width is invalid", "Width is not a valid number. Please provide a valid size in mm.")
-                return
-            
-            # Do the same with height maximum - row 1
-            height_max = self.wall_elements["input_x"][1].text()
-            # check it's an integer string and if so convert to int
-            try:
-                height_max = int(height_max)
-            except ValueError:
-                QMessageBox.warning(self, "Maximum height not a number", "Maximum height is not a number. Please provide a valid size in mm.")
-                return
-            # Also check it's not a negative number, or ridiculously large (over 100m)
-            if height_max <= 0 or height_max > 10000:
-                QMessageBox.warning(self, "Maximum height is invalid", "Maximum height is not a valid number. Please provide a valid size in mm.")
-                return
-            # and for height minimum - row 2
-            height_min = self.wall_elements["input_x"][2].text()
-            # check it's an integer string and if so convert to int
-            try:
-                height_min = int(height_min)
-            except ValueError:
-                QMessageBox.warning(self, "Minimum height not a number", "Minimum height is not a number. Please provide a valid size in mm.")
-                return
-            # Also check it's not a negative number, or ridiculously large (over 100m)
-            if height_min <= 0 or height_min > 10000:
-                QMessageBox.warning(self, "Minimum height is invalid", "Minimum height is not a valid number. Please provide a valid size in mm.")
-                return
-            # Could check that min is less than max, but if not then get an inverted apex (strange, but let user do if they want)
-            #height delta just reduces amount of calculates in generating point and makes it easier to follow
-            height_delta = height_max - height_min
-            # Create an apex wall
-            wall_data['points'] = [
-                (0,height_delta), (int(width/2), 0), (width, height_delta), 
-                (width, height_max), (0, height_max),
-                (0,height_delta)
-                ]
-        # If it's not one of the simplified ones then it's custom
-        # Read in any values that are displayed, ignore any that are not ints and see if we have enough at the end (at least 3)
-        # Both x and y must be numbers for it to be considered valid
-        else:
-            for row in range (0, self.num_rows):
-                this_x = self.wall_elements["input_x"][row].text()
-                this_y = self.wall_elements["input_y"][row].text()
-                # convert to int - if either fail then ignore
-                try:
-                    this_x = int(this_x)
-                    this_y = int(this_y)
-                except ValueError:
-                    continue
-                else:
-                    wall_data['points'].append([this_x, this_y])
-            # Do we have at least 3?
-            if len(wall_data['points']) < 3:
-                QMessageBox.warning(self, "Insufficient points", "Insufficient points entered. Please ensure both x and y are valid sizes in mm.")
-                return
-            # Check if start and last points are equal, if not then complete the rectangle
-            if wall_data['points'][0] != wall_data['points'][len(wall_data['points'])-1]:
-                wall_data['points'].append(wall_data['points'][0])
-             
-        # Followin gives a warning but allows proceed with creating
-        if (wall_data['name'] == ""):
-            return_val = QMessageBox.warning(self, 'Warning name not provided', 'A name was not provided for the wall. Accept default named \"Unknown\"?', QMessageBox.Ok | QMessageBox.Cancel)
-            if return_val == QMessageBox.Ok:
-                wall_data['name'] = "Unknown"
-            else:
-                return
+        style = self.texture_to_key(self.ui.textureCombo.currentText())
         
-        # if this is a new wall
-        if self.wall == None:
-            # Add this wall
-            self.builder.add_wall(wall_data)
-        # If this is existing wall then update it
-        else:
-            self.wall.name = wall_data['name']
-            # create copy of the list - rather than pass the list which will be edited in future
-            self.wall.points = copy.deepcopy(wall_data['points'])
-            self.wall.view = wall_data['view']
+        # Iterate over the fields in the style
+        style_settings = {}
+        num_fields = len(self.textures[style]) - 1
+        for i in range (0, len(self.labels)):
+            if i >= num_fields:
+                break
+            # temp variable to shorten and simplify the code as used multiple times
+            # [i+1] skips the first entry which is title of the texture style
+            this_texture_setting = self.textures[style][i+1]
+            text_value = self.inputs[i].text()
+            # First check for an empty string - which is treated as 0,
+            # Otherwise needs to be a number
+            if text_value == "":
+                num_value = 0
+            else:
+                try:
+                    num_value = int(text_value)
+                except ValueError:
+                    QMessageBox.warning(self, f"{this_texture_setting[1]} is not a valid number", f"{this_texture_setting[1]} is not a valid number. Please provide a valid size in mm.")
+                    return
+            # Simple check to test for a valid number - only a very basic check that don't end up with less than 0 or a ridiculously large number
+            # 0 would count as default if appropriate
+            if num_value < 0 or num_value > 100000:
+                # Message is slightly different from if not a number
+                QMessageBox.warning(self, f"{this_texture_setting[1]} value is not valid", f"{this_texture_setting[1]} value is not valid. Please provide a valid size in mm.")
+                return
+            style_settings[this_texture_setting[0]] = num_value
             
+            
+        # If existing update
+        if self.texture != None:
+            self.texture.change_texture(style, style_settings)
+        else:
+            # otherwise this is a new texture
+            # Create new (note [] denotes full wall - which is only option at the moment
+            self.wall.add_texture(style, [], style_settings)
+
+        #print (f"Style {style}")
+        #print (f"Details {style_settings}")
+            
+        # Note need to update edit view as well
         # Update parent
         self.parent.update_all_views()
         
         # Reset the window and hide
         self.reset()
         self.hide()
-        
-    # Used to hide a row when in custom mode
-    def hide_row(self, row):
-        self.wall_elements["label"][row].setText("")
-        self.wall_elements["label_x"][row].hide()
-        self.wall_elements["label_y"][row].hide()
-        self.wall_elements["label_y"][row].hide()
-        self.wall_elements["input_x"][row].hide()
-        self.wall_elements["input_y"][row].hide()
-        self.wall_elements["delete"][row].hide()
-        self.wall_elements["add"][row].hide()
-        
-    # Used to show a row when in custom mode
-    def show_row(self, row):
-        self.wall_elements["label"][row].setText(f"Point {row+1}")
-        self.wall_elements["label_x"][row].show()
-        self.wall_elements["label_y"][row].show()
-        self.wall_elements["label_y"][row].show()
-        self.wall_elements["input_x"][row].show()
-        self.wall_elements["input_y"][row].show()
-        self.wall_elements["delete"][row].show()
-        # if the last allowed row then don't show the add button
-        if row < self.max_rows - 1:
-            self.wall_elements["add"][row].show()
-        
-    def custom_interface(self):
-        # Change information at the top of the screen
-        self.ui.dimensionsText1.setText("Enter dimensions in mm full size (1:1).")
-        self.ui.dimensionsText2.setText("All points relative to top left position.")
-        # Hide scale option
-        self.ui.scaleCombo.hide()
-        self.ui.scaleLabel.hide()
-        # Minimum of 4 entries (assumes back to start for 5)
-        for i in range (0, 4):
-            # Change text fields for the main entries
-            self.wall_elements["label"][i].setText(f"Point {i+1}")
-            # Enable the X and Y labels and input fields
-            self.wall_elements["label_x"][i].show()
-            self.wall_elements["label_y"][i].setText("Y")
-            self.wall_elements["label_y"][i].show()
-            self.wall_elements["input_x"][i].show()
-            self.wall_elements["input_y"][i].show()
-            self.wall_elements["delete"][i].show()
-            self.wall_elements["add"][i].show()
-            
-
-    # Simple interface used for basic rectangular wall (or initial setup for apex)
-    def simple_interface(self):
-        # Change information at the top of the screen
-        self.ui.dimensionsText1.setText("Enter dimensions in mm.")
-        self.ui.dimensionsText2.setText("")
-        # Show scale pull-down - only used for UI always save using full size dimensions
-        self.ui.scaleCombo.show()
-        self.ui.scaleLabel.show()
-        # Set text on simple labels
-        self.ui.wall_label_0.setText("Wall width:")
-        self.ui.wall_label_1.setText("Wall height:")
-        self.ui.wall_label_y_0.setText("Scale size:")
-        self.ui.wall_label_y_1.setText("Scale size:")
-        self.ui.wall_label_y_2.setText("Scale size:")
-        # Update all fields to remove delete and add buttons
-        for i in range (0, self.max_rows):
-            self.wall_elements["label_x"][i].hide()
-            self.wall_elements["delete"][i].hide()
-            self.wall_elements["add"][i].hide()
-        # Hide none standard fields
-        # Hide labels
-        for i in range (2, self.max_rows):
-            # Do not hide first label as that would reformat the window
-            # Instead set it to ""
-            self.wall_elements["label"][i].setText("")
-            # Do not hide label_y for first entries as says "Scale"
-            self.wall_elements["label_y"][i].hide()
-            self.wall_elements["input_x"][i].hide()
-            self.wall_elements["input_y"][i].hide()
-
-        
-    # Based on simple interface then adds extra field for additional wall height
-    def apex_interface(self):
-        self.simple_interface()
-        # Set text of the wall height 1 to max
-        self.ui.wall_label_1.setText("Wall height max:")
-        self.ui.wall_label_2.setText("Wall height min:") 
-        # Re-enable line 2
-        self.ui.wall_label_2.show()
-        self.ui.wall_label_y_2.show()
-        self.ui.wall_input_x_2.show()
-        self.ui.wall_input_y_2.show()
-        
-        
 

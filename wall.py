@@ -265,6 +265,8 @@ class Wall():
         return polygon.bounds[3] - polygon.bounds[1]
        
     
+    # Used by builder class or internally within this
+    # Does not update etches
     def add_texture_towall (self, type, area, settings):
         # If no area / zone provided then use wall
         if area == []:
@@ -274,6 +276,7 @@ class Wall():
         
     # Note that this is different order to texture constructor as
     # in constructor type is optional - but not in here
+    # area can be [] which means entire wall
     def add_texture (self, type, area, settings):
         self.add_texture_towall (type, area, settings)
         # Only update etches as that is limit of textures

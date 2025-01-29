@@ -3,6 +3,7 @@
 # Creates an instance for each element - then can use to detect
 # if it needs to be removed because of other features
 
+import copy
 from laser import *
 from helpers import *
 from shapely import Point, Polygon, LineString
@@ -16,7 +17,7 @@ class Texture():
         self.points = points
         self.style = style
         if settings != None:
-            self.settings = settings
+            self.settings = copy.copy(settings)
         else:
             self.settings = {}
         # Convert points to a polygon
@@ -24,10 +25,18 @@ class Texture():
         self.disable = False   # Allows to disable completely if not required
         self.excludes = []     # Excludes is replaced each time get_etches is called to ensure always updated
         
+    # Change texture
+    # Can just change texture style, or can also change all settings
+    # old settings will not be retained
+    def change_texture(self, style, settings=None):
+        self.style = style
+        if settings != None:
+            self.settings = copy.copy(settings)
+        
     # Returns a setting value or "" if nt exist
     def get_setting_str (self, value):
         if value in self.settings.keys():
-            self.settings[value]
+            return self.settings[value]
         else:
             return ""
             
@@ -53,11 +62,18 @@ class Texture():
     
     
     # Returns horizontal etch lines representing a wood texture
+    # Typically set width to 0 (full width of building)
+    # With a wood_width then would go to that length before starting again
+    # Does not stagger alternate lines
     def _get_etches_horizontal_wood(self):
         lines = []
         etches = []
         etch_width = self.settings["wood_etch"]
         wood_height = self.settings["wood_height"]
+        if "wood_width" in self.settings:
+            wood_width = self.settings["wood_width"]
+        else:
+            wood_width = 0
         min_x = self.polygon.bounds[0]+1
         max_x = self.polygon.bounds[2]-1
         min_y = self.polygon.bounds[1]+1
@@ -72,6 +88,16 @@ class Texture():
             if current_y < min_y + min_wood_size:
                 break
             lines.extend(self._line([min_x, current_y],[max_x, current_y]))
+        # Ignore wood width if default (0)
+        if wood_width > 0:
+            # Apply vertical lines unless width is default (0)
+            current_x = 0
+            while current_x < max_x:
+                current_x += wood_width
+                if current_x > max_x:
+                    break
+                lines.extend(self._line([current_x, min_y],[current_x, max_y]))
+                current_x += etch_width
         for line in lines:
             etches.append(EtchLine(line[0], line[1], etch_width=etch_width))
         return etches
@@ -94,6 +120,7 @@ class Texture():
         return self._get_etches_rects(etch_width, tile_height, tile_width)
     
     # Returns rect used for bricks / rect tiles (known as tiles)
+    # Applies rows of staggered rectangles (such as bricks)
     def _get_etches_rects(self, etch_width, rect_height, rect_width):
         lines = []
         etches = []
