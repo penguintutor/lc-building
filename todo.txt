@@ -54,6 +54,7 @@ Also apply filters based on type
 
 
 # Textures
+Possibly future plan
 Need to track if entire wall or whether to save polygon 
 (ie. if not specified then entire wall and don't need to save points, but
 if only specific area then do need to save - Not currently handled)

@@ -158,6 +158,17 @@ class MainWindowUI(QMainWindow):
         # texture view option
         self.gconfig.checkbox['texture'] = self.ui.textureCheckBox.isChecked()
     
+    #If item is double clicked then it gets passed to this
+    def double_click (self):
+        #object = self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj)
+        # If we are in wall edit then edit properties
+        if self.current_scene == "walledit":
+            self.wall_properties()
+        # If not then change to edit wall
+        else:
+            self.edit_wall()
+        
+   
     # Check for items in current scene have moved - do we need to update current screen
     def check_obj_moved (self):
         moved = False

@@ -19,6 +19,12 @@ class ViewGraphicsScene (QGraphicsScene):
         # Triggers when a selection is changed within the scene
         self.selectionChanged.connect(self.new_focus)
 
+    # If double click then pass up to the main window and act as though edit 
+    def mouseDoubleClickEvent(self, event):
+        # If double click on left button
+        if event.buttons() == Qt.MouseButton.LeftButton:
+            self.main_window.double_click()
+
     # Uses mouseReleaseEvent
     # Drag events don't trigger when dragging parts away
     # itemEvent triggers too often - so just look at when button is released
