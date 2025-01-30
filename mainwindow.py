@@ -477,6 +477,9 @@ class MainWindowUI(QMainWindow):
     def update_all_views (self):
         for scene_name in self.config.allowed_views:
             self.update_view (scene_name)
+        # Also need to check if we are in edit and if so update that
+        if self.current_scene == "walledit":
+            self.update_view("walledit")
         
     def zoom_out (self):
         # Minimum zoom is 0.125 - actually two values for scale, but just look at x

@@ -22,7 +22,6 @@ Handle selection of scale
 - when created set it to default
 - when reset go back to default
 Switching to custom set first entry to 0,0
-Set Enter key to press OK
 When returning from an edit - should return to the edit view
 
 # Track updates 

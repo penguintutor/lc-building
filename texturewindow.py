@@ -12,14 +12,13 @@ from lcconfig import LCConfig
 from gconfig import GConfig
 from vgraphicsscene import ViewGraphicsScene
 from wall import Wall
-import copy
 import webbrowser
 import resources
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
 
-app_title = "Wall texture"
+app_title = "Wall texture" 
 
 class TextureWindowUI(QMainWindow):
 
@@ -209,6 +208,7 @@ class TextureWindowUI(QMainWindow):
     # If we don't have an existing texture then this is new
     # Otherwise we need to update the existing texture
     def accept(self):
+        print (f"Wall is {id(self.wall)}")
         # Validate data 
         # Add to builder, then reset and hide window
         # Validates entries

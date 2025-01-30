@@ -40,6 +40,7 @@ class Builder():
             self.process_data()
         else:
             print ("File load failed")
+        #print (f"Walls are {self.walls}")
         return result
         
     # Saves the file
@@ -222,12 +223,14 @@ class Builder():
         num_walls = len(all_walls)
         #print (f"Num walls {num_walls}")
         current_wall = 0
+        #print (f"All walls {all_walls}")
         for wall in all_walls:
             percent_loaded = int((current_wall/num_walls)*100)
             print (f"Reading in walls {percent_loaded}%")
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2], wall[3]))
             current_wall += 1
+        #print (f"Self Walls {self.walls}")
             
         if num_walls > 0:
             print ("Reading in walls 100%")
