@@ -374,7 +374,7 @@ class Wall():
 
     def _get_cuts_features (self):
         feature_cuts = []
-        for feature in self.features:
+        for feature in self.features: 
             feature_cuts.extend(feature.get_cuts())
             if "outertype" in self.settings and self.settings["outertype"] == "cuts":
                 new_cuts = feature.get_outers_cuts()
@@ -399,3 +399,9 @@ class Wall():
         for this_il in self.il:
             if this_il.edge == edge:
                 self.il.remove(this_il)
+    
+    # If size has changed then may need to update texture points
+    def update_texture_points(self):
+        for texture in self.textures:
+            if texture.fullwall:
+                texture.change_points(self.points)

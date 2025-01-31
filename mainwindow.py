@@ -656,7 +656,6 @@ class MainWindowUI(QMainWindow):
             self.add_feature_window.set_wall(self.view_scenes['walledit'].wall)
             self.add_feature_window.show()
 
-
     def delete_feature (self):
         selected_items = self.scenes[self.current_scene].get_selected()
 

@@ -152,15 +152,16 @@ class WallWindowUI(QMainWindow):
         self.custom_interface()
         # Set values based on wall class
         self.ui.nameText.setText(self.wall.name)
+        self.num_rows = len(self.wall.points)
         row = 0
         for point in self.wall.points:
-            self.wall_elements["input_x"][row].setText(f"{point[0]}")
-            self.wall_elements["input_y"][row].setText(f"{point[1]}")
+            self.wall_elements["input_x"][row].setText(f"{int(point[0])}")
+            self.wall_elements["input_y"][row].setText(f"{int(point[1])}")
             row += 1
             if row > 9:
                 break
         # If there are more than 4 points then enable the fields
-        for i in range (4, len(self.wall.points)-1):
+        for i in range (4, self.num_rows):
             self.show_row(i)
         #todo set profile view
         view = self.wall.view
@@ -415,7 +416,7 @@ class WallWindowUI(QMainWindow):
             # Could check that min is less than max, but if not then get an inverted apex (strange, but let user do if they want)
             #height delta just reduces amount of calculates in generating point and makes it easier to follow
             height_delta = height_max - height_min
-            # Create an apex wall
+            # Create an apex wall 
             wall_data['points'] = [
                 (0,height_delta), (int(width/2), 0), (width, height_delta), 
                 (width, height_max), (0, height_max),
@@ -433,7 +434,11 @@ class WallWindowUI(QMainWindow):
                     this_x = int(this_x)
                     this_y = int(this_y)
                 except ValueError:
-                    continue
+                    # Warning - if error - note counts from 1
+                    # For custom then all values are in mm real size so don't allow fractions
+                    # Ie. only if int - could change above to allow float and then round if preferred
+                    QMessageBox.warning(self, f"Row {row+1} is invalid", "Row {row+1} not a valid number. Please provide a valid size in mm.")
+                    return
                 else:
                     wall_data['points'].append([this_x, this_y])
             # Do we have at least 3?
@@ -463,7 +468,10 @@ class WallWindowUI(QMainWindow):
             self.wall.points = copy.deepcopy(wall_data['points'])
             self.wall.view = wall_data['view']
             
-        # Update parent
+            
+        # If wall dimensions changed then also need to update any textures
+        self.wall.update_texture_points()
+        # Update parent (via main window)
         self.parent.update_all_views()
         
         # Reset the window and hide

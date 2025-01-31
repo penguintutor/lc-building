@@ -11,12 +11,16 @@ from shapely import Point, Polygon, LineString
 
 # Only work in mm
 # Wall should handle conversion to pixels
-
+# settings is dependent upon style - eg. brick_width only on bricks
+# fullwall option is whether to automatically extend the points to the full wall
+# in the event that the wall is changed this is default as GUI does not support partial textures
 class Texture():
-    def __init__ (self, points, style="", settings=None):
-        self.points = points
+    def __init__ (self, points, style="", settings=None, fullwall=True):
+        self.fullwall = fullwall
+        self.points = copy.copy(points)
         self.style = style
-        if settings != None:
+        if settings != None: 
+            # creates a copy of the settings in case settings list is reused upstream
             self.settings = copy.copy(settings)
         else:
             self.settings = {}
@@ -28,10 +32,17 @@ class Texture():
     # Change texture
     # Can just change texture style, or can also change all settings
     # old settings will not be retained
+    # Most likely would change both settings and style
     def change_texture(self, style, settings=None):
         self.style = style
         if settings != None:
+            # creates a copy of the settings in case settings list is reused upstream
             self.settings = copy.copy(settings)
+            
+    # Change the points to new 
+    def change_points (self, points):
+        self.points = copy.copy(points)
+        self.polygon = Polygon(points)
         
     # Returns a setting value or "" if nt exist
     def get_setting_str (self, value):

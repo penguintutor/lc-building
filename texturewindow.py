@@ -163,7 +163,7 @@ class TextureWindowUI(QMainWindow):
         self.reset()
         if wall.textures == None or len(wall.textures)<1:
             self.texture = None
-            #print ("No textures")
+            #print ("No textures") 
             self.ui.show()
             return
         # Only edit first texture
@@ -208,7 +208,7 @@ class TextureWindowUI(QMainWindow):
     # If we don't have an existing texture then this is new
     # Otherwise we need to update the existing texture
     def accept(self):
-        print (f"Wall is {id(self.wall)}")
+        #print (f"Wall is {id(self.wall)}")
         # Validate data 
         # Add to builder, then reset and hide window
         # Validates entries
