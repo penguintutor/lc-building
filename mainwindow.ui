@@ -53,6 +53,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="interlockingButton">
+            <property name="text">
+             <string>Interlocking</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="closeButton">
             <property name="text">
              <string>Close</string>

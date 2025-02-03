@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>900</width>
     <height>600</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
+    <width>900</width>
     <height>600</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>800</width>
+    <width>900</width>
     <height>600</height>
    </size>
   </property>
@@ -56,8 +56,8 @@
    <widget class="QDialogButtonBox" name="buttonBox">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>530</y>
+      <x>710</x>
+      <y>500</y>
       <width>166</width>
       <height>25</height>
      </rect>
@@ -69,134 +69,18 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>70</y>
-      <width>761</width>
-      <height>441</height>
+      <x>10</x>
+      <y>110</y>
+      <width>854</width>
+      <height>351</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="8" column="1">
-      <widget class="QLabel" name="interlock_01_b_Label_7">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QPushButton" name="Del_Button_00">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>-</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="interlock_01_a_Label_5">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="interlock_01_a_Label_8">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="2">
-      <widget class="QPushButton" name="Del_button_8">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>-</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="interlock_00_a_Label">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QPushButton" name="Del_button_02">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>-</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="interlock_01_a_Label">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="interlock_01_a_Label_3">
+      <widget class="QLabel" name="interlock_03_a_Label">
        <property name="minimumSize">
         <size>
-         <width>350</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
@@ -205,11 +89,18 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLabel" name="interlock_01_b_Label_2">
+     <item row="2" column="2">
+      <widget class="QLabel" name="interlock_02_type_Label">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="interlock_09_a_Label">
        <property name="minimumSize">
         <size>
-         <width>350</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
@@ -218,63 +109,7 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
-      <widget class="QLabel" name="interlock_01_b_Label_5">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QPushButton" name="Del_button_6">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>-</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLabel" name="interlock_01_b_Label_3">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLabel" name="interlock_01_b_Label_4">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="2">
+     <item row="8" column="3">
       <widget class="QPushButton" name="Del_button_9">
        <property name="maximumSize">
         <size>
@@ -291,71 +126,11 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="interlock_01_a_Label_2">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
-      <widget class="QPushButton" name="Del_button_5">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>-</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="Del_button_4">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>-</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QLabel" name="interlock_01_b_Label_10">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
      <item row="7" column="0">
-      <widget class="QLabel" name="interlock_01_a_Label_6">
+      <widget class="QLabel" name="interlock_07_a_Label">
        <property name="minimumSize">
         <size>
-         <width>350</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
@@ -364,11 +139,11 @@
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
-      <widget class="QLabel" name="interlock_01_b_Label_8">
+     <item row="7" column="1">
+      <widget class="QLabel" name="interlock_07_b_Label">
        <property name="minimumSize">
         <size>
-         <width>350</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
@@ -377,24 +152,7 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="2">
-      <widget class="QPushButton" name="Del_button_3">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>-</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="2">
+     <item row="6" column="3">
       <widget class="QPushButton" name="Del_button_7">
        <property name="maximumSize">
         <size>
@@ -411,37 +169,18 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="interlock_01_b_Label">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
+     <item row="1" column="2">
+      <widget class="QLabel" name="interlock_01_type_Label">
        <property name="text">
-        <string>Wall 1 Side x</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QLabel" name="interlock_01_b_Label_6">
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Wall 1 Side x</string>
+        <string>Default</string>
        </property>
       </widget>
      </item>
      <item row="4" column="0">
-      <widget class="QLabel" name="interlock_01_a_Label_4">
+      <widget class="QLabel" name="interlock_04_a_Label">
        <property name="minimumSize">
         <size>
-         <width>350</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
@@ -456,7 +195,182 @@
        </property>
       </widget>
      </item>
-     <item row="9" column="2">
+     <item row="6" column="0">
+      <widget class="QLabel" name="interlock_06_a_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="interlock_00_type_Label">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="interlock_01_a_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QPushButton" name="Del_button_4">
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="3">
+      <widget class="QPushButton" name="Del_button_8">
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="interlock_02_a_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QLabel" name="interlock_08_b_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="3">
+      <widget class="QPushButton" name="Del_button_6">
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QLabel" name="interlock_09_b_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="interlock_01_b_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="interlock_02_b_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="interlock_04_b_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="interlock_00_a_Label">
+       <property name="minimumSize">
+        <size>
+         <width>240</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="3">
       <widget class="QPushButton" name="Del_button_10">
        <property name="maximumSize">
         <size>
@@ -473,11 +387,28 @@
        </property>
       </widget>
      </item>
-     <item row="9" column="0">
-      <widget class="QLabel" name="interlock_01_a_Label_7">
+     <item row="4" column="3">
+      <widget class="QPushButton" name="Del_button_5">
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLabel" name="interlock_06_b_Label">
        <property name="minimumSize">
         <size>
-         <width>350</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
@@ -486,33 +417,178 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="interlock_01_a_Label_10">
+     <item row="3" column="3">
+      <widget class="QPushButton" name="Del_button_3">
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QPushButton" name="Del_Button_00">
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="interlock_03_b_Label">
        <property name="minimumSize">
         <size>
-         <width>350</width>
+         <width>0</width>
          <height>0</height>
         </size>
        </property>
        <property name="text">
         <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="interlock_05_a_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="interlock_08_a_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLabel" name="interlock_05_b_Label">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Wall 1 Side x</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QPushButton" name="Del_button_02">
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</normaloff>../../../../../usr/share/icons/HighContrast/scalable/places/user-trash.svg</iconset>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QLabel" name="interlock_00_b_Label">
+       <property name="minimumSize">
+        <size>
+         <width>240</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>Wall 2 Side x</string>
        </property>
       </widget>
      </item>
+     <item row="3" column="2">
+      <widget class="QLabel" name="interlock_03_type_Label">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QLabel" name="interlock_04_type_Label">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QLabel" name="interlock_05_type_Label">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QLabel" name="interlock_06_type_Label">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="2">
+      <widget class="QLabel" name="interlock_07_type_Label">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="2">
+      <widget class="QLabel" name="interlock_08_type_Label">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="2">
+      <widget class="QLabel" name="interlock_09_type_Label">
+       <property name="text">
+        <string>Default</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="newInterlockButton">
     <property name="geometry">
      <rect>
-      <x>577</x>
-      <y>20</y>
+      <x>690</x>
+      <y>30</y>
       <width>171</width>
       <height>27</height>
      </rect>

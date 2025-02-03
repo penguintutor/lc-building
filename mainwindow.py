@@ -14,6 +14,7 @@ import resources
 from wallwindow import WallWindowUI
 from texturewindow import TextureWindowUI
 from addfeaturewindow import AddFeatureWindowUI
+from interlockingwindow import
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
@@ -131,6 +132,7 @@ class MainWindowUI(QMainWindow):
         self.ui.copyWallButton.pressed.connect(self.copy_wall)
         self.ui.editWallButton.pressed.connect(self.edit_wall)
         self.ui.deleteWallButton.pressed.connect(self.delete_wall)
+        self.ui.interlockingButton.pressed.connect(self.view_interlocking_window)
         
         # Action buttons when edit wall
         self.ui.closeButton.pressed.connect(self.close_edit)
@@ -151,6 +153,7 @@ class MainWindowUI(QMainWindow):
         self.wall_window = None
         self.texture_window = None
         self.add_feature_window = None
+        self.interlocking_window = None
 
         # Update gconfig based on checkboxes - may need to load these values in future
         # interlocking view option
@@ -182,6 +185,12 @@ class MainWindowUI(QMainWindow):
         if self.wall_window == None:
             self.wall_window = WallWindowUI(self, self.config, self.gconfig, self.builder)
         self.wall_window.edit_properties(self.view_scenes[self.current_scene].wall)
+        
+    # Launch interlocking (view) window
+    def wall_properties(self):
+        if self.interlocking_window == None:
+            self.interlocking_window = InterlockingWindowUI(self, self.config, self.gconfig, self.builder)
+        self.interlocking_window.show()
         
     # Launch texture properties (edit) window
     # Same for add texture and edit texture
