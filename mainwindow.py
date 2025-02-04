@@ -14,7 +14,7 @@ import resources
 from wallwindow import WallWindowUI
 from texturewindow import TextureWindowUI
 from addfeaturewindow import AddFeatureWindowUI
-from interlockingwindow import
+from interlockingwindow import InterlockingWindowUI
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
@@ -187,10 +187,10 @@ class MainWindowUI(QMainWindow):
         self.wall_window.edit_properties(self.view_scenes[self.current_scene].wall)
         
     # Launch interlocking (view) window
-    def wall_properties(self):
+    def view_interlocking_window(self):
         if self.interlocking_window == None:
             self.interlocking_window = InterlockingWindowUI(self, self.config, self.gconfig, self.builder)
-        self.interlocking_window.show()
+        self.interlocking_window.display()
         
     # Launch texture properties (edit) window
     # Same for add texture and edit texture

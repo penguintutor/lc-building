@@ -38,35 +38,31 @@ class InterlockingWindowUI(QMainWindow):
         self.config = config
         self.gconfig = gconfig
         self.builder = builder
-                   
-        # Set wall type pull down menu
-        for texture_key in self.textures.keys():
-            self.ui.textureCombo.addItem(self.textures[texture_key][0])
-        
-        # Set to 0 - None
-        # If already set then need to change
-        self.ui.textureCombo.setCurrentIndex(0)
-        
-        self.ui.textureCombo.activated.connect(self.update_fields)
+                          
+        #self.ui.textureCombo.activated.connect(self.update_fields)
                
+        self.il_elements = {"edge1":[], "edge2":[], "type":[], "delete":[]}
+        for i in range (0, 10):
+            exec ("self.il_elements[\"edge1\"].append("+f"self.ui.interlock_{i:02}_a_Label"+")")
+            exec ("self.il_elements[\"edge2\"].append("+f"self.ui.interlock_{i:02}_b_Label"+")")
+            exec ("self.il_elements[\"type\"].append("+f"self.ui.interlock_{i:02}_type_Label"+")")
+            exec ("self.il_elements[\"delete\"].append("+f"self.ui.delButton_{i:02}"+")")
+            
+            # set each of the values empty - then add existing values
+            self.il_elements['edge1'][i].setText("")
+            self.il_elements['edge2'][i].setText("")
+            self.il_elements['type'][i].setText("")
+            self.il_elements['delete'][i].hide()
+        
         self.ui.buttonBox.rejected.connect(self.cancel)
         self.ui.buttonBox.accepted.connect(self.accept)
         
-        # shortcuts to the input fields as list for easy index
-        # currently fixed number of fields - if change that then find
-        # anywhere that looks for len(self.labels)
-        self.labels = [self.ui.texture_label_1, self.ui.texture_label_2, self.ui.texture_label_3]
-        self.inputs = [self.ui.texture_input_1, self.ui.texture_input_2, self.ui.texture_input_3]
-        self.typicals = [self.ui.typical_label_1, self.ui.typical_label_2, self.ui.typical_label_3]
         
-        # Set validator for inputs, only allow digits (typically 4)
-        # Mask does not work - instead validate when OK pressed
-        #self.ui.texture_input_1.setInputMask("0000")
-        #self.ui.texture_input_2.setInputMask("0000")
-        #self.ui.texture_input_3.setInputMask("00")
         
-        self.texture_select ("none")
-        print ("Texture window setup")
+
+    def display (self):
+        self.ui.show()
+
 
     # Give the texture type title (eg. Brick)
     # Returns dictionary key (eg. brick)
