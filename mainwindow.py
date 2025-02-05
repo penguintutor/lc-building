@@ -190,6 +190,7 @@ class MainWindowUI(QMainWindow):
     def view_interlocking_window(self):
         if self.interlocking_window == None:
             self.interlocking_window = InterlockingWindowUI(self, self.config, self.gconfig, self.builder)
+        self.interlocking_window.update()
         self.interlocking_window.display()
         
     # Launch texture properties (edit) window

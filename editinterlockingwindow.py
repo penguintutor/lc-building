@@ -149,8 +149,62 @@ class EditInterlockingWindowUI(QMainWindow):
         self.hide()
     
     # Accept button is pressed
-    # If we don't have an existing texture then this is new
-    # Otherwise we need to update the existing texture
+    # This is new
+    # Todo add ability to edit for future
     def accept(self):
+        
+        primary_wall_id = self.ui.primaryWallCombo.currentIndex() - 1
+        if primary_wall_id < 0:
+            QMessageBox.warning(self, f"Select primary wall", f"Primary wall not selected, select a wall from the list.")
+            return
+        primary_edge_id = self.ui.primaryEdgeCombo.currentIndex() - 1
+        if primary_edge_id < 0:
+            QMessageBox.warning(self, f"Select primary edge", f"Primary edge not selected, select an edge from the list.")
+            return
+        primary_reverse = self.ui.primaryReverseCombo.currentIndex()
+        
+        secondary_wall_id = self.ui.secondaryWallCombo.currentIndex() - 1
+        if secondary_wall_id < 0:
+            QMessageBox.warning(self, f"Select secondary wall", f"Secondary wall not selected, select a wall from the list.")
+            return
+        secondary_edge_id = self.ui.secondaryEdgeCombo.currentIndex() - 1
+        if secondary_edge_id < 0:
+            QMessageBox.warning(self, f"Select secondary edge", f"Secondary edge not selected, select an edge from the list.")
+            return
+        secondary_reverse = self.ui.secondaryReverseCombo.currentIndex()
+        
+        step_string = self.ui.stepEditLine.text()
+        # Mandatory - must be a number
+        try:
+            start_value = int(step_string)
+        except ValueError:
+            QMessageBox.warning(self, f"Step value is not a valid number", f"Step value is not a valid number. Please provide a valid size in mm.")
+
+        # start and end default to 0
+        start_string = self.ui.startEditLine.text()
+        if start_string == "":
+            start_value = 0
+        else:
+            try:
+                start_value = int(start_string)
+            except ValueError:
+                QMessageBox.warning(self, f"Start is not a valid number", f"Start is not a valid number. Please provide a valid size in mm or leave blank.")
+                return
+
+        end_string = self.ui.endEditLine.text()
+        if end_string == "":
+            end_value = 0
+        else:
+            try:
+                end_value = int(end_string)
+            except ValueError:
+                QMessageBox.warning(self, f"End is not a valid number", f"End is not a valid number. Please provide a valid size in mm or leave blank.")
+                return
+ 
+        # Todo
+        # Handle adding this interlocking
+ 
+        
+        self.clear()
         self.ui.hide()
 

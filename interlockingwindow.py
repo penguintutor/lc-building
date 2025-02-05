@@ -49,6 +49,7 @@ class InterlockingWindowUI(QMainWindow):
         self.ui.newInterlockButton.pressed.connect(self.new_interlock)
         
         self.update()
+        self.ui.show()
         
     def new_interlock(self):
         if self.edit_window == None:
@@ -76,14 +77,14 @@ class InterlockingWindowUI(QMainWindow):
             wall1_wall = self.builder.walls[group.primary_wall].name
             #wall1_edge = self.builder.walls[group.primary_wall].il[group.primary_il].edge
             wall1_edge = group.primary_il.edge
-            wall1_string = f"Wall 1: {wall1_wall}, edge {wall1_edge}"
+            wall1_string = f"Primary: {wall1_wall}, edge {wall1_edge}"
             # Get type from primary
             il_type = group.primary_il.il_type
             
             self.il_elements['edge1'][num_groups].setText(wall1_string)
             wall2_wall = self.builder.walls[group.secondary_wall].name
             wall2_edge = group.secondary_il.edge
-            wall2_string = f"Wall 2: {wall2_wall}, edge {wall2_edge}"
+            wall2_string = f"Secondary: {wall2_wall}, edge {wall2_edge}"
             self.il_elements['edge2'][num_groups].setText(wall2_string)
             
             self.il_elements['type'][num_groups].setText(il_type)
