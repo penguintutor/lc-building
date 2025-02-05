@@ -142,11 +142,15 @@ if bdata['interlocking'].lower() == "true":
         reverse = ""
         if len(il["primary"]) > 2:
             reverse = il["primary"][2]
-        walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, parameters)
+        # il_type has default but can add others in future
+        il_type = "default"
+        if "type" in il:
+            il_type = il["type"]
+        walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, il_type, parameters)
         reverse = ""
         if len(il["secondary"]) > 2:
             reverse = il["secondary"][2]
-        walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
+        walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
     
     
    

@@ -82,6 +82,8 @@ class Builder():
         # Get wall and edge from both, but other parameters from primary only (should be the same)
         for il_group in self.interlocking_groups:
             primary_entry = [il_group.primary_wall, il_group.primary_il.edge]
+            # type is taken from primary entry
+            il_type = il_group.primary_il.il_type
             if il_group.primary_il.reverse == True:
                 primary_entry.append("reverse")
             secondary_entry = [il_group.secondary_wall, il_group.secondary_il.edge]
@@ -90,6 +92,7 @@ class Builder():
             il_data.append({
                 "primary": primary_entry,
                 "secondary": secondary_entry,
+                "type": il_type,
                 "step": il_group.primary_il.step,
                 "start": il_group.primary_il.start
                 })
@@ -281,12 +284,14 @@ class Builder():
         if num_features > 0:
             print (f"Adding features 100%")
         
-            
         # Although there is a setting to ignore interlocking still load it here to preserve
         for il in self.building.get_interlocking():
         #    print ("Adding interlocking")
             # Great interlocking group which tracks these in case they are edited
             # Also add both primary and secondary walls for each entry
+            il_type = "default"
+            if "type" in il:
+                il_type = il["type"]
             # parameters are optional (defines start and end positions of interlocking section)
             # These are the optional parameters which are appended
             parameter_keys = ["start", "end"]
@@ -299,14 +304,14 @@ class Builder():
             if len(il["primary"]) > 2:
                 reverse = il["primary"][2]
             primary_wall = il["primary"][0]
-            primary_il = Interlocking(il["step"], il["primary"][1], "primary", reverse, parameters)
-            self.walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, parameters)
+            primary_il = Interlocking(il["step"], il["primary"][1], "primary", reverse, il_type, parameters)
+            self.walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, il_type, parameters)
             reverse = ""
             if len(il["secondary"]) > 2:
                 reverse = il["secondary"][2]
             secondary_wall = il["secondary"][0]
-            secondary_il = Interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
-            self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
+            secondary_il = Interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
+            self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
             self.interlocking_groups.append(InterlockingGroup(primary_wall, primary_il, secondary_wall, secondary_il))
         
         # Now force update as used non updating functions to add features / textures

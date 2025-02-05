@@ -21,7 +21,7 @@ Laser.sc = sc
 material_thickness = 3
 scale_material = sc.reverse_scale_convert(material_thickness)
 # Set material thickness for Interlocking (class variable)
-Interlocking.material_thickness = scale_material
+lsaInterlocking.material_thickness = scale_material
 # Set default etchline width
 #EtchLine.global_etch_width = config.etch_line_width
 

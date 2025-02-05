@@ -83,6 +83,19 @@ class Wall():
             summary_dict[f"Feature {i+1}"] = self.features[i].get_summary()
         return summary_dict
         
+    # get a list of edges
+    def get_edges_str (self):
+        edges = []
+        for i in range (0, len(self.points)):
+            # if it's not the first then append current point to previous entry
+            if i != 0 :
+                edges[i-1] = f"{edges[i-1]}{int(self.points[i][0])} , {int(self.points[i][1])}"
+            # skip last one (after adding to the end of previous one) as it's back to start
+            # Create next entry (but don't put future point)
+            if i < len(self.points)-1:
+                edges.append (f"Edge {i+1}: {int(self.points[i][0])} , {int(self.points[i][1])} : ")
+        return edges
+            
         
     def get_features (self):
         return self.features
@@ -354,10 +367,10 @@ class Wall():
     # add any interlock rules for the edges
     # edges are number from 0 (top left) in clockwise direction
     # parameters should be a dictionary if supplied
-    def add_interlocking (self, step, edge, primary, reverse, parameters=None):
+    def add_interlocking (self, step, edge, primary, reverse, il_type, parameters=None):
         if parameters==None:
             parameters = {}
-        self.il.append(Interlocking(step, edge, primary, reverse, parameters))
+        self.il.append(Interlocking(step, edge, primary, reverse, il_type, parameters))
             
     # This is later stage in get_etches
     def _texture_to_etches(self):

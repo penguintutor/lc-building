@@ -7,7 +7,9 @@ class Interlocking():
     material_thickness = 0
     
     # Note parameters if supplied should be a dictionary
-    def __init__ (self, step, edge, primary, reverse="", parameters=None):
+    def __init__ (self, step, edge, primary, reverse="", il_type="default", parameters=None):
+        # Type is not used at the moment, but allows for different configs in future
+        self.il_type = il_type
         self.step = step         # Size of a single interlock step
         self.edge = edge         # Edge number on wall this is contained in
         self.primary = primary   # Is this "primary" or "secondary"

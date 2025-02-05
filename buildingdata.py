@@ -236,6 +236,10 @@ class BuildingData ():
             # otherwise add
             for il in self.get_interlocking():
                 # Add both primary and secondary for each entry
+                # il_type has default but can add others in future
+                il_type = "default"
+                if "type" in il:
+                    il_type = il["type"]
                 # parameters are optional (defines start and end positions of interlocking section)
                 # These are the optional parameters which are appended
                 parameter_keys = ["start", "end"]
@@ -247,11 +251,11 @@ class BuildingData ():
                 reverse = ""
                 if len(il["primary"]) > 2:
                     reverse = il["primary"][2]
-                walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, parameters)
+                walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, il_type, parameters)
                 reverse = ""
                 if len(il["secondary"]) > 2:
                     reverse = il["secondary"][2]
-                walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, parameters)
+                walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
             
         print ("Creating output")   
         # Create output

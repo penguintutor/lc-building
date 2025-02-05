@@ -59,6 +59,11 @@ if only specific area then do need to save - Not currently handled)
 Update current edit display when adding / updating texture
 Handle removing texture / perhaps set to "None"
 
+# Add Interlocking
+No checking for duplicates
+Can only delete and readd rather than edit
+
+
 # Track history - with undo and redo
 Currently history is saved on objects - need to save in main windows / edit window instead
 
