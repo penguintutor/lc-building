@@ -176,9 +176,10 @@ class EditInterlockingWindowUI(QMainWindow):
         step_string = self.ui.stepEditLine.text()
         # Mandatory - must be a number
         try:
-            start_value = int(step_string)
+            step_value = int(step_string)
         except ValueError:
             QMessageBox.warning(self, f"Step value is not a valid number", f"Step value is not a valid number. Please provide a valid size in mm.")
+            return
 
         # start and end default to 0
         start_string = self.ui.startEditLine.text()
@@ -198,13 +199,20 @@ class EditInterlockingWindowUI(QMainWindow):
             try:
                 end_value = int(end_string)
             except ValueError:
-                QMessageBox.warning(self, f"End is not a valid number", f"End is not a valid number. Please provide a valid size in mm or leave blank.")
+                QMessageBox.warning(self, f"End is not a valid number", f"End is not a valid number. Please provide a valid size in mm or leave blank")
                 return
+            
+        parameters = {"start" : start_value, "end" : end_value}
  
-        # Todo
-        # Handle adding this interlocking
- 
+        # Add this interlocking
+        # type is set to default as that is all that is currently supported
+        self.builder.add_il(primary_wall_id, primary_edge_id, primary_reverse, secondary_wall_id, secondary_edge_id, secondary_reverse, "default", step_value, parameters)
         
+        # Each of the updated walls needs to update their cuts
+        self.builder.walls[primary_wall_id].update_cuts()
+        self.builder.walls[secondary_wall_id].update_cuts()
+        
+        self.parent.update()
         self.clear()
         self.ui.hide()
 

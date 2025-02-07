@@ -15,6 +15,7 @@ from PySide6.QtWidgets import QGraphicsItem
 # Create as an object group and move items into it
 class ObjView():
     def __init__ (self, scene, settings, coords = [0,0], type="unknown", moveable=True):
+        #print ("Adding objview to scene {scene}")
         #print (f"Creating object moveable {moveable}")
         self.settings = settings
         self.scene = scene
@@ -69,6 +70,7 @@ class ObjView():
     # standard_object = treat as a line / cut
     # polygon_object = convert to polygon
     def add_cut(self, cut):
+        #print ("Debug adding cut to objview")
         self.add_standard_object (cut, "cut")
         
     def add_outer(self, outer):

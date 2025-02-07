@@ -14,6 +14,13 @@ class GConfig():
         self.maximized = False
         self.default_screensize = [1000, 700]
         
+        # Use for debugging
+        # 0 = no debugging
+        # 1 = main actions / windows
+        # 2 = more detailed
+        # 4 = very high level of debug
+        self.debug = True
+        
         # Check to see if default screensize is a reasonable size for this screen
         # just basic check to see if it's larger and if so set to maximum screen size
         # May still be too bit (does not allow for application bars / launchers) but

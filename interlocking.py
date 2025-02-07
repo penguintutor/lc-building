@@ -86,7 +86,8 @@ class Interlocking():
             newpos = add_distance_to_points (line[0], self.step, angle)
             if check_distance (line_start, newpos, line_dist) < 1:
                 # not enough space add last segment to new segments and return
-                new_segments.append(*line)
+                ###print (f"Adding line {line}")
+                new_segments.append(line)
                 return new_segments
             # Add to new segments
             new_segments.append((line[0], newpos))

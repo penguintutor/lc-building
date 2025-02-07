@@ -62,6 +62,8 @@ class MainWindowUI(QMainWindow):
         self.current_scene = 'front'
         
         self.gconfig = GConfig(status)
+        if self.gconfig.debug > 0:
+            print ("Debug - Create Main Window")
         self.builder = Builder(self.config)
         
         # Set default screensize (even if going to maximise afterwards)
@@ -286,6 +288,7 @@ class MainWindowUI(QMainWindow):
             self.ui.copyWallButton.show()
             self.ui.editWallButton.show()
             self.ui.deleteWallButton.show()
+            self.ui.interlockingButton.show()
             self.ui.closeButton.hide()
             self.ui.wallPropertiesButton.hide()
             self.ui.wallTexturesButton.hide()
@@ -304,6 +307,7 @@ class MainWindowUI(QMainWindow):
             self.ui.copyWallButton.hide()
             self.ui.editWallButton.hide()
             self.ui.deleteWallButton.hide()
+            self.ui.interlockingButton.hide()
             self.ui.closeButton.show()
             self.ui.wallPropertiesButton.show()
             self.ui.wallTexturesButton.show()

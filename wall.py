@@ -171,7 +171,7 @@ class Wall():
     # Gets only cuts associated with the wall itself (not features / textures)
     # Used by wall edit also internally by update_cuts
     def get_wall_cuts (self):
-        #print ("Getting wall cuts")
+        print ("Getting wall cuts")
         # First get edges then generate cuts
         # cut lines is the one that is returned
         # this can either be used directly (eg. in edit wall)
@@ -194,8 +194,12 @@ class Wall():
             
             # Only handle interlocking if not False
             if (self.show_interlock == True):
+                print (f"Wall {self.name} Edge {i}")
+                print (f"ILs in wall {self.il}")
                 for il in self.il:
+                    print (f" edge {il.edge}, step {il.step}, start {il.start}")
                     if il.get_edge() == i:
+                        print (" Matches edge")
                         # add interlocks to this edge
                         edge_ils = il
                         
@@ -203,6 +207,7 @@ class Wall():
             # Must not overlap, but only check startpos rather than end
             # Note if interlock = false then we don't have added any edge_ils so don't need to check here
             if edge_ils != None:
+                print (f" Includes edge ils {edge_ils}")
                 # remove last segment to perform transformations on it
                 remaining_edge_segment = this_edge_segments.pop()
                 # Then add any returned segments back onto the list
@@ -210,11 +215,12 @@ class Wall():
                 # Convert to line objects
                 for this_segment in this_edge_segments:
                     cut_lines.append(CutLine(this_segment[0], this_segment[1]))
-                    #print (f" Adding il segment {i} {this_segment[0]} , {this_segment[1]}")
+                    print (f" Adding il segment {i} {this_segment[0]} , {this_segment[1]}")
             else:
+                print (" No edge ils")
                 # otherwise just append his one edge
                 cut_lines.append(CutLine(cut_edges[i][0], cut_edges[i][1]))
-                #print (f"  Adding normal edge {i} : {cut_edges[i][0]} , {cut_edges[i][1]}")
+                print (f"  Adding normal edge {i} : {cut_edges[i][0]} , {cut_edges[i][1]}")
         return cut_lines
                 
 
@@ -371,6 +377,7 @@ class Wall():
         if parameters==None:
             parameters = {}
         self.il.append(Interlocking(step, edge, primary, reverse, il_type, parameters))
+        return self.il[-1]
             
     # This is later stage in get_etches
     def _texture_to_etches(self):

@@ -48,12 +48,43 @@ class InterlockingWindowUI(QMainWindow):
         
         self.ui.newInterlockButton.pressed.connect(self.new_interlock)
         
+        self.ui.delButton_00.pressed.connect(lambda: self.del_entry(0))
+        self.ui.delButton_01.pressed.connect(lambda: self.del_entry(1))
+        self.ui.delButton_02.pressed.connect(lambda: self.del_entry(2))
+        self.ui.delButton_03.pressed.connect(lambda: self.del_entry(3))
+        self.ui.delButton_04.pressed.connect(lambda: self.del_entry(4))
+        self.ui.delButton_05.pressed.connect(lambda: self.del_entry(5))
+        self.ui.delButton_06.pressed.connect(lambda: self.del_entry(6))
+        self.ui.delButton_07.pressed.connect(lambda: self.del_entry(7))
+        self.ui.delButton_08.pressed.connect(lambda: self.del_entry(8))
+        self.ui.delButton_09.pressed.connect(lambda: self.del_entry(9))
+        
         self.update()
         self.ui.show()
         
+    def del_entry (self, entry_id):
+        # Delete secondary, then primary
+        groups = self.builder.interlocking_groups
+        wall2 = self.builder.walls[groups[entry_id].secondary_wall]
+        il2 = groups[entry_id].secondary_il
+        wall2.il.remove(il2)
+        wall1 = self.builder.walls[groups[entry_id].primary_wall]
+        il1 = groups[entry_id].primary_il
+        wall1.il.remove(il1)
+        # Remove from group last (otherwise can't get details)
+        self.builder.del_il_group(entry_id)
+
+
+        # Update the current window
+        self.update()
+        # refresh all windows (as may include walls on different views etc.)
+        self.parent.update_all_views()
+        
+
+        
     def new_interlock(self):
         if self.edit_window == None:
-            self.edit_window = EditInterlockingWindowUI(self.parent, self.config, self.gconfig, self.builder)
+            self.edit_window = EditInterlockingWindowUI(self, self.config, self.gconfig, self.builder)
         else:
             self.edit_window.new()
         
@@ -66,9 +97,11 @@ class InterlockingWindowUI(QMainWindow):
             self.il_elements['delete'][i].hide()
         
     # Update list of interlocking groups
-    def update (self):
+    # Do we need to update parent - if so set parent to true
+    def update (self, parent=False):
         groups = self.builder.interlocking_groups
-        
+        print (f"Num il groups {len(groups)}")
+                
         # Hide all existing
         self.clear()
         
@@ -76,14 +109,15 @@ class InterlockingWindowUI(QMainWindow):
         for group in groups:
             wall1_wall = self.builder.walls[group.primary_wall].name
             #wall1_edge = self.builder.walls[group.primary_wall].il[group.primary_il].edge
-            wall1_edge = group.primary_il.edge
+            # + 1 more user friendly starting at 1 (consistant with edit)
+            wall1_edge = group.primary_il.edge +1
             wall1_string = f"Primary: {wall1_wall}, edge {wall1_edge}"
             # Get type from primary
             il_type = group.primary_il.il_type
             
             self.il_elements['edge1'][num_groups].setText(wall1_string)
             wall2_wall = self.builder.walls[group.secondary_wall].name
-            wall2_edge = group.secondary_il.edge
+            wall2_edge = group.secondary_il.edge +1
             wall2_string = f"Secondary: {wall2_wall}, edge {wall2_edge}"
             self.il_elements['edge2'][num_groups].setText(wall2_string)
             
@@ -91,6 +125,8 @@ class InterlockingWindowUI(QMainWindow):
             self.il_elements['delete'][num_groups].show()
             
             num_groups += 1
+        if (parent):
+            self.parent.update_all_views()
             
 
     def display (self):

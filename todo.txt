@@ -61,7 +61,11 @@ Handle removing texture / perhaps set to "None"
 
 # Add Interlocking
 No checking for duplicates
+- Hide existing entries from add option
 Can only delete and readd rather than edit
+* If add edit then should not be allowed to change wall as that is where objects exist
+Refresh doesn't work when deleting interlocking
+
 
 
 # Track history - with undo and redo

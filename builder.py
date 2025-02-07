@@ -29,6 +29,10 @@ class Builder():
         # including remove interlocking that relies on that wall (primary and secondary)
         self.interlocking_groups = []
         self.process_data()
+        
+    # Only deletes the actual group
+    def del_il_group (self, entry_id):
+        del self.interlocking_groups[entry_id]
 
     # Loads a new file overwriting all data
     # Returns result of buildingdata load - (True/False, "Error string")
@@ -77,7 +81,7 @@ class Builder():
         newdata['textures'] = texture_data
         newdata['features'] = feature_data
         
-        # Add interlocking (not part of wall)
+        # Add interlocking (not saved as part of wall)
         il_data = []
         # Get wall and edge from both, but other parameters from primary only (should be the same)
         for il_group in self.interlocking_groups:
@@ -304,14 +308,15 @@ class Builder():
             if len(il["primary"]) > 2:
                 reverse = il["primary"][2]
             primary_wall = il["primary"][0]
-            primary_il = Interlocking(il["step"], il["primary"][1], "primary", reverse, il_type, parameters)
-            self.walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, il_type, parameters)
+            # il moved to wall and then get back as a reference so it can be added to the interlocking group
+            # primary_il = Interlocking(il["step"], il["primary"][1], "primary", reverse, il_type, parameters)
+            primary_il = self.walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, il_type, parameters)
             reverse = ""
             if len(il["secondary"]) > 2:
                 reverse = il["secondary"][2]
             secondary_wall = il["secondary"][0]
-            secondary_il = Interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
-            self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
+            #secondary_il = Interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
+            secondary_il = self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
             self.interlocking_groups.append(InterlockingGroup(primary_wall, primary_il, secondary_wall, secondary_il))
         
         # Now force update as used non updating functions to add features / textures
@@ -326,6 +331,14 @@ class Builder():
             print ("Rendering walls 100%")
     
         #print ("Builder processing data complete\n\n")
+            
+    def add_il (self, primary_wall_id, primary_edge, primary_reverse, secondary_wall_id, secondary_edge, secondary_reverse, il_type, step, parameters):
+            # il moved to wall and then get back as a reference so it can be added to the interlocking group
+            primary_wall = self.walls[primary_wall_id]
+            primary_il = primary_wall.add_interlocking(step, primary_edge, "primary", primary_reverse, il_type, parameters)
+            secondary_wall = self.walls[secondary_wall_id]
+            secondary_il = secondary_wall.add_interlocking(step, secondary_edge, "secondary", secondary_reverse, il_type, parameters)
+            self.interlocking_groups.append(InterlockingGroup(primary_wall_id, primary_il, secondary_wall_id, secondary_il))
             
     def delete_wall (self, wall):
         for i in range (0, len(self.walls)):

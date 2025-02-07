@@ -74,8 +74,10 @@ class ViewScene():
         
     # Add walls to the scene
     def add_walls(self):
+        if self.gconfig.debug > 2:
+            print ("Debug - View Scene {self.scene} add walls")
         # Delete old objects and add new
-        #print ("Add walls")
+        #print ("View Scene Add walls")
         # Get all the walls from builder
         walls = self.builder.get_walls_view(self.view_name)
         #print (f"Adding {len(walls)} walls")
