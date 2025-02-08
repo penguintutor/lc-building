@@ -189,6 +189,8 @@ class Builder():
         # Todo Calculate position
         position = [0,0]
         self.walls.append(Wall(wall_data['name'], wall_data['points'], wall_data['view'], position))
+        # Return wall so it can be used elsewhere
+        return self.walls[-1]
         
     def copy_wall(self, wall_to_copy):
         position = [0,0]

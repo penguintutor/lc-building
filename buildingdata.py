@@ -143,13 +143,28 @@ class BuildingData ():
     # Exports file as an svg
     # todo
     # Need to ensure building data is updated first
-    def export_file (self, filename):
+    # Options are things that can be selected - eg. material_thickness etc.
+    def export_file (self, filename, options=None):
+        #### TEMP
+        ### Todo - this should be read in - any values missing then can use
+        # Bdata instead
+        if options == None:
+            options = {
+                "material_thickness": 3,
+                "outertype": "etches",
+                "interlocking": "true"
+                }
+        
+        
+        
         print (f"Starting export in building data filename {filename}")
 
         bdata = self.get_values()
         
+        print ("Values read")
+        
         # todo read this from GUI somehow
-        scale = "OO"
+        scale = "O"
         
         # Export in grid 3 wide
         grid_width = 3
@@ -163,18 +178,42 @@ class BuildingData ():
         # Eg. size of a small laser cutter / 3D printer
         doc_size_mm = (600, 600)
 
+        print (f"Creating scale with {scale}")
+
         sc = Scale(scale)
         # Pass scale instance to laser class
         Laser.sc = sc
         
-        material_thickness = bdata["material_thickness"]
+        print (f"Checking material thickness {options}")
+        
+        if "material_thickness" in options.keys():
+            material_thickness = options['material_thickness']
+        elif "material_thickness" in bdata.keys():
+            material_thickness = bdata["material_thickness"]
+        else:
+            # ideally shouldn't get this but use a sensible default
+            print ("Warning using default for material thickness")
+            material_thickness = 3
+            
+        print (f"Creating scale material {material_thickness}")
         scale_material = int(sc.reverse_scale_convert(material_thickness))
+        print ("Scale material created")
         # Set material thickness for Interlocking (class variable)
         Interlocking.material_thickness = scale_material
         # Set default etchline width
         EtchLine.global_etch_width = self.config.etch_line_width
 
-        Wall.settings["outertype"] = bdata["outertype"]
+        print ("Adding outertype")
+
+        if "outertype" in options.keys():
+            outertype = options['outertype']
+        elif "outertype" in bdata.keys():
+            outertype = bdata["outertype"]
+        else:
+            # ideally shouldn't get this but use a sensible default
+            print ("Warning using default for outer type ")
+            outertype = 3
+        Wall.settings["outertype"] = outertype
 
         # Convert configuration into SVG settings for output
         svgsettings = {}
@@ -197,6 +236,8 @@ class BuildingData ():
         svgsettings["etchaspolygon"] = self.config.etch_as_polygon
         svg = SVGOut(filename, svgsettings)
 
+        print ("Reading walls")
+
         walls = []
         for wall in self.get_walls():
             # Convert from string values to values from bdata
@@ -206,12 +247,16 @@ class BuildingData ():
         for roof in self.get_roofs():
             walls.append(Wall(roof[0], roof[1], roof[2]))
 
+        print ("Adding textures")
+
         for texture in self.get_textures():
             # If not area then default to entire wall
             area = []
             if 'area' in texture:
                 area = texture['area']
-            walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"] )
+            walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"], update=False)
+            
+        print ("Adding features")
             
         for feature in self.get_features():
             # Features takes a polygon, but may be represented as more basic rectangle.
@@ -227,14 +272,27 @@ class BuildingData ():
                 height = feature["parameters"]["height"]
                 polygon = rect_to_polygon((0,0), width, height)
                 
+            print (f'Adding feature to {feature["wall"]}')
+            print (f'Pos {pos}, Polygon {polygon}')
             walls[feature["wall"]].add_feature(feature["type"], feature["template"], pos, polygon,
-                                               feature["cuts"], feature["etches"], feature["outers"])
+                                               feature["cuts"], feature["etches"], feature["outers"], update=False)
             
+        print ("Adding interlocking")
+        # export interlocking defaults to True, but can be overridden
+        en_il = True
+        if "interlocking" in options.keys():
+            en_il == options['interlocking']
+        elif "interlocking" in bdata.keys():
+            # Could be stored a bool or string
+            if bdata["outertype"] == False or bdata["outertype"].lower() == "false":
+                en_il = False
+        Wall.settings["outertype"] = outertype
         # if setting is ignore interlocking then ignore any entries (wall will have il=[])
-        if bdata['interlocking'].lower() == "true":
+        if en_il:
             #print ("Getting interlocking")
             # otherwise add
             for il in self.get_interlocking():
+                print (f"Adding il {il}")
                 # Add both primary and secondary for each entry
                 # il_type has default but can add others in future
                 il_type = "default"
@@ -246,9 +304,12 @@ class BuildingData ():
                 # if tags exist then use that if not then don't include
                 parameters = {}
                 for this_key in parameter_keys:
+                    print (f"Parameter {this_key}")
                     if this_key in il.keys():
                         parameters[this_key] = il[this_key]
+                        print(f" param value {parameters[this_key]}")
                 reverse = ""
+                # il["primary"] (and secondary) are tuples with 2 values = no reverse option, 3 values includes reverse
                 if len(il["primary"]) > 2:
                     reverse = il["primary"][2]
                 walls[il["primary"][0]].add_interlocking(il["step"], il["primary"][1], "primary", reverse, il_type, parameters)
@@ -263,6 +324,10 @@ class BuildingData ():
         num_walls = len(walls)
         wall_num = 0
         for wall in walls:
+            print (f"Exporting wall {wall_num}")
+            # First update the wall
+            wall.update(interlock=True, texture=True)
+            
             # Is this modulo grid_width if so then start next line
             # Will match on first one - which will add spacing
             if num_objects % grid_width == 0:
@@ -373,7 +438,7 @@ class BuildingData ():
     
     def get_interlocking(self):
         if (not "interlocking" in self.data):
-            #print ("No interlocking")
+            print ("No interlocking")
             return []
         return self.data["interlocking"]
     
@@ -412,10 +477,14 @@ class BuildingData ():
     
     # Returns as a copy of the parameters and settings
     def get_values(self):
-        values = self.data["parameters"].copy()
-        # If any settings then add those
-        if "settings" in self.data.keys():
-            values.update(self.data["settings"])
+        if "parameters" in self.data.keys():
+            values = self.data["parameters"].copy()
+            if "settings" in self.data.keys():
+                #print (f"Adding {self.data["settings"]}")
+                values.update(self.data["settings"])
+        else:
+            values = {}
+
         return values
 
     def get_features(self):

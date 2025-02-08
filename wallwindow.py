@@ -460,7 +460,7 @@ class WallWindowUI(QMainWindow):
         # if this is a new wall
         if self.wall == None:
             # Add this wall
-            self.builder.add_wall(wall_data)
+            self.wall = self.builder.add_wall(wall_data)
         # If this is existing wall then update it
         else:
             self.wall.name = wall_data['name']

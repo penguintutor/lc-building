@@ -8,6 +8,7 @@ class Scale():
         'N': 148,      # Note that some of the objects are very small with N scale
         'OO': 76.2,
         'HO': 87,
+        'O': 48,
         'TT': 120,
         'G': 22.5,
         'F': 20.3,

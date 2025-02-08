@@ -27,6 +27,9 @@ import json
 # Note that methods ending _towall should only be used during a load or where update is being called afterwards
 # Is used internally and for performance reasons can be used by file load etc.
 
+# Some methods include option update=True
+# Can instead set to False if multiple operations then apply manuall afterwards
+
 class Wall():
     
     settings = {}
@@ -296,10 +299,11 @@ class Wall():
     # Note that this is different order to texture constructor as
     # in constructor type is optional - but not in here
     # area can be [] which means entire wall
-    def add_texture (self, type, area, settings):
+    def add_texture (self, type, area, settings, update=True):
         self.add_texture_towall (type, area, settings)
-        # Only update etches as that is limit of textures
-        self.update_etches()
+        if update == True:
+            # Only update etches as that is limit of textures
+            self.update_etches()
 
     # This is internal method - or one to be used when loading from file
     # Does not perform update - also used by add_feature but then performs update
@@ -330,9 +334,11 @@ class Wall():
     # Add a feature - such as a window
     # cuts, etches and outers should all be lists
     # If not set to None then change to [] avoid dangerous default
-    def add_feature (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None):
+    def add_feature (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None, update=True):
         feature_num = self.add_feature_towall (feature_type, feature_template, startpos, points, cuts, etches, outers)
-        self.update()
+        if update == True:
+            print ("Update")
+            self.update()
         return feature_num
 
     # Add feature loaded from file
@@ -374,6 +380,7 @@ class Wall():
     # edges are number from 0 (top left) in clockwise direction
     # parameters should be a dictionary if supplied
     def add_interlocking (self, step, edge, primary, reverse, il_type, parameters=None):
+        print (f"Adding interlocking to {self.name}, Edge {edge}, Step {step}, {primary}, {reverse}, {il_type}, Params {parameters}")
         if parameters==None:
             parameters = {}
         self.il.append(Interlocking(step, edge, primary, reverse, il_type, parameters))

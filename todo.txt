@@ -13,6 +13,8 @@ Make view scene honor checkboxes
 When clicking edit but nothing selected give a warning - select object first
 When quit chosen ask if save
 Refresh (update_all_views) does not always appear to update all walls.
+Pressing delete should delete a wall
+When copy - perhaps ask new wall name?
 
 
 ## In add / edit wall window
@@ -23,6 +25,9 @@ Handle selection of scale
 - when reset go back to default
 Switching to custom set first entry to 0,0
 When returning from an edit - should return to the edit view
+Ensure profile menu is reset when adding new
+After adding wall switch to that view
+After adding wall then texture is shown even if not ticked
 
 # Track updates 
 Warn if open etc.
@@ -38,6 +43,7 @@ Possibly - rename copied walls (1) etc. instead of (copy)
 
 # Delete wall
 Note need to update any interlockinggroups to refer to new wall references
+Does not appear to delete all interlocking references
 
 # Edit wall 
 Make it obvious in wall edit mode (not sure how best to achieve)
@@ -65,7 +71,13 @@ No checking for duplicates
 Can only delete and readd rather than edit
 * If add edit then should not be allowed to change wall as that is where objects exist
 Refresh doesn't work when deleting interlocking
+Ensure that re-read walls for the add menu
+Delete existing interlocking when opening file
 
+
+# Export
+Show status whilst exporting
+*** VImportant Export uses old wall data needs to be updated first
 
 
 # Track history - with undo and redo
@@ -73,4 +85,5 @@ Currently history is saved on objects - need to save in main windows / edit wind
 
 # Future 
 Show selected objects better 
-
+Perhaps texture picker 
+Helpers when doing interlocking (eg. whether forward vs reverse based on direction of edge) and perhaps suggested il for typical building / wizard.

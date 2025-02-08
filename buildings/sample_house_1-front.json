@@ -1,0 +1,1 @@
+{"name": "", "type": "", "subtype": "", "description": "", "settings": [], "walls": [["Front", [[0, 0], [9000, 0], [9000, 6000], [0, 6000], [0, 0]], "front", [0, 0]]], "textures": [{"type": "brick", "wall": 0, "settings": {"brick_height": 65, "brick_width": 103, "brick_etch": 10}}], "features": [], "interlocking": []}
