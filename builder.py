@@ -333,17 +333,24 @@ class Builder():
         #print ("Builder processing data complete\n\n")
             
     def add_il (self, primary_wall_id, primary_edge, primary_reverse, secondary_wall_id, secondary_edge, secondary_reverse, il_type, step, parameters):
-            # il moved to wall and then get back as a reference so it can be added to the interlocking group
-            primary_wall = self.walls[primary_wall_id]
-            primary_il = primary_wall.add_interlocking(step, primary_edge, "primary", primary_reverse, il_type, parameters)
-            secondary_wall = self.walls[secondary_wall_id]
-            secondary_il = secondary_wall.add_interlocking(step, secondary_edge, "secondary", secondary_reverse, il_type, parameters)
-            self.interlocking_groups.append(InterlockingGroup(primary_wall_id, primary_il, secondary_wall_id, secondary_il))
+        # il moved to wall and then get back as a reference so it can be added to the interlocking group
+        primary_wall = self.walls[primary_wall_id]
+        primary_il = primary_wall.add_interlocking(step, primary_edge, "primary", primary_reverse, il_type, parameters)
+        secondary_wall = self.walls[secondary_wall_id]
+        secondary_il = secondary_wall.add_interlocking(step, secondary_edge, "secondary", secondary_reverse, il_type, parameters)
+        self.interlocking_groups.append(InterlockingGroup(primary_wall_id, primary_il, secondary_wall_id, secondary_il))
+        #self.print_il()
+            
+            
+    def print_il (self):
+        print (f"IL entries:")
+        for il_group in self.interlocking_groups:
+            print (f" {il_group}")
             
     def delete_wall (self, wall):
         for i in range (0, len(self.walls)):
             if self.walls[i] == wall:
-                print (f"Deleting wall {i}")
+                #print (f"Deleting wall {i}")
                 # Delete any interlocking objects that reference this wall
                 # Must be before deleting wall as walls renumbered afterwards
                 self.delete_wall_il(i)

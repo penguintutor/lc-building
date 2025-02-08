@@ -218,9 +218,9 @@ class MainWindowUI(QMainWindow):
                 selected_objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj))
             # Should only be one selected (don't support copying multiple walls together)
             if len(selected_objs) == 1:
-                print ("Copy selected")
-                print (f"Name: {selected_objs[0].name}")
-                print (f"Type: {selected_objs[0].type}") 
+                #print ("Copy selected")
+                #print (f"Name: {selected_objs[0].name}")
+                #print (f"Type: {selected_objs[0].type}") 
                 # Copy in builder
                 self.builder.copy_wall(selected_objs[0])
                 # Update the scene

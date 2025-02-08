@@ -100,7 +100,7 @@ class InterlockingWindowUI(QMainWindow):
     # Do we need to update parent - if so set parent to true
     def update (self, parent=False):
         groups = self.builder.interlocking_groups
-        print (f"Num il groups {len(groups)}")
+        #print (f"Num il groups {len(groups)}")
                 
         # Hide all existing
         self.clear()

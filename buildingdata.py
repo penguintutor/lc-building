@@ -232,7 +232,7 @@ class BuildingData ():
             
         # if setting is ignore interlocking then ignore any entries (wall will have il=[])
         if bdata['interlocking'].lower() == "true":
-            print ("Getting interlocking")
+            #print ("Getting interlocking")
             # otherwise add
             for il in self.get_interlocking():
                 # Add both primary and secondary for each entry

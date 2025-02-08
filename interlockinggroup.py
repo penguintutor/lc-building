@@ -9,6 +9,8 @@ class InterlockingGroup():
         self.secondary_wall = secondary_wall
         self.secondary_il = secondary_il
         
-    
+    def __str__ (self):
+        return (f"{self.primary_wall} {self.primary_il} : {self.secondary_wall} {self.secondary_il}")
+
 
         

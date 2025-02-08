@@ -14,7 +14,7 @@ class Interlocking():
         self.edge = edge         # Edge number on wall this is contained in
         self.primary = primary   # Is this "primary" or "secondary"
         self.reverse = False
-        if reverse == "reverse":   # Set to "reverse" to reverse direction
+        if reverse == "reverse" or reverse == 1:   # Set to "reverse" to reverse direction
             self.reverse = True
         self.parameters = {}
         if parameters != None:
@@ -27,9 +27,12 @@ class Interlocking():
         self.end = None
         if "start" in self.parameters.keys():
             self.start = self.parameters["start"]
-        if "end" in self.parameters.keys():
+        # If end is 0 then it's default so ignore
+        if "end" in self.parameters.keys() and self.parameters["end"] != 0:
             self.end = self.parameters["end"]
-            
+        
+    def __str__ (self):
+        return (f"Edge {self.edge}, Step {self.step}, Primary {self.primary}, Reverse {self.reverse}, {self.parameters}")
         
     # sort based on start parameter
     def __lt__(self, other):
@@ -105,6 +108,7 @@ class Interlocking():
 
     # max line should be last distance for line (eg. - 1 step from end)
     def add_interlock_segment (self, line_start, line, max_line):
+        #print (f" Adding segment {line_start} {line} {max_line}")
         new_segments = [] 
         # Check we have enough space for Indent 
         angle = get_angle (line)
