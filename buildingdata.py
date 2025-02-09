@@ -161,7 +161,7 @@ class BuildingData ():
 
         bdata = self.get_values()
         
-        print ("Values read")
+        #print ("Values read")
         
         # todo read this from GUI somehow
         scale = "O"
@@ -178,13 +178,13 @@ class BuildingData ():
         # Eg. size of a small laser cutter / 3D printer
         doc_size_mm = (600, 600)
 
-        print (f"Creating scale with {scale}")
+        #print (f"Creating scale with {scale}")
 
         sc = Scale(scale)
         # Pass scale instance to laser class
         Laser.sc = sc
         
-        print (f"Checking material thickness {options}")
+        #print (f"Checking material thickness {options}")
         
         if "material_thickness" in options.keys():
             material_thickness = options['material_thickness']
@@ -195,15 +195,15 @@ class BuildingData ():
             print ("Warning using default for material thickness")
             material_thickness = 3
             
-        print (f"Creating scale material {material_thickness}")
+        #print (f"Creating scale material {material_thickness}")
         scale_material = int(sc.reverse_scale_convert(material_thickness))
-        print ("Scale material created")
+        #print ("Scale material created")
         # Set material thickness for Interlocking (class variable)
         Interlocking.material_thickness = scale_material
         # Set default etchline width
         EtchLine.global_etch_width = self.config.etch_line_width
 
-        print ("Adding outertype")
+        #print ("Adding outertype")
 
         if "outertype" in options.keys():
             outertype = options['outertype']
@@ -211,7 +211,7 @@ class BuildingData ():
             outertype = bdata["outertype"]
         else:
             # ideally shouldn't get this but use a sensible default
-            print ("Warning using default for outer type ")
+            #print ("Warning using default for outer type ")
             outertype = 3
         Wall.settings["outertype"] = outertype
 
@@ -236,7 +236,7 @@ class BuildingData ():
         svgsettings["etchaspolygon"] = self.config.etch_as_polygon
         svg = SVGOut(filename, svgsettings)
 
-        print ("Reading walls")
+        #print ("Reading walls")
 
         walls = []
         for wall in self.get_walls():
@@ -247,7 +247,7 @@ class BuildingData ():
         for roof in self.get_roofs():
             walls.append(Wall(roof[0], roof[1], roof[2]))
 
-        print ("Adding textures")
+        #print ("Adding textures")
 
         for texture in self.get_textures():
             # If not area then default to entire wall
@@ -256,7 +256,7 @@ class BuildingData ():
                 area = texture['area']
             walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"], update=False)
             
-        print ("Adding features")
+        #print ("Adding features")
             
         for feature in self.get_features():
             # Features takes a polygon, but may be represented as more basic rectangle.
@@ -272,12 +272,12 @@ class BuildingData ():
                 height = feature["parameters"]["height"]
                 polygon = rect_to_polygon((0,0), width, height)
                 
-            print (f'Adding feature to {feature["wall"]}')
-            print (f'Pos {pos}, Polygon {polygon}')
+            #print (f'Adding feature to {feature["wall"]}')
+            #print (f'Pos {pos}, Polygon {polygon}')
             walls[feature["wall"]].add_feature(feature["type"], feature["template"], pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"], update=False)
             
-        print ("Adding interlocking")
+        #print ("Adding interlocking")
         # export interlocking defaults to True, but can be overridden
         en_il = True
         if "interlocking" in options.keys():
@@ -292,7 +292,7 @@ class BuildingData ():
             #print ("Getting interlocking")
             # otherwise add
             for il in self.get_interlocking():
-                print (f"Adding il {il}")
+                #print (f"Adding il {il}")
                 # Add both primary and secondary for each entry
                 # il_type has default but can add others in future
                 il_type = "default"
@@ -304,10 +304,10 @@ class BuildingData ():
                 # if tags exist then use that if not then don't include
                 parameters = {}
                 for this_key in parameter_keys:
-                    print (f"Parameter {this_key}")
+                    #print (f"Parameter {this_key}")
                     if this_key in il.keys():
                         parameters[this_key] = il[this_key]
-                        print(f" param value {parameters[this_key]}")
+                        #print(f" param value {parameters[this_key]}")
                 reverse = ""
                 # il["primary"] (and secondary) are tuples with 2 values = no reverse option, 3 values includes reverse
                 if len(il["primary"]) > 2:
@@ -318,15 +318,17 @@ class BuildingData ():
                     reverse = il["secondary"][2]
                 walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
             
-        print ("Creating output")   
+        #print ("Creating output")   
         # Create output
         # Track wall number for simple progress chart
         num_walls = len(walls)
         wall_num = 0
         for wall in walls:
-            print (f"Exporting wall {wall_num}")
+            #print (f"Exporting wall {wall_num}")
             # First update the wall
             wall.update(interlock=True, texture=True)
+            
+            #print ("Wall updated")
             
             # Is this modulo grid_width if so then start next line
             # Will match on first one - which will add spacing
@@ -340,9 +342,13 @@ class BuildingData ():
             # Get overall dimensions for positioning
             num_objectsect_size = sc.convert(wall.get_maxsize())
                 
+            #print ("Getting cuts")
+            
             # get the cuts
             for cut in wall.get_cuts():
                 svg.add_cut(cut)
+                    
+            #print ("Getting etches")
                     
             # Get the etching
             etches = wall.get_etches()

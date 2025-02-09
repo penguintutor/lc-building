@@ -175,13 +175,16 @@ class EtchLine(Etch):
     # Used by etch lines only, but can be accessed by all instances
     global_etch_width = 10
     def __init__(self, start, end, internal_offset=(0,0), strength=5, etch_width=None):
+        #print ("Creating Etch line")
         self.strength = strength
         self.start = start
         self.end = end
         # how wide to cut (cannot have line as lightburn doesn't like it)
         # If set to None (default) then look at class variable global_etch_width
         self.etch_width = etch_width
+        #print ("Calling EtchLine init")
         super().__init__("line", internal_offset)
+        #print ("Etchline created")
     
     # unformat returns (type, [list_of_values]) 
     def unformat(self):
@@ -406,6 +409,9 @@ class OuterLine(Outer):
         return (("line", (self.start, self.end)))
         
     def get_args(self):
+        #print ("Outer line get arg")
+        #print (f"Start {self.start}")
+        #print (f"End {self.end}")
         return [self.start, self.end]
     
     def get_start(self):
@@ -423,8 +429,13 @@ class OuterLine(Outer):
         return CutLine(args[0], args[1], self.io)
     
     def get_etch(self):
+        #print ("Getting etch from outerline")
         args = self.get_args()
-        return EtchLine(args[0], args[1], self.io, strength)
+        #print ("Getting etch line")
+        #print (f"args {args}")
+        #print (f"Self.io {self.io}")
+        #print (f"Strength {self.strength}")
+        return EtchLine(args[0], args[1], self.io, self.strength)
     
     def get_start_pixels_screen(self, offset=(0,0)):
         # Add internal offset to offset
@@ -480,6 +491,8 @@ class OuterPolygon(Outer):
         return (("polygon", self.points))
         
     def get_args(self):
+        #print ("Get args")
+        #print (f"Points {self.points}")
         return self.points
 
     # Returns as a cut object

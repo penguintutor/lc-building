@@ -164,8 +164,11 @@ class Feature():
         return cuts
     
     def get_outers_etches(self):
+        #print ("In get outers etches")
         etches = []
+        #print (f"Outers {self.outers}")
         for outer in self.outers:
+            #print (f"Outer {outer}")
             etches.append(outer.get_etch())
         return etches
         

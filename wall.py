@@ -167,9 +167,13 @@ class Wall():
             self.show_interlock = interlock
         if texture != None:
             self.show_textures = texture
+        #print ("Update - update cuts")
         self.update_cuts()
+        #print ("Update - update etches")
         self.update_etches()
+        #print ("Update - update outers")
         self.update_outers()
+        #print ("Update done")
         
     # Gets only cuts associated with the wall itself (not features / textures)
     # Used by wall edit also internally by update_cuts
@@ -231,7 +235,9 @@ class Wall():
     # For performance reasons call this initially then just use get_cuts
     # but if update then run this again before running get_cuts
     def update_cuts (self):
+        #print ("Updating cuts")
         self.cut_lines = self.get_wall_cuts ()
+        #print ("Getting cuts from features")
         # Add cuts from features
         feature_cuts = self._get_cuts_features()
         if feature_cuts != None:
@@ -251,17 +257,24 @@ class Wall():
     
     # Implement this at the Wall level
     def update_etches (self):
+        #print ("Updating wall etches")
         self.etches = self._texture_to_etches()
         # Add etches from features
+        #print ("Getting features from etches")
         feature_etches = self._get_etches_features()
-        if feature_etches != None:
+        #print ("Returned from _get_etches_features")
+        #print (f"Features {feature_etches}")
+        #print (f"Got {self.etches}")
+        if feature_etches != None and feature_etches != []:
             self.etches.extend(feature_etches)
+        #print ("Features extended")
         return self.etches
 
     def get_outers (self):
         return self.outers
         
     def update_outers (self):
+        #print ("Getting wall outers")
         self.outers = []
         # Add any accessories (windows etc.)
         for feature in self.features:
@@ -337,7 +350,7 @@ class Wall():
     def add_feature (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None, update=True):
         feature_num = self.add_feature_towall (feature_type, feature_template, startpos, points, cuts, etches, outers)
         if update == True:
-            print ("Update")
+            #print ("Update")
             self.update()
         return feature_num
 
@@ -380,7 +393,7 @@ class Wall():
     # edges are number from 0 (top left) in clockwise direction
     # parameters should be a dictionary if supplied
     def add_interlocking (self, step, edge, primary, reverse, il_type, parameters=None):
-        print (f"Adding interlocking to {self.name}, Edge {edge}, Step {step}, {primary}, {reverse}, {il_type}, Params {parameters}")
+        #print (f"Adding interlocking to {self.name}, Edge {edge}, Step {step}, {primary}, {reverse}, {il_type}, Params {parameters}")
         if parameters==None:
             parameters = {}
         self.il.append(Interlocking(step, edge, primary, reverse, il_type, parameters))
@@ -396,6 +409,8 @@ class Wall():
             for texture in self.textures:
                 # Each texture can have one or more etches
                 etches.extend(texture.get_etches(exclude_areas))
+        #print ("Returning from _texture_to_etches")
+        #print (f"Returning {etches}")
         return etches
         
 
@@ -412,11 +427,14 @@ class Wall():
     def _get_etches_features (self):
         feature_etches = []
         for feature in self.features:
+            #print (f"Feature {feature}")
             feature_etches.extend(feature.get_etches())
             if "outertype" in self.settings and self.settings["outertype"] == "etches":
+                #print (f"Getting outers from _get_etches")
                 new_etches = feature.get_outers_etches()
-                if new_etches != None:
+                if new_etches != None and new_etches != []:
                     feature_etches.extend(new_etches)
+        #print (f"Returning from _get_etches_features {feature_etches}")
         return feature_etches
 
 
