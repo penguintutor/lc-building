@@ -1,19 +1,11 @@
 # Window to add / update texture to a wall
 
 import os
-from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo, QObject, Qt
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QWidget
-from PySide6.QtSvgWidgets import QGraphicsSvgItem
+from PySide6.QtCore import QThreadPool, Signal
+from PySide6.QtWidgets import QMainWindow, QMessageBox
 from PySide6.QtUiTools import QUiLoader
-from scale import Scale
-from builder import Builder
-from viewscene import ViewScene
 from lcconfig import LCConfig
 from gconfig import GConfig
-from vgraphicsscene import ViewGraphicsScene
-from wall import Wall
-import webbrowser
-import resources
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
@@ -76,7 +68,8 @@ class TextureWindowUI(QMainWindow):
                    
         # Set wall type pull down menu
         for texture_key in self.textures.keys():
-            self.ui.textureCombo.addItem(self.textures[texture_key][0])
+            this_texture = self.textures[texture_key][0]
+            self.ui.textureCombo.addItem(this_texture)
         
         # Set to 0 - None
         # If already set then need to change
@@ -109,6 +102,7 @@ class TextureWindowUI(QMainWindow):
         for key in self.textures.keys():
             if self.textures[key][0] == texture:
                 return key
+        return None
 
     # Return index position in the textures
     # used to get position of the pull-down from the name

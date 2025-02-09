@@ -5,12 +5,10 @@
 # interprets the different types
 
 import os
-from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo, QObject, Qt
+from PySide6.QtCore import QThreadPool, Signal, QFileInfo, Qt
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QWidget
-from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtUiTools import QUiLoader
 from scale import Scale
-from builder import Builder
 from viewscene import ViewScene
 from lcconfig import LCConfig
 from gconfig import GConfig

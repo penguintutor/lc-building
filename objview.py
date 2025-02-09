@@ -14,7 +14,7 @@ from PySide6.QtWidgets import QGraphicsItem
 # eg. so can re-render the texture without effecting other objects
 # Create as an object group and move items into it
 class ObjView():
-    def __init__ (self, scene, settings, coords = [0,0], type="unknown", moveable=True):
+    def __init__ (self, scene, settings, coords = (0,0), type="unknown", moveable=True):
         #print ("Adding objview to scene {scene}")
         #print (f"Creating object moveable {moveable}")
         self.settings = settings
@@ -58,7 +58,7 @@ class ObjView():
         
     def get_pos(self):
         # Perhaps regenerate at this point??
-        return self.pos()
+        return self.pos
                 
     def set_offset(self, offset):
         self.offset = offset
@@ -130,7 +130,7 @@ class ObjView():
             this_etch = self.scene.addPolygon(polygon, pen_obj) 
             self.item_group.addToGroup(this_etch)
         else:
-           self.add_standard_object (etch, "etch", strength) 
+            self.add_standard_object (etch, "etch", strength) 
 
 
 

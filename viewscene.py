@@ -1,12 +1,6 @@
 # Draws the view onto the scene - eg. front walls
 # Pulls in relevant objects from builder (eg. walls) and then uses ObjViews to draw
-from PySide6.QtCore import QPoint, QPointF
-from builder import Builder
-from wall import Wall
-from texture import Texture
-from feature import Feature
 from objview import ObjView
-from laser import Laser
 
 class ViewScene():
     def __init__(self, scene, builder, gconfig, view_name):
@@ -68,8 +62,9 @@ class ViewScene():
                 return i
         return None
     
-    def del_obj_from_obj_view(self, selected_obj):
-        id = self.get_id_from_obj_view(selected_obj)
+    # Not implemented - possible cleanup
+    #def del_obj_from_obj_view(self, selected_obj):
+    #    id = self.get_id_from_obj_view(selected_obj)
         
         
     # Add walls to the scene

@@ -14,7 +14,6 @@
 # Standard methods uses scale class for scaling
 # Methods with _screen return using vs (zoom level)
 
-from scale import Scale
 from viewscale import ViewScale
 
 class Laser():
@@ -165,8 +164,8 @@ class Etch(Laser):
     def __init__(self, type, internal_offset):
         super().__init__(type, internal_offset)
         
-    def get_strength(self):
-        return self.strength
+    #def get_strength(self):
+    #    return self.strength
         
         
 # Start and end are tuples
@@ -420,8 +419,8 @@ class OuterLine(Outer):
     def get_end(self):
         return (self.end[0]+self.io[0], self.end[1]+self.io[1])
 
-    def get_size(self):
-        return self.size
+    #def get_size(self):
+    #    return self.size
 
     # Returns as a cut object
     def get_cut(self):
@@ -457,10 +456,13 @@ class OuterRect(Outer):
         
     # uformat returns (type, [list_of_values]) 
     def unformat(self):
-       return (("rect", (self.start, self.size))) 
-        
+        return (("rect", (self.start, self.size))) 
+
     def get_args(self):
         return [self.start, self.size]
+    
+    def get_start(self):
+        return (self.start[0]+self.io[0], self.start[1]+self.io[1])
     
     # Returns as a cut object
     def get_cut(self):
@@ -504,7 +506,8 @@ class OuterPolygon(Outer):
 
     def get_points_pixels_screen(self, offset=(0,0)):
         new_points = []
-        for point in self.get_points():
+        #for point in self.get_points():
+        for point in self.points:
             sc_point = Laser.vs.convert(point)
             new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
         return new_points

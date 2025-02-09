@@ -5,19 +5,12 @@
 # interprets the different types
 
 import os
-from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo, QObject
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QWidget
-from PySide6.QtSvgWidgets import QGraphicsSvgItem
+from PySide6.QtCore import QThreadPool, Signal
+from PySide6.QtWidgets import QMainWindow, QMessageBox
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtUiTools import QUiLoader
-from scale import Scale
-from builder import Builder
-from viewscene import ViewScene
 from lcconfig import LCConfig
 from gconfig import GConfig
-from vgraphicsscene import ViewGraphicsScene
-import webbrowser
-import resources
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)

@@ -4,14 +4,11 @@ from mainwindow import MainWindowUI
 from scale import Scale
 from laser import Laser
 from interlocking import Interlocking
-from wallwindow import WallWindowUI
-
 
 class App(QApplication):
     def __init__ (self, args):
         super().__init__()
         
-
 # Scale for output - default to OO
 sc = Scale("OO")
 # Pass scale instance to laser class

@@ -1,7 +1,6 @@
 import os
 from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QLabel, QTableWidget, QTableWidgetItem
-from PySide6.QtSvgWidgets import QGraphicsSvgItem
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
 from viewscene import ViewScene
@@ -10,7 +9,6 @@ from lcconfig import LCConfig
 from gconfig import GConfig
 from vgraphicsscene import ViewGraphicsScene
 import webbrowser
-import resources
 from wallwindow import WallWindowUI
 from texturewindow import TextureWindowUI
 from addfeaturewindow import AddFeatureWindowUI
@@ -42,7 +40,7 @@ class MainWindowUI(QMainWindow):
         
         self.config = LCConfig()
         # How much we are zoomed in zoom (1 = 100%, 2 = 200%)
-        self.zoom_level = 1
+        self.zoom_level = 1.0
         
         # Used if need to send a status message (eg. pop-up warning)
         self.status_message = ""
@@ -322,7 +320,8 @@ class MainWindowUI(QMainWindow):
 
 
     def open_file_dialog(self):
-        filename = QFileDialog.getOpenFileName(self.parent(), "Open building file", "", "Building file (*.json);;All (*.*)")
+        #filename = QFileDialog.getOpenFileName(self.parent(), "Open building file", "", "Building file (*.json);;All (*.*)")
+        filename = QFileDialog.getOpenFileName(self, "Open building file", "", "Building file (*.json);;All (*.*)")
         #print (f'Selected file {filename}')
         # possibly check for valid file
         if filename[0] == '':
@@ -502,7 +501,8 @@ class MainWindowUI(QMainWindow):
         if self.zoom_level <= 0.25:
             return
         else:
-            self.zoom_level -= 0.25
+            #self.zoom_level -= 0.25
+            self.zoom_level = float(self.zoom_level) - 0.25
         # Otherwise scale by 1/2 size
         self.ui.graphicsView.resetTransform()
         self.ui.graphicsView.scale(self.zoom_level, self.zoom_level)
@@ -516,7 +516,8 @@ class MainWindowUI(QMainWindow):
         if self.zoom_level >= 10:
             return
         else:
-            self.zoom_level += 0.25        
+            #self.zoom_level += 0.25
+            self.zoom_level = float(self.zoom_level) + 0.25
         # Otherwize zoom in by twice current
         self.ui.graphicsView.resetTransform()
         self.ui.graphicsView.scale(self.zoom_level, self.zoom_level)
