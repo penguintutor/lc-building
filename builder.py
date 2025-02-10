@@ -51,6 +51,13 @@ class Builder():
     # Overwrites existing file
     # If want to confirm to overwrite check before calling this
     def save_file(self, filename):
+        newdata = self.update_bdata()
+        # Save details
+        result = self.building.save_file(filename, newdata)
+        print (f"Save completed - {result}")
+        return result
+    
+    def update_bdata(self):
         # create newdata dictionary with all current data
         # Start with building summary information (main data) which is a dictionary
         newdata = self.building_info
@@ -101,12 +108,8 @@ class Builder():
                 "start": il_group.primary_il.start
                 })
         newdata['interlocking'] = il_data
-                
-        #print (f"New data:\n {newdata}")
-        # Save details
-        result = self.building.save_file(filename, newdata)
-        print (f"Save completed - {result}")
-        return result
+        return newdata
+
         
     # Exports the file as SVG
     # Overwrites existing file
@@ -164,7 +167,14 @@ class Builder():
 #         #print (f"New data:\n {newdata}")
 #         # Save details
 #         result = self.building.export_file(filename, newdata)
-        result = self.building.export_file(filename)
+
+        #print ("Getting newdata")
+
+        newdata = self.update_bdata()
+        
+        #print (f"New data {newdata}")
+
+        result = self.building.export_file(filename, newdata)
         return result
         
     # Get the walls that match a certain view

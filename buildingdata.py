@@ -144,7 +144,7 @@ class BuildingData ():
     # todo
     # Need to ensure building data is updated first
     # Options are things that can be selected - eg. material_thickness etc.
-    def export_file (self, filename, options=None):
+    def export_file (self, filename, bdata, options=None):
         #### TEMP
         ### Todo - this should be read in - any values missing then can use
         # Bdata instead
@@ -155,13 +155,12 @@ class BuildingData ():
                 "interlocking": "true"
                 }
         
-        
-        
         print (f"Starting export in building data filename {filename}")
 
-        bdata = self.get_values()
+        #bdata = self.get_values()
+        #bdata = new_data.get_values()
         
-        #print ("Values read")
+        print (f"Bdata {bdata}")
         
         # todo read this from GUI somehow
         scale = "O"

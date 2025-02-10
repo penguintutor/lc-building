@@ -163,9 +163,12 @@ class CutPolygon(Cut):
 class Etch(Laser):
     def __init__(self, type, internal_offset):
         super().__init__(type, internal_offset)
-        
-    #def get_strength(self):
-    #    return self.strength
+    
+    # Strength is added by the subclass
+    strength = None
+    
+    def get_strength(self):
+        return self.strength
         
         
 # Start and end are tuples
