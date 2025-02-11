@@ -235,29 +235,32 @@ class BuildingData ():
         svgsettings["etchaspolygon"] = self.config.etch_as_polygon
         svg = SVGOut(filename, svgsettings)
 
-        #print ("Reading walls")
+        print ("Reading walls")
 
         walls = []
-        for wall in self.get_walls():
+        #for wall in self.get_walls():
+        for wall in bdata['walls']:
             # Convert from string values to values from bdata
             walls.append(Wall(wall[0], wall[1], wall[2]))
             
         # Add roofs (loads differently but afterwards is handled as a wall)
-        for roof in self.get_roofs():
-            walls.append(Wall(roof[0], roof[1], roof[2]))
+        #for roof in self.get_roofs():
+        #    walls.append(Wall(roof[0], roof[1], roof[2]))
 
-        #print ("Adding textures")
+        print ("Adding textures")
 
-        for texture in self.get_textures():
+        #for texture in self.get_textures():
+        for texture in bdata['textures']:
             # If not area then default to entire wall
             area = []
             if 'area' in texture:
                 area = texture['area']
             walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"], update=False)
             
-        #print ("Adding features")
+        print ("Adding features")
             
-        for feature in self.get_features():
+        #for feature in self.get_features():
+        for feature in bdata['features']:
             # Features takes a polygon, but may be represented as more basic rectangle.
             pos = feature["parameters"]["pos"]
             polygon = []
@@ -276,7 +279,7 @@ class BuildingData ():
             walls[feature["wall"]].add_feature(feature["type"], feature["template"], pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"], update=False)
             
-        #print ("Adding interlocking")
+        print ("Adding interlocking")
         # export interlocking defaults to True, but can be overridden
         en_il = True
         if "interlocking" in options.keys():
@@ -290,7 +293,8 @@ class BuildingData ():
         if en_il:
             #print ("Getting interlocking")
             # otherwise add
-            for il in self.get_interlocking():
+            #for il in self.get_interlocking():
+            for il in bdata['interlocking']:
                 #print (f"Adding il {il}")
                 # Add both primary and secondary for each entry
                 # il_type has default but can add others in future

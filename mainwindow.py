@@ -448,8 +448,9 @@ class MainWindowUI(QMainWindow):
         QMessageBox.warning(self, "File save error", self.status_message, QMessageBox.Ok)
         
 
-    def visit_website(self, s):
-        webbrowser.open("https://www.penguintutor.com/projects/laser-cut-buildings")
+    def visit_website(self, site=None):
+        if site == None:
+            webbrowser.open("https://www.penguintutor.com/projects/laser-cut-buildings")
 
     def edit_menu(self):
         pass
@@ -623,7 +624,7 @@ class MainWindowUI(QMainWindow):
                     self.set_left_buttons("default")
 
             elif (len(selected_objs) == 1):
-                self.ui.infoLabel.setText(f"One object selected")
+                self.ui.infoLabel.setText("One object selected")
                 info_dict = selected_objs[0].get_summary_dict()
                 current_row = 0
                 self.ui.infoTable.setRowCount(len(info_dict))
@@ -637,13 +638,13 @@ class MainWindowUI(QMainWindow):
                 else:
                     self.set_left_buttons("wallselect")
             else:
-                self.ui.infoLabel.setText(f"No objects selected")
+                self.ui.infoLabel.setText("No objects selected")
                 if self.current_scene == "walledit":
                     self.set_left_buttons("walledit")
                 else:
                     self.set_left_buttons("default")
         else:
-            self.ui.infoLabel.setText(f"No objects selected")
+            self.ui.infoLabel.setText("No objects selected")
             
         
     # Call if checkbox changed
