@@ -156,11 +156,6 @@ class BuildingData ():
                 }
         
         print (f"Starting export in building data filename {filename}")
-
-        #bdata = self.get_values()
-        #bdata = new_data.get_values()
-        
-        print (f"Bdata {bdata}")
         
         # todo read this from GUI somehow
         scale = "O"
@@ -235,21 +230,12 @@ class BuildingData ():
         svgsettings["etchaspolygon"] = self.config.etch_as_polygon
         svg = SVGOut(filename, svgsettings)
 
-        print ("Reading walls")
-
         walls = []
         #for wall in self.get_walls():
         for wall in bdata['walls']:
             # Convert from string values to values from bdata
             walls.append(Wall(wall[0], wall[1], wall[2]))
             
-        # Add roofs (loads differently but afterwards is handled as a wall)
-        #for roof in self.get_roofs():
-        #    walls.append(Wall(roof[0], roof[1], roof[2]))
-
-        print ("Adding textures")
-
-        #for texture in self.get_textures():
         for texture in bdata['textures']:
             # If not area then default to entire wall
             area = []
@@ -257,9 +243,6 @@ class BuildingData ():
                 area = texture['area']
             walls[texture["wall"]].add_texture(texture["type"], area, texture["settings"], update=False)
             
-        print ("Adding features")
-            
-        #for feature in self.get_features():
         for feature in bdata['features']:
             # Features takes a polygon, but may be represented as more basic rectangle.
             pos = feature["parameters"]["pos"]
@@ -274,12 +257,9 @@ class BuildingData ():
                 height = feature["parameters"]["height"]
                 polygon = rect_to_polygon((0,0), width, height)
                 
-            #print (f'Adding feature to {feature["wall"]}')
-            #print (f'Pos {pos}, Polygon {polygon}')
             walls[feature["wall"]].add_feature(feature["type"], feature["template"], pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"], update=False)
             
-        print ("Adding interlocking")
         # export interlocking defaults to True, but can be overridden
         en_il = True
         if "interlocking" in options.keys():
@@ -321,7 +301,6 @@ class BuildingData ():
                     reverse = il["secondary"][2]
                 walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
             
-        #print ("Creating output")   
         # Create output
         # Track wall number for simple progress chart
         num_walls = len(walls)
@@ -330,8 +309,6 @@ class BuildingData ():
             #print (f"Exporting wall {wall_num}")
             # First update the wall
             wall.update(interlock=True, texture=True)
-            
-            #print ("Wall updated")
             
             # Is this modulo grid_width if so then start next line
             # Will match on first one - which will add spacing
@@ -344,14 +321,10 @@ class BuildingData ():
             # At end of adding each shape we extend the x position (but not the y)
             # Get overall dimensions for positioning
             num_objectsect_size = sc.convert(wall.get_maxsize())
-                
-            #print ("Getting cuts")
-            
+                            
             # get the cuts
             for cut in wall.get_cuts():
                 svg.add_cut(cut)
-                    
-            #print ("Getting etches")
                     
             # Get the etching
             etches = wall.get_etches()

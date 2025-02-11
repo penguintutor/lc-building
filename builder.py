@@ -83,7 +83,6 @@ class Builder():
                 feature_data.append (feature)
             wall_num += 1
             
-        #print ("Adding data")
         newdata['walls'] = wall_data
         newdata['textures'] = texture_data
         newdata['features'] = feature_data
@@ -116,64 +115,7 @@ class Builder():
     # If want to confirm to overwrite check before calling this
     def export_file(self, filename):
         # create newdata dictionary with all current data
-        # Not perform anymore - instead need to update current data into building data
-        # Start with building summary information (main data) which is a dictionary
-#         newdata = self.building_info
-#         newdata['settings'] = self.settings
-#         
-#         wall_data = []
-#         texture_data = []
-#         feature_data = []
-#         
-#         wall_num = 0
-#         for wall in self.walls:
-#             #print ("Getting walls")
-#             wall_data.append(wall.get_save_data())
-#             #print ("Getting textures")
-#             textures = wall.get_save_textures(wall_num)
-#             #print (f"Textures are {textures}")
-#             for texture in textures:
-#                 texture_data.append (texture)
-#             #print ("Getting Features")
-#             features = wall.get_save_features(wall_num)
-#             #print (f"Features are {features}")
-#             for feature in features:
-#                 feature_data.append (feature)
-#             wall_num += 1
-#             
-#         #print ("Adding data")
-#         newdata['walls'] = wall_data
-#         newdata['textures'] = texture_data
-#         newdata['features'] = feature_data
-#         
-#         # Add interlocking (not part of wall)
-#         il_data = []
-#         # Get wall and edge from both, but other parameters from primary only (should be the same)
-#         for il_group in self.interlocking_groups:
-#             primary_entry = [il_group.primary_wall, il_group.primary_il.edge]
-#             if il_group.primary_il.reverse == True:
-#                 primary_entry.append("reverse")
-#             secondary_entry = [il_group.secondary_wall, il_group.secondary_il.edge]
-#             if il_group.secondary_il.reverse == True:
-#                 secondary_entry.append("reverse")
-#             il_data.append({
-#                 "primary": primary_entry,
-#                 "secondary": secondary_entry,
-#                 "step": il_group.primary_il.step,
-#                 "start": il_group.primary_il.start
-#                 })
-#         newdata['interlocking'] = il_data
-#                 
-#         #print (f"New data:\n {newdata}")
-#         # Save details
-#         result = self.building.export_file(filename, newdata)
-
-        #print ("Getting newdata")
-
         newdata = self.update_bdata()
-        
-        #print (f"New data {newdata}")
-
         result = self.building.export_file(filename, newdata)
         return result
         
@@ -216,40 +158,35 @@ class Builder():
         for this_texture in wall_to_copy.get_textures():
             texture_details = this_texture.get_entry()
             # When adding texture to wall it takes different order to Texture constructor
-            # Thsi reorders them (see comment in add_texture in wall for more details)
+            # This reorders them (see comment in add_texture in wall for more details)
             new_wall.add_texture(texture_details[1], texture_details[0], texture_details[2])
         # Do not copy interlocking (does not make sense to do so)
-        
         
     # After loading data this converts into builder objects
     # Deletes any existing entries
     def process_data(self):
         
-        #print ("\n\nBuilder processing data")
         self.settings = self.building.get_settings()
         if len(self.settings) > 0:
             # Add settings to the class
             for setting in self.settings.keys():
                 Wall.settings[setting] = self.settings[setting]
         
-        #print ("Get main info")
         self.building_info = self.building.get_main_data()
         
-        #print ("Get walls")
         self.walls = []
         all_walls = self.building.get_walls()
         
         num_walls = len(all_walls)
-        #print (f"Num walls {num_walls}")
+
         current_wall = 0
-        #print (f"All walls {all_walls}")
+
         for wall in all_walls:
             percent_loaded = int((current_wall/num_walls)*100)
             print (f"Reading in walls {percent_loaded}%")
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2], wall[3]))
             current_wall += 1
-        #print (f"Self Walls {self.walls}")
             
         if num_walls > 0:
             print ("Reading in walls 100%")
