@@ -79,6 +79,11 @@ Choosing the Add Texture button will allow you to apply a texture to the wall (e
 
 To return to the main view click on the close button, or choose one of the other views from the view selection icons on the right hand side.
 
+
+### Interlocking
+
+Interlocking provides the ability to join walls using interlocking tabs. Each join needs two edges. One is designated primary, the other is secondary. The primary edge defaults to clockwise direction, or can be reversed by selecting reverse. The secondary edge is in the opposite direction and inverted resulting in interlocking tabs. The choice of reverse should normally be the same for both primary and secondary.
+
     
     
 ## Limitations

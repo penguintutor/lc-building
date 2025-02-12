@@ -89,12 +89,12 @@
       <widget class="QComboBox" name="secondaryReverseCombo">
        <item>
         <property name="text">
-         <string>Forward (clockwise)</string>
+         <string>Forward (anticlockwise)</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Reverse (anticlockwise)</string>
+         <string>Reverse (clockwise)</string>
         </property>
        </item>
       </widget>
