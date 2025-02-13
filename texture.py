@@ -2,12 +2,10 @@
 # Not shown where conflict with a feature (eg. window)
 # Creates an instance for each element - then can use to detect
 # if it needs to be removed because of other features
-
 import copy
 from laser import *
 from helpers import *
 from shapely import Point, Polygon, LineString
-
 
 # Only work in mm
 # Wall should handle conversion to pixels
@@ -196,8 +194,7 @@ class Texture():
             
         
     # Get lines within wall (or texture zone if that is defined instead)
-    # Note that there are many ways that this could be optomised, but based on usage (ie. typical builing size)
-    # this is efficient enough
+    # Note that there are ways that this could be optimized
     def _line_zone(self, line):
         return_lines = []
         # Get angle if needed later

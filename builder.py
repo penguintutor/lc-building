@@ -2,7 +2,6 @@
 # Uses BuildingData to import the data and then to
 # write it out, but otherwise uses internal objects to handle
 
-
 from buildingdata import *
 from helpers import *
 from wall import Wall
@@ -36,12 +35,13 @@ class Builder():
 
     # Loads a new file overwriting all data
     # Returns result of buildingdata load - (True/False, "Error string")
-    def load_file(self, filename):
+    # If GUI is set to a widget then use for status updates
+    def load_file(self, filename, gui=None):
         result = self.building.load_file(filename)
         # If successfully load then clear existing data and regenerate
         if result[0] == True:
-            print ("File loaded - processing data")
-            self.process_data()
+            #print ("File loaded - processing data")
+            self.process_data(gui)
         else:
             print ("File load failed")
         #print (f"Walls are {self.walls}")
@@ -164,13 +164,23 @@ class Builder():
         
     # After loading data this converts into builder objects
     # Deletes any existing entries
-    def process_data(self):
+    def process_data(self, gui=None):
         
+        # Use percentage - calculate as appropriate - only very approximate
+        percent_complete = 0
+        if gui != None:
+            #gui.update_progress(percent_complete)
+            #gui.progress_update_signal.emit(percent_complete)
+            gui.progress_update_signal.emit(2)
+        
+        #print ("Getting settings")
         self.settings = self.building.get_settings()
         if len(self.settings) > 0:
             # Add settings to the class
             for setting in self.settings.keys():
                 Wall.settings[setting] = self.settings[setting]
+        
+        #print ("Getting main data")
         
         self.building_info = self.building.get_main_data()
         
@@ -183,13 +193,18 @@ class Builder():
 
         for wall in all_walls:
             percent_loaded = int((current_wall/num_walls)*100)
-            print (f"Reading in walls {percent_loaded}%")
+            #print (f"Reading in walls {percent_loaded}%")
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2], wall[3]))
             current_wall += 1
             
-        if num_walls > 0:
-            print ("Reading in walls 100%")
+        #if num_walls > 0:
+        #    print ("Reading in walls 100%")
+            
+        percent_complete = 2
+        if gui != None:
+            #gui.update_progress(percent_complete)
+            gui.progress_update_signal.emit(percent_complete)
         
         # Add roofs (loads differently but afterwards is handled as a wall)
         for roof in self.building.get_roofs():
@@ -202,22 +217,26 @@ class Builder():
         current_texture = 0
         for texture in textures:
             percent_loaded = int((current_texture/num_textures)*100)
-            print (f"Applying textures {percent_loaded}%")
+            #print (f"Applying textures {percent_loaded}%")
             # If not area then default to entire wall
             area = []
             if 'area' in texture:
                 area = texture['area']
             self.walls[texture["wall"]].add_texture_towall(texture["type"], area, texture["settings"] )
             current_texture += 1
-        if num_textures > 0:
-            print ("Applying textures 100%")
+        #if num_textures > 0:
+        #    print ("Applying textures 100%")
+        
+        percent_complete = 5
+        if gui != None:
+            gui.progress_update_signal.emit(percent_complete)
         
         features = self.building.get_features()
         num_features = len(features)
         current_feature = 0
         for feature in features:
             percent_loaded = int((current_feature/num_features)*100)
-            print (f"Adding features {percent_loaded}%")
+            #print (f"Adding features {percent_loaded}%")
             # Features takes a polygon, but may be represented as more basic rectangle.
             pos = feature["parameters"]["pos"]
             polygon = []
@@ -234,8 +253,12 @@ class Builder():
             self.walls[feature["wall"]].add_feature_towall(feature["type"], feature["template"], pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"])
             current_feature += 1
-        if num_features > 0:
-            print (f"Adding features 100%")
+        #if num_features > 0:
+        #    print (f"Adding features 100%")
+            
+        percent_complete = 10
+        if gui != None:
+            gui.progress_update_signal.emit(percent_complete)
         
         # Although there is a setting to ignore interlocking still load it here to preserve
         for il in self.building.get_interlocking():
@@ -268,16 +291,31 @@ class Builder():
             secondary_il = self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
             self.interlocking_groups.append(InterlockingGroup(primary_wall, primary_il, secondary_wall, secondary_il))
         
+        percent_complete = 20
+        if gui != None:
+            gui.progress_update_signal.emit(percent_complete)
+        
         # Now force update as used non updating functions to add features / textures
         num_walls = len(self.walls)
+        
+        # split remaining 80 % over rendering
+        if num_walls > 0:
+            per_wall_percent = 80 / num_walls
         current_wall = 0
         for wall in self.walls:
             percent_loaded = int((current_wall/num_walls)*100)
-            print (f"Rendering walls {percent_loaded}%")
+            #print (f"Rendering walls {percent_loaded}%")
             wall.update()
+            percent_complete += per_wall_percent
+            if gui != None:
+                gui.progress_update_signal.emit(percent_complete)
             current_wall += 1
-        if num_walls > 0:
-            print ("Rendering walls 100%")
+        #if num_walls > 0:
+        #    print ("Rendering walls 100%")
+            
+        percent_complete = 100
+        if gui != None:
+            gui.progress_update_signal.emit(percent_complete)
     
         #print ("Builder processing data complete\n\n")
             

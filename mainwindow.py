@@ -1,6 +1,6 @@
 import os
-from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem
+from PySide6.QtCore import Qt, QCoreApplication, QThreadPool, Signal, QFileInfo
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QProgressDialog
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
 from viewscene import ViewScene
@@ -23,6 +23,7 @@ class MainWindowUI(QMainWindow):
     
     load_complete_signal = Signal()
     file_save_warning_signal = Signal()
+    progress_update_signal = Signal(int)
     
     def __init__(self):
         super().__init__()
@@ -33,10 +34,15 @@ class MainWindowUI(QMainWindow):
         # Connect signal handler
         self.load_complete_signal.connect(self.load_complete)
         self.file_save_warning_signal.connect(self.file_save_warning)
-        
+        self.progress_update_signal.connect(self.update_progress_dialog)
         
         self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
+        
+        # Progress dialog window (create when required)
+        self.progress_window = None
+        #self.progress_window = QProgressDialog ("Updating ...", "Cancel", 0, 0)
+        #self.progress_window.setWindowModality(Qt.WindowModal)
         
         self.config = LCConfig()
         # How much we are zoomed in zoom (1 = 100%, 2 = 200%)
@@ -161,6 +167,12 @@ class MainWindowUI(QMainWindow):
         # texture view option
         self.gconfig.checkbox['texture'] = self.ui.textureCheckBox.isChecked()
     
+    
+    #def show_progress (self, min, max):
+    #    self.progress_window = QProgressDialog ("Updating ...", "Cancel", min, max, parent=self)
+    #    self.progress_window.setWindowModality(Qt.WindowModal)
+        
+        
     #If item is double clicked then it gets passed to this
     def double_click (self):
         #object = self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj)
@@ -329,6 +341,9 @@ class MainWindowUI(QMainWindow):
             return
         self.ui.statusbar.showMessage ("Loading "+filename[0])
         self.new_filename = filename[0]
+        # Create progress window before starting threadpool (needs to be in main thread)
+        self.start_progress("Loading ...", 100)
+        #self.progress_window.setMaximum(100)
         self.threadpool.start(self.file_open)
         
     # Note save_file is called from the UI
@@ -458,9 +473,12 @@ class MainWindowUI(QMainWindow):
     # File open is called as a separate thread
     def file_open(self):
         print (f"Loading file {self.new_filename}")
+        #progress_window = QProgressDialog ("Loading file ...", "Cancel", 0, 0, parent=self)
+        #progress_window.setWindowModality(Qt.WindowModal)
+        
         # Prevent duplicate file opens (or saving when opening etc.)
         self.disable_file_actions()
-        result = self.builder.load_file(self.new_filename)
+        result = self.builder.load_file(self.new_filename, self)
         if result[0] == False:
             #Todo show error message
             print (f"Error {result[1]}")
@@ -476,6 +494,7 @@ class MainWindowUI(QMainWindow):
         
     # Called from load_complete_signal after a file has been loaded
     def load_complete(self):
+        #print ("Load complete")
         # Reenable file actions
         self.enable_file_actions()
         #print ("Updating GUI")
@@ -489,11 +508,20 @@ class MainWindowUI(QMainWindow):
         self.ui.actionOpen.setEnabled(True)
         
     def update_all_views (self):
+        print ("Updating all views")
+        num_views = len(self.config.allowed_views) + 1
+        #self.show_progress (0, num_views)
+        #self.progress_window.setMaximum(num_views)
+        current_view = 0
         for scene_name in self.config.allowed_views:
             self.update_view (scene_name)
+            #current_view += 1
+            #self.progress_window.setValue(current_view)
         # Also need to check if we are in edit and if so update that
         if self.current_scene == "walledit":
             self.update_view("walledit")
+        #self.progress_window.setValue(num_views)
+        print ("View update complete")
         
     def zoom_out (self):
         # Minimum zoom is 0.125 - actually two values for scale, but just look at x
@@ -686,3 +714,19 @@ class MainWindowUI(QMainWindow):
             # not required instead just call an update
             #self.view_scenes["walledit"].del_obj_from_obj_view(selected_items[1])
             self.view_scenes["walledit"].update()
+
+
+    def start_progress (self, status, maximum):
+        if (self.progress_window == None):
+            self.progress_window = QProgressDialog (status, "Cancel", 0, maximum)
+            self.progress_window.setCancelButton(None)
+            self.progress_window.setMinimumDuration(500)
+            self.progress_window.setWindowModality(Qt.WindowModal)
+        else:
+            self.progress_window.setMaximum (maximum)
+
+    # This is in the main thread
+    # If updating from another thread then using emit
+    def update_progress_dialog (self, value):
+        #print (f"Updating dialog with emit value {value}")
+        self.progress_window.setValue(value)
