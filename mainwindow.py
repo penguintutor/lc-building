@@ -429,7 +429,8 @@ class MainWindowUI(QMainWindow):
             return
         self.export_filename = this_filename
 
-        self.ui.statusbar.showMessage ("Exporting as "+self.export_filename)
+        #self.ui.statusbar.showMessage ("Exporting as "+self.export_filename)
+        self.start_progress ("Exporting ...", 100)
         # Reach here then it's saving in a new file (not overwrite)
         self.threadpool.start(self.file_export)
 
@@ -448,14 +449,12 @@ class MainWindowUI(QMainWindow):
             
     # Performs the actual save (normally triggered in a threadpool)
     def file_export(self):
-        print (f"Exporting file {self.export_filename}")
+        #print (f"Exporting file {self.export_filename}")
         # Todo implement this
-        success = self.builder.export_file(self.export_filename)
+        success = self.builder.export_file(self.export_filename, self)
         # If successful then confirm new filename
-        if success[0] == True:
-            pass
         # If not then give an error message - need to pass back to GUI thread
-        else:
+        if success[0] != True:
             self.status_message = f"Unable to export {self.new_filename}.\n\nError: {success[1]}"
             self.file_save_warning_signal.emit()
             
@@ -723,6 +722,7 @@ class MainWindowUI(QMainWindow):
             self.progress_window.setMinimumDuration(500)
             self.progress_window.setWindowModality(Qt.WindowModal)
         else:
+            self.progress_window.setLabelText (status)
             self.progress_window.setMaximum (maximum)
 
     # This is in the main thread

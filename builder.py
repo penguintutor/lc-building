@@ -113,7 +113,7 @@ class Builder():
     # Exports the file as SVG
     # Overwrites existing file
     # If want to confirm to overwrite check before calling this
-    def export_file(self, filename):
+    def export_file(self, filename, gui=None):
         # create newdata dictionary with all current data
         newdata = self.update_bdata()
         result = self.building.export_file(filename, newdata)
@@ -167,11 +167,11 @@ class Builder():
     def process_data(self, gui=None):
         
         # Use percentage - calculate as appropriate - only very approximate
-        percent_complete = 0
-        if gui != None:
+        #percent_complete = 0
+        #if gui != None:
             #gui.update_progress(percent_complete)
             #gui.progress_update_signal.emit(percent_complete)
-            gui.progress_update_signal.emit(2)
+        #    gui.progress_update_signal.emit(2)
         
         #print ("Getting settings")
         self.settings = self.building.get_settings()

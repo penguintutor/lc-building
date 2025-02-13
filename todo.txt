@@ -6,7 +6,6 @@ Replace hardcoded material thickness / interlocking with setting
 # Eg. update all scenes / edit wall
 
 ## In Main Window 
-Show status bar when loading a large file
 Show updating status when ticking / unticking interlocking / texture
 Handle checkboxes (different for if edit walls rather than view scene)
 Make view scene honor checkboxes
@@ -77,7 +76,6 @@ Delete existing interlocking when opening file
 
 # Export
 Show status whilst exporting
-*** VImportant Export uses old wall data needs to be updated first
 
 
 # Track history - with undo and redo

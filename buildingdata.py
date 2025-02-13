@@ -143,7 +143,7 @@ class BuildingData ():
     # todo
     # Need to ensure building data is updated first
     # Options are things that can be selected - eg. material_thickness etc.
-    def export_file (self, filename, bdata, options=None):
+    def export_file (self, filename, bdata, gui=None, options=None):
         #### TEMP
         ### Todo - this should be read in - any values missing then can use
         # Bdata instead
@@ -155,6 +155,10 @@ class BuildingData ():
                 }
         
         print (f"Starting export in building data filename {filename}")
+        
+        percent_complete = 2
+        if gui != None:
+            gui.progress_update_signal.emit(percent_complete)
         
         # todo read this from GUI somehow
         scale = "O"
@@ -210,6 +214,10 @@ class BuildingData ():
 
         # Convert configuration into SVG settings for output
         svgsettings = {}
+        
+        percent_complete = 3
+        if gui != None:
+            gui.progress_update_signal.emit(percent_complete)
         
         # Leave some print statements in - otherwise do not know if progressing
         # Todo Future add progress bar
@@ -299,10 +307,20 @@ class BuildingData ():
                 if len(il["secondary"]) > 2:
                     reverse = il["secondary"][2]
                 walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
-            
+                
+        percent_complete = 10
+        if gui != None:
+            gui.progress_update_signal.emit(percent_complete)    
+        
         # Create output
         # Track wall number for simple progress chart
         num_walls = len(walls)
+        
+        # split remaining % over rendering
+        if num_walls > 0:
+            per_wall_percent = 90 / num_walls
+        
+        
         wall_num = 0
         for wall in walls:
             #print (f"Exporting wall {wall_num}")
@@ -338,9 +356,16 @@ class BuildingData ():
                 current_height = num_objectsect_size[1]
             wall_num += 1
             # Print status
-            print (f"{round((wall_num/num_walls) * 100)} % complete")
-        print ("Data compiled - saving")
-                    
+            #print (f"{round((wall_num/num_walls) * 100)} % complete")
+            percent_complete += per_wall_percent
+            if gui != None:
+                gui.progress_update_signal.emit(percent_complete)
+        #print ("Data compiled - saving")
+        
+        percent_complete = 100
+        if gui != None:
+            gui.progress_update_signal.emit(percent_complete)
+        
         svg.save()
         
         print ("Save complete")
