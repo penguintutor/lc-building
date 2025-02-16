@@ -10,6 +10,7 @@ from feature import Feature
 from interlocking import Interlocking
 from interlockinggroup import InterlockingGroup
 from lcconfig import LCConfig
+from datetime import datetime
 
 # If threadpool provided then that can be used - otherwise threadpool = None and operations run sequentially
 # Must be a QObject so that can use signals
@@ -17,7 +18,9 @@ class Builder(QObject):
     
     # Used during loading of wall (includes progress)
     wall_load_signal = Signal(int)
+    wall_load_all_signal = Signal()
     # Used during normal refresh
+    wall_update_status_signal = Signal() # Update status 
     wall_update_signal = Signal(int)
     
     def __init__(self, lcconfig, threadpool=None, gui=None):
@@ -43,6 +46,8 @@ class Builder(QObject):
         # Following for creating wall updates on separate threads
         self.num_updates_progress = 0
         self.wall_load_signal.connect (self.wall_load_received)
+        self.wall_load_all_signal.connect (self.wall_load_all_received)
+        self.wall_update_status_signal.connect(self.wall_update_status)
         self.wall_update_signal.connect (self.wall_update_received)
         
         # Used as part of thread to provide status
@@ -340,8 +345,10 @@ class Builder(QObject):
                 current_wall += 1
         else:
             # Call threaded version of update
+            print (f"Start {datetime.now()}")
             ## Note interlock and texture are defaults - but may need to get from config in future
-            self.update_walls_td (interlock=False, texture=True, signal=self.wall_load_signal)
+            #self.update_walls_td (interlock=False, texture=True, signal=self.wall_load_signal)
+            self.update_walls_single_td (interlock=False, texture=True, signal=self.wall_load_all_signal)
             
         #self.current_status = 100
         #if self.gui != None:
@@ -389,6 +396,14 @@ class Builder(QObject):
                 self.interlocking_groups.remove(ilg)
 
 
+    # update_walls_td to be replaced by update_walls_single_td
+    # Note that this needs to be run in separate thread to gui otherwise app not responding
+    # Due to GIL running in more than one addition thread has a negative impact on performance
+    # In one particular test 37 seconds for single thread vs 47 seconds for thread per wall
+    # Approx 20% slower by splitting threads
+    # Possibly move to completely different process (difficult due to the data that would need to be passed)
+    # or removal of GIL may improve this
+
     # Update walls using threadpool
     # Provide Signal as an argument to reply when each wall is done
     # Signal should accept int with the wall num (based on order in builder list)
@@ -404,7 +419,7 @@ class Builder(QObject):
             self.update_walls(interlock, texture)
             return
         i = 0
-        # Clear any existing works
+        # Clear any existing workers
         self.workers = []
         for wall in self.walls:
             self.num_updates_progress += 1
@@ -412,6 +427,24 @@ class Builder(QObject):
             self.threadpool.start(self.workers[-1])
             print ("Threadpool started")
             i += 1
+            
+    # Same as update_walls_td but only use a single thread
+    # Testing for performance
+    def update_walls_single_td (self, interlock, texture, signal):
+        # Don't run if already running
+        if self.num_updates_progress > 0:
+            print ("Trying to start update when already updating - aborting")
+            return
+        # As this is threaded only shouldn't get this
+        if self.threadpool == None:
+            print ("Warning: Attempt to run in threads without a threadpool")
+            # Insetad user the normal update
+            self.update_walls(interlock, texture)
+            return
+        self.num_updates_progress = 1
+        self.worker = BuilderWallUpdate(_thread_update_all_walls, self.walls, interlock, texture, self.wall_update_status_signal, signal)
+        self.threadpool.start(self.worker)
+            
             
     ### Different methods depending upon why running update
     # If load then also update progress
@@ -428,9 +461,9 @@ class Builder(QObject):
             self.gui.progress_update_signal.emit(100)
             # Tell MainWindo to refresh
             self.gui.load_complete_signal.emit()
+            print (f"Complete {datetime.now()}")
             return
         # Otherwise update progress
-        print (f"Status was {self.current_status}, add {self.status_per_wall}")
         self.current_status += self.status_per_wall
         print (f"Updating status to {self.current_status}")
         self.gui.progress_update_signal.emit(self.current_status)
@@ -438,6 +471,20 @@ class Builder(QObject):
     # Wall num just used for debugging, just count number of update responses
     def wall_update_received(self, wall_num):
         self.num_updates_progress -= 1
+        
+    def wall_load_all_received (self):
+        print ("All walls loaded")
+        self.num_updates_progress = 0
+        self.gui.progress_update_signal.emit(100)
+        self.gui.load_complete_signal.emit()
+        print (f"Complete {datetime.now()}")
+        
+    def wall_update_status(self):
+        print ("Wall finished")
+        self.current_status += self.status_per_wall
+        print (f"Updating status to {self.current_status}")
+        self.gui.progress_update_signal.emit(self.current_status)
+        
 
 # This is passed to a new worker thread
 # Does not use self as called in threadpool
@@ -449,6 +496,15 @@ def _thread_update_wall(wall, wall_num, interlock, texture, callback=None):
     wall.update(interlock, texture)
     if callback != None:
         callback.emit (wall_num)
+
+def _thread_update_all_walls(walls, interlock, texture, status_emit=None, callback=None):
+    for wall in walls:
+        if status_emit != None:
+            status_emit.emit()
+        wall.update(interlock, texture)
+    if callback != None:
+        callback.emit ()
+    
 
             
 # Create a seperate worker class for adding walls - so that they are on separate threads           
