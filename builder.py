@@ -17,8 +17,7 @@ from datetime import datetime
 class Builder(QObject):
     
     # Used during loading of wall (includes progress)
-    wall_load_signal = Signal(int)
-    wall_load_all_signal = Signal()
+    wall_load_signal = Signal()
     # Used during normal refresh
     wall_update_status_signal = Signal() # Update status 
     wall_update_signal = Signal(int)
@@ -46,7 +45,6 @@ class Builder(QObject):
         # Following for creating wall updates on separate threads
         self.num_updates_progress = 0
         self.wall_load_signal.connect (self.wall_load_received)
-        self.wall_load_all_signal.connect (self.wall_load_all_received)
         self.wall_update_status_signal.connect(self.wall_update_status)
         self.wall_update_signal.connect (self.wall_update_received)
         
@@ -215,10 +213,7 @@ class Builder(QObject):
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2], wall[3]))
             current_wall += 1
-            
-        #if num_walls > 0:
-        #    print ("Reading in walls 100%")
-            
+                       
         # Current status is percentage complete
         self.current_status = 2
         if self.gui != None:
@@ -310,14 +305,7 @@ class Builder(QObject):
         self.current_status = 20
         if self.gui != None:
             self.gui.progress_update_signal.emit(self.current_status)
-        
-
-        # Now perform update as used non updating functions to add features / textures
-        
-        ## Need to change this to threaded updates
-        ## Note need to use timers to periodically check on status
-        ###########
-        
+               
         num_walls = len(self.walls)
             
         # If no walls then stop here
@@ -345,10 +333,8 @@ class Builder(QObject):
                 current_wall += 1
         else:
             # Call threaded version of update
-            print (f"Start {datetime.now()}")
             ## Note interlock and texture are defaults - but may need to get from config in future
-            #self.update_walls_td (interlock=False, texture=True, signal=self.wall_load_signal)
-            self.update_walls_single_td (interlock=False, texture=True, signal=self.wall_load_all_signal)
+            self.update_walls_td (interlock=False, texture=True, status_signal=self.wall_update_status_signal, complete_signal=self.wall_load_signal)
             
         #self.current_status = 100
         #if self.gui != None:
@@ -396,7 +382,7 @@ class Builder(QObject):
                 self.interlocking_groups.remove(ilg)
 
 
-    # update_walls_td to be replaced by update_walls_single_td
+    # update_walls_td replaced with a single thred version
     # Note that this needs to be run in separate thread to gui otherwise app not responding
     # Due to GIL running in more than one addition thread has a negative impact on performance
     # In one particular test 37 seconds for single thread vs 47 seconds for thread per wall
@@ -406,31 +392,7 @@ class Builder(QObject):
 
     # Update walls using threadpool
     # Provide Signal as an argument to reply when each wall is done
-    # Signal should accept int with the wall num (based on order in builder list)
-    def update_walls_td (self, interlock, texture, signal):
-        # Don't run if already running
-        if self.num_updates_progress > 0:
-            print ("Trying to start update when already updating - aborting")
-            return
-        # As this is threaded only shouldn't get this
-        if self.threadpool == None:
-            print ("Warning: Attempt to run in threads without a threadpool")
-            # Insetad user the normal update
-            self.update_walls(interlock, texture)
-            return
-        i = 0
-        # Clear any existing workers
-        self.workers = []
-        for wall in self.walls:
-            self.num_updates_progress += 1
-            self.workers.append(BuilderWallUpdate(_thread_update_wall, wall, i, interlock, texture, signal))
-            self.threadpool.start(self.workers[-1])
-            print ("Threadpool started")
-            i += 1
-            
-    # Same as update_walls_td but only use a single thread
-    # Testing for performance
-    def update_walls_single_td (self, interlock, texture, signal):
+    def update_walls_td (self, interlock, texture, status_signal, complete_signal):
         # Don't run if already running
         if self.num_updates_progress > 0:
             print ("Trying to start update when already updating - aborting")
@@ -442,47 +404,26 @@ class Builder(QObject):
             self.update_walls(interlock, texture)
             return
         self.num_updates_progress = 1
-        self.worker = BuilderWallUpdate(_thread_update_all_walls, self.walls, interlock, texture, self.wall_update_status_signal, signal)
+        self.worker = BuilderWallUpdate(_thread_update_all_walls, self.walls, interlock, texture, status_signal, complete_signal)
         self.threadpool.start(self.worker)
             
             
     ### Different methods depending upon why running update
     # If load then also update progress
     
-    # Called during initial load - tracks progress
-    # Wall num just used for debugging, just count number of update responses
-    def wall_load_received(self, wall_num):
-        print (f"Wall loaded {wall_num} of {self.num_updates_progress}")
-        # Decrement number of walls in progress
-        self.num_updates_progress -= 1
-        # If reach zero then update complete so perform callback to mainwindow
-        if self.num_updates_progress < 1:
-            # Set to 100% complete (to remove progress window)
-            self.gui.progress_update_signal.emit(100)
-            # Tell MainWindo to refresh
-            self.gui.load_complete_signal.emit()
-            print (f"Complete {datetime.now()}")
-            return
-        # Otherwise update progress
-        self.current_status += self.status_per_wall
-        print (f"Updating status to {self.current_status}")
-        self.gui.progress_update_signal.emit(self.current_status)
-        
     # Wall num just used for debugging, just count number of update responses
     def wall_update_received(self, wall_num):
         self.num_updates_progress -= 1
         
-    def wall_load_all_received (self):
-        print ("All walls loaded")
+    # Finished loading wall
+    def wall_load_received (self):
         self.num_updates_progress = 0
         self.gui.progress_update_signal.emit(100)
         self.gui.load_complete_signal.emit()
-        print (f"Complete {datetime.now()}")
         
+    # One wall has finished loading so update status
     def wall_update_status(self):
-        print ("Wall finished")
         self.current_status += self.status_per_wall
-        print (f"Updating status to {self.current_status}")
         self.gui.progress_update_signal.emit(self.current_status)
         
 
@@ -491,19 +432,24 @@ class Builder(QObject):
 # Install all arguments must be sent through BuilderWallUpdate constructor
 # Wall num is just a reference for callback (signal), if not relevant then
 # can be set to 0
-def _thread_update_wall(wall, wall_num, interlock, texture, callback=None):
-    print ("Creating thread for wall")
+def _thread_update_wall(wall, wall_num, interlock, texture, status_emit=None, complete_emit=None):
     wall.update(interlock, texture)
-    if callback != None:
-        callback.emit (wall_num)
+    # Update status and complete separately allows sometimes to use progress bar, but not always
+    if status_emit != None:
+        status_emit.emit (wall_num)
+    if complete_emit != None:
+        complete_emit.emit ()
 
-def _thread_update_all_walls(walls, interlock, texture, status_emit=None, callback=None):
+# Update all the walls
+def _thread_update_all_walls(walls, interlock, texture, status_emit=None, complete_emit=None):
     for wall in walls:
+        # Send status update as each wall is complete
         if status_emit != None:
             status_emit.emit()
         wall.update(interlock, texture)
-    if callback != None:
-        callback.emit ()
+    # Send complete when all updates complete
+    if complete_emit != None:
+        complete_emit.emit ()
     
 
             

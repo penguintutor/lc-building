@@ -153,7 +153,7 @@ class MainWindowUI(QMainWindow):
         
         self.set_left_buttons("default")
         
-        print ("Showing UI")
+        #print ("Showing UI")
         self.ui.show()
         
         # Set to none, only create when needed and can check if it's created yet
@@ -333,7 +333,7 @@ class MainWindowUI(QMainWindow):
 
 
     def open_file_dialog(self):
-        print ("Open file dialog")
+        #print ("Open file dialog")
         #filename = QFileDialog.getOpenFileName(self.parent(), "Open building file", "", "Building file (*.json);;All (*.*)")
         filename = QFileDialog.getOpenFileName(self, "Open building file", "", "Building file (*.json);;All (*.*)")
         #print (f'Selected file {filename}')
@@ -473,7 +473,7 @@ class MainWindowUI(QMainWindow):
     
     # File open is called as a separate thread
     def file_open(self):
-        print (f"Loading file {self.new_filename}")
+        #print (f"Loading file {self.new_filename}")
         #progress_window = QProgressDialog ("Loading file ...", "Cancel", 0, 0, parent=self)
         #progress_window.setWindowModality(Qt.WindowModal)
         
@@ -496,7 +496,7 @@ class MainWindowUI(QMainWindow):
     # Called from load_complete_signal after a file has been loaded
     # Refresh display
     def load_complete(self):
-        print ("Load complete")
+        #print ("Load complete")
         # Reenable file actions
         self.enable_file_actions()
         #print ("Updating GUI")
@@ -510,7 +510,7 @@ class MainWindowUI(QMainWindow):
         self.ui.actionOpen.setEnabled(True)
         
     def update_all_views (self):
-        print ("Updating all views")
+        #print ("Updating all views")
         num_views = len(self.config.allowed_views) + 1
         #self.show_progress (0, num_views)
         #self.progress_window.setMaximum(num_views)
@@ -523,7 +523,7 @@ class MainWindowUI(QMainWindow):
         if self.current_scene == "walledit":
             self.update_view("walledit")
         #self.progress_window.setValue(num_views)
-        print ("View update complete")
+        #print ("View update complete")
         
     def zoom_out (self):
         # Minimum zoom is 0.125 - actually two values for scale, but just look at x
@@ -586,7 +586,7 @@ class MainWindowUI(QMainWindow):
         self.change_scene('bottom')
 
     def update_current_scene (self):
-        print ("Update current scene")
+        #print ("Update current scene")
         self.view_scenes[self.current_scene].update()
 
     def change_scene (self, new_scene):
@@ -731,5 +731,5 @@ class MainWindowUI(QMainWindow):
     # This is in the main thread
     # If updating from another thread then using emit
     def update_progress_dialog (self, value):
-        print (f"Updating dialog with emit value {value}")
+        #print (f"Updating dialog with emit value {value}")
         self.progress_window.setValue(value)
