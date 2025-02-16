@@ -39,10 +39,13 @@ Some may need a different version of venv (eg.)
 
 
 ### Command line lcmake file
+** The command line version will be deprecated in future versions **
+
 Currently configs are in the buildings directory, but are referenced by hard coding in the lcmake.py file.
 This also needs a folder called output, if one does not already exist then it should be created.
 After configuring the above then run
 
+    source ~/.venv/pyside6/bin/activate
     python3 lcmake.py 
 
 
@@ -59,9 +62,11 @@ Tests are written using unittest
 
 Run using:
 
+    source ~/.venv/pyside6/bin/activate
     python3 -m unittest tests
 or
 
+    source ~/.venv/pyside6/bin/activate
     python3 tests.py
     
 ## Limitations
@@ -110,3 +115,6 @@ not known to have another other impact on the software operation.
 Changes are implemented immediately, but there is not currently a way to undo those changes, 
 other than not saving them. 
 Data is included in some of the functions and is likely to be included in future. Note that the history of edits is independant so changes to different parts may have unintentional consequences.
+
+### Performance issues
+Performance is under review. Attempted multithreading for updates (thread per wall), but due to GIL and additional overheads this was noticeably slower.

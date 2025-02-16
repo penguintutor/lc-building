@@ -339,7 +339,7 @@ class Builder(QObject):
             for wall in self.walls:
                 self.current_status = int((current_wall/num_walls)*100)
                 wall.update()
-                self.current_status += per_wall_percent
+                self.current_status += self.status_per_wall
                 if self.gui != None:
                     self.gui.progress_update_signal.emit(self.current_status)
                 current_wall += 1
