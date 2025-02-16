@@ -68,7 +68,7 @@ class MainWindowUI(QMainWindow):
         self.gconfig = GConfig(status)
         if self.gconfig.debug > 0:
             print ("Debug - Create Main Window")
-        self.builder = Builder(self.config)
+        self.builder = Builder(self.config, self.threadpool, self)
         
         # Set default screensize (even if going to maximise afterwards)
         self.ui.resize(*self.gconfig.default_screensize)
@@ -153,6 +153,7 @@ class MainWindowUI(QMainWindow):
         
         self.set_left_buttons("default")
         
+        print ("Showing UI")
         self.ui.show()
         
         # Set to none, only create when needed and can check if it's created yet
@@ -332,6 +333,7 @@ class MainWindowUI(QMainWindow):
 
 
     def open_file_dialog(self):
+        print ("Open file dialog")
         #filename = QFileDialog.getOpenFileName(self.parent(), "Open building file", "", "Building file (*.json);;All (*.*)")
         filename = QFileDialog.getOpenFileName(self, "Open building file", "", "Building file (*.json);;All (*.*)")
         #print (f'Selected file {filename}')
@@ -451,7 +453,7 @@ class MainWindowUI(QMainWindow):
     def file_export(self):
         #print (f"Exporting file {self.export_filename}")
         # Todo implement this
-        success = self.builder.export_file(self.export_filename, self)
+        success = self.builder.export_file(self.export_filename)
         # If successful then confirm new filename
         # If not then give an error message - need to pass back to GUI thread
         if success[0] != True:
@@ -477,7 +479,7 @@ class MainWindowUI(QMainWindow):
         
         # Prevent duplicate file opens (or saving when opening etc.)
         self.disable_file_actions()
-        result = self.builder.load_file(self.new_filename, self)
+        result = self.builder.load_file(self.new_filename)
         if result[0] == False:
             #Todo show error message
             print (f"Error {result[1]}")
@@ -492,8 +494,9 @@ class MainWindowUI(QMainWindow):
         self.load_complete_signal.emit()
         
     # Called from load_complete_signal after a file has been loaded
+    # Refresh display
     def load_complete(self):
-        #print ("Load complete")
+        print ("Load complete")
         # Reenable file actions
         self.enable_file_actions()
         #print ("Updating GUI")
@@ -728,5 +731,5 @@ class MainWindowUI(QMainWindow):
     # This is in the main thread
     # If updating from another thread then using emit
     def update_progress_dialog (self, value):
-        #print (f"Updating dialog with emit value {value}")
+        print (f"Updating dialog with emit value {value}")
         self.progress_window.setValue(value)

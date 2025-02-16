@@ -1,7 +1,7 @@
 # Used for reading, editing and saving buildings
 # Uses BuildingData to import the data and then to
 # write it out, but otherwise uses internal objects to handle
-
+from PySide6.QtCore import QRunnable, Slot, QThreadPool, Signal, QObject
 from buildingdata import *
 from helpers import *
 from wall import Wall
@@ -11,9 +11,20 @@ from interlocking import Interlocking
 from interlockinggroup import InterlockingGroup
 from lcconfig import LCConfig
 
-class Builder():
-    def __init__(self, lcconfig):
+# If threadpool provided then that can be used - otherwise threadpool = None and operations run sequentially
+# Must be a QObject so that can use signals
+class Builder(QObject):
+    
+    # Used during loading of wall (includes progress)
+    wall_load_signal = Signal(int)
+    # Used during normal refresh
+    wall_update_signal = Signal(int)
+    
+    def __init__(self, lcconfig, threadpool=None, gui=None):
+        super().__init__()
         self.config = lcconfig
+        self.threadpool = threadpool	# If threads available pass threadpool
+        self.gui = gui					# If call from gui pass mainwindow for sending notifications
         
         # Create empty building data instance - can load or edit
         self.building = BuildingData(self.config)
@@ -27,7 +38,17 @@ class Builder():
         # walls (eg. delete a wall) then need to update the walls in interlocking
         # including remove interlocking that relies on that wall (primary and secondary)
         self.interlocking_groups = []
-        self.process_data()
+        #self.process_data()
+        
+        # Following for creating wall updates on separate threads
+        self.num_updates_progress = 0
+        self.wall_load_signal.connect (self.wall_load_received)
+        self.wall_update_signal.connect (self.wall_update_received)
+        
+        # Used as part of thread to provide status
+        self.current_status = 0
+        # How much to add to status as each wall complete
+        self.status_per_wall = 0
         
     # Only deletes the actual group
     def del_il_group (self, entry_id):
@@ -36,12 +57,12 @@ class Builder():
     # Loads a new file overwriting all data
     # Returns result of buildingdata load - (True/False, "Error string")
     # If GUI is set to a widget then use for status updates
-    def load_file(self, filename, gui=None):
+    def load_file(self, filename):
         result = self.building.load_file(filename)
         # If successfully load then clear existing data and regenerate
         if result[0] == True:
             #print ("File loaded - processing data")
-            self.process_data(gui)
+            self.process_data()
         else:
             print ("File load failed")
         #print (f"Walls are {self.walls}")
@@ -113,7 +134,7 @@ class Builder():
     # Exports the file as SVG
     # Overwrites existing file
     # If want to confirm to overwrite check before calling this
-    def export_file(self, filename, gui=None):
+    def export_file(self, filename):
         # create newdata dictionary with all current data
         newdata = self.update_bdata()
         result = self.building.export_file(filename, newdata)
@@ -164,16 +185,8 @@ class Builder():
         
     # After loading data this converts into builder objects
     # Deletes any existing entries
-    def process_data(self, gui=None):
-        
-        # Use percentage - calculate as appropriate - only very approximate
-        #percent_complete = 0
-        #if gui != None:
-            #gui.update_progress(percent_complete)
-            #gui.progress_update_signal.emit(percent_complete)
-        #    gui.progress_update_signal.emit(2)
-        
-        #print ("Getting settings")
+    def process_data(self):
+        self.current_status = 0
         self.settings = self.building.get_settings()
         if len(self.settings) > 0:
             # Add settings to the class
@@ -192,8 +205,8 @@ class Builder():
         current_wall = 0
 
         for wall in all_walls:
-            percent_loaded = int((current_wall/num_walls)*100)
-            #print (f"Reading in walls {percent_loaded}%")
+            #self.current_status = int((current_wall/num_walls)*100)
+            #print (f"Reading in walls {self.current_status}%")
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2], wall[3]))
             current_wall += 1
@@ -201,10 +214,11 @@ class Builder():
         #if num_walls > 0:
         #    print ("Reading in walls 100%")
             
-        percent_complete = 2
-        if gui != None:
-            #gui.update_progress(percent_complete)
-            gui.progress_update_signal.emit(percent_complete)
+        # Current status is percentage complete
+        self.current_status = 2
+        if self.gui != None:
+            #self.gui.update_progress(self.current_status)
+            self.gui.progress_update_signal.emit(self.current_status)
         
         # Add roofs (loads differently but afterwards is handled as a wall)
         for roof in self.building.get_roofs():
@@ -216,8 +230,8 @@ class Builder():
         num_textures = len(textures)
         current_texture = 0
         for texture in textures:
-            percent_loaded = int((current_texture/num_textures)*100)
-            #print (f"Applying textures {percent_loaded}%")
+            self.current_status = int((current_texture/num_textures)*100)
+            #print (f"Applying textures {self.current_status}%")
             # If not area then default to entire wall
             area = []
             if 'area' in texture:
@@ -227,16 +241,16 @@ class Builder():
         #if num_textures > 0:
         #    print ("Applying textures 100%")
         
-        percent_complete = 5
-        if gui != None:
-            gui.progress_update_signal.emit(percent_complete)
+        self.current_status = 5
+        if self.gui != None:
+            self.gui.progress_update_signal.emit(self.current_status)
         
         features = self.building.get_features()
         num_features = len(features)
         current_feature = 0
         for feature in features:
-            percent_loaded = int((current_feature/num_features)*100)
-            #print (f"Adding features {percent_loaded}%")
+            self.current_status = int((current_feature/num_features)*100)
+            #print (f"Adding features {self.current_status}%")
             # Features takes a polygon, but may be represented as more basic rectangle.
             pos = feature["parameters"]["pos"]
             polygon = []
@@ -253,16 +267,13 @@ class Builder():
             self.walls[feature["wall"]].add_feature_towall(feature["type"], feature["template"], pos, polygon,
                                                feature["cuts"], feature["etches"], feature["outers"])
             current_feature += 1
-        #if num_features > 0:
-        #    print (f"Adding features 100%")
             
-        percent_complete = 10
-        if gui != None:
-            gui.progress_update_signal.emit(percent_complete)
+        self.current_status = 10
+        if self.gui != None:
+            self.gui.progress_update_signal.emit(self.current_status)
         
         # Although there is a setting to ignore interlocking still load it here to preserve
         for il in self.building.get_interlocking():
-        #    print ("Adding interlocking")
             # Great interlocking group which tracks these in case they are edited
             # Also add both primary and secondary walls for each entry
             il_type = "default"
@@ -291,34 +302,53 @@ class Builder():
             secondary_il = self.walls[il["secondary"][0]].add_interlocking(il["step"], il["secondary"][1], "secondary", reverse, il_type, parameters)
             self.interlocking_groups.append(InterlockingGroup(primary_wall, primary_il, secondary_wall, secondary_il))
         
-        percent_complete = 20
-        if gui != None:
-            gui.progress_update_signal.emit(percent_complete)
+        self.current_status = 20
+        if self.gui != None:
+            self.gui.progress_update_signal.emit(self.current_status)
         
-        # Now force update as used non updating functions to add features / textures
+
+        # Now perform update as used non updating functions to add features / textures
+        
+        ## Need to change this to threaded updates
+        ## Note need to use timers to periodically check on status
+        ###########
+        
         num_walls = len(self.walls)
-        
-        # split remaining 80 % over rendering
-        if num_walls > 0:
-            per_wall_percent = 80 / num_walls
-        current_wall = 0
-        for wall in self.walls:
-            percent_loaded = int((current_wall/num_walls)*100)
-            #print (f"Rendering walls {percent_loaded}%")
-            wall.update()
-            percent_complete += per_wall_percent
-            if gui != None:
-                gui.progress_update_signal.emit(percent_complete)
-            current_wall += 1
-        #if num_walls > 0:
-        #    print ("Rendering walls 100%")
             
-        percent_complete = 100
-        if gui != None:
-            gui.progress_update_signal.emit(percent_complete)
+        # If no walls then stop here
+        if num_walls < 1:
+            self.current_status = 100
+            if self.gui != None:
+                self.gui.progress_update_signal.emit(self.current_status)
+                self.gui.load_complete_signal.emit()
+            return
+        
+        self.current_status = 20
+        self.status_per_wall = 80 / num_walls
+        
+
+        # If not thread then use this
+        if self.threadpool == None:
+            
+            current_wall = 0
+            for wall in self.walls:
+                self.current_status = int((current_wall/num_walls)*100)
+                wall.update()
+                self.current_status += per_wall_percent
+                if self.gui != None:
+                    self.gui.progress_update_signal.emit(self.current_status)
+                current_wall += 1
+        else:
+            # Call threaded version of update
+            ## Note interlock and texture are defaults - but may need to get from config in future
+            self.update_walls_td (interlock=False, texture=True, signal=self.wall_load_signal)
+            
+        #self.current_status = 100
+        #if self.gui != None:
+        #    self.gui.progress_update_signal.emit(self.current_status)
     
         #print ("Builder processing data complete\n\n")
-            
+                  
     def add_il (self, primary_wall_id, primary_edge, primary_reverse, secondary_wall_id, secondary_edge, secondary_reverse, il_type, step, parameters):
         # il moved to wall and then get back as a reference so it can be added to the interlocking group
         primary_wall = self.walls[primary_wall_id]
@@ -357,3 +387,80 @@ class Builder():
                     self.walls[ilg.secondary_wall].delete_il(ilg.secondary_il.edge)
                 # Delete the group
                 self.interlocking_groups.remove(ilg)
+
+
+    # Update walls using threadpool
+    # Provide Signal as an argument to reply when each wall is done
+    # Signal should accept int with the wall num (based on order in builder list)
+    def update_walls_td (self, interlock, texture, signal):
+        # Don't run if already running
+        if self.num_updates_progress > 0:
+            print ("Trying to start update when already updating - aborting")
+            return
+        # As this is threaded only shouldn't get this
+        if self.threadpool == None:
+            print ("Warning: Attempt to run in threads without a threadpool")
+            # Insetad user the normal update
+            self.update_walls(interlock, texture)
+            return
+        i = 0
+        # Clear any existing works
+        self.workers = []
+        for wall in self.walls:
+            self.num_updates_progress += 1
+            self.workers.append(BuilderWallUpdate(_thread_update_wall, wall, i, interlock, texture, signal))
+            self.threadpool.start(self.workers[-1])
+            print ("Threadpool started")
+            i += 1
+            
+    ### Different methods depending upon why running update
+    # If load then also update progress
+    
+    # Called during initial load - tracks progress
+    # Wall num just used for debugging, just count number of update responses
+    def wall_load_received(self, wall_num):
+        print (f"Wall loaded {wall_num} of {self.num_updates_progress}")
+        # Decrement number of walls in progress
+        self.num_updates_progress -= 1
+        # If reach zero then update complete so perform callback to mainwindow
+        if self.num_updates_progress < 1:
+            # Set to 100% complete (to remove progress window)
+            self.gui.progress_update_signal.emit(100)
+            # Tell MainWindo to refresh
+            self.gui.load_complete_signal.emit()
+            return
+        # Otherwise update progress
+        print (f"Status was {self.current_status}, add {self.status_per_wall}")
+        self.current_status += self.status_per_wall
+        print (f"Updating status to {self.current_status}")
+        self.gui.progress_update_signal.emit(self.current_status)
+        
+    # Wall num just used for debugging, just count number of update responses
+    def wall_update_received(self, wall_num):
+        self.num_updates_progress -= 1
+
+# This is passed to a new worker thread
+# Does not use self as called in threadpool
+# Install all arguments must be sent through BuilderWallUpdate constructor
+# Wall num is just a reference for callback (signal), if not relevant then
+# can be set to 0
+def _thread_update_wall(wall, wall_num, interlock, texture, callback=None):
+    print ("Creating thread for wall")
+    wall.update(interlock, texture)
+    if callback != None:
+        callback.emit (wall_num)
+
+            
+# Create a seperate worker class for adding walls - so that they are on separate threads           
+class BuilderWallUpdate (QRunnable):
+    def __init__(self, fn, *args, **kwargs):
+        super().__init__()
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        
+    @Slot() # Pyside6.QtCore.Slot
+    def run(self):
+        self.fn(*self.args, **self.kwargs)
+
+            
