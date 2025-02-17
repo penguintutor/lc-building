@@ -325,7 +325,7 @@ class BuildingData ():
         for wall in walls:
             #print (f"Exporting wall {wall_num}")
             # First update the wall
-            wall.update(interlock=True, texture=True)
+            wall.update()
             
             # Is this modulo grid_width if so then start next line
             # Will match on first one - which will add spacing
@@ -340,7 +340,7 @@ class BuildingData ():
             num_objectsect_size = sc.convert(wall.get_maxsize())
                             
             # get the cuts
-            for cut in wall.get_cuts():
+            for cut in wall.get_cuts(show_interlock=True, show_texture=True):
                 svg.add_cut(cut)
                     
             # Get the etching

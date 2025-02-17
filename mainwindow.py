@@ -684,7 +684,7 @@ class MainWindowUI(QMainWindow):
         self.gconfig.checkbox['il'] = interlock
         texture = self.ui.textureCheckBox.isChecked()
         self.gconfig.checkbox['texture'] = texture
-        self.builder.update_walls(interlock, texture)
+        #self.builder.update_walls(interlock, texture)
         # request update of viewgraphics
         self.update_view(self.current_scene)
         

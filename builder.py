@@ -155,9 +155,10 @@ class Builder(QObject):
         return view_walls
     
     # Update walls - eg. if interlock or texture setting changed then reflect against all walls
-    def update_walls(self, interlock, texture):
+    # interlock and texture no longer used
+    def update_walls(self, interlock=False, texture=False):
         for wall in self.walls:
-            wall.update(interlock, texture)
+            wall.update()
         
     # Takes a dictionary with the wall data where points is a list within the dictionary
     # Wall args are: name, points, view="front", position=[0,0]

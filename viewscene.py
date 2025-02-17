@@ -90,18 +90,18 @@ class ViewScene():
             # Also typically will want to output in that order (although that is under control of laser cut software)
 
             # Get the etching
-            etches = wall.get_etches()
+            etches = wall.get_etches(self.gconfig.checkbox['il'], self.gconfig.checkbox['texture'])
             if etches != None:
                 for etch in etches:
                     self.obj_views[len(self.obj_views)-1].add_etch(etch)
                     
             # Get the outers (show different pen)
-            outers = wall.get_outers()
+            outers = wall.get_outers(self.gconfig.checkbox['il'], self.gconfig.checkbox['texture'])
             if outers != None:
                 for outer in outers:
                     self.obj_views[len(self.obj_views)-1].add_outer(outer)
                     
-            cuts = wall.get_cuts()
+            cuts = wall.get_cuts(self.gconfig.checkbox['il'], self.gconfig.checkbox['texture'])
             for cut in cuts:
                 self.obj_views[len(self.obj_views)-1].add_cut(cut)
             

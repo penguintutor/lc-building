@@ -85,7 +85,7 @@ class EditScene(ViewScene):
         # Replaces existing
         self.obj_views = [ObjView(self.scene, self.gconfig, coords = [0,0], moveable=False)]
         # just get cuts related to wall
-        cuts = self.wall.get_wall_cuts()
+        cuts = self.wall.get_wall_cuts(self.gconfig.checkbox['il'], self.gconfig.checkbox['texture'])
         for cut in cuts:
             self.obj_views[0].add_cut(cut)
         # Add texture if enabled
@@ -115,7 +115,6 @@ class EditScene(ViewScene):
             if etches != None:
                 for etch in etches:
                     self.obj_views[len(self.obj_views)-1].add_etch(etch)
-        #print (f"Feature pos is {self.obj_views[1].get_pos()}")
  
                     
     def clear(self):

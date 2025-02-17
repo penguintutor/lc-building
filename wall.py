@@ -60,9 +60,26 @@ class Wall():
         # Only update when update_xxx is called
         # These are for all features and textures - can get separately using get_wall_cuts / etches etc.
         # Which will generate as needed rather than for the whole object
-        self.cut_lines = []
-        self.etches = []
-        self.outers = []
+        # Split into dictionaries to allow different views - eg. il / no_il (for interlock / no interlock)
+        # Typically return (walls OR il) AND features AND ?textures
+        self.cut_lines = {
+            'wall': [],
+            'il': [],
+            'features': [],
+            'textures': []
+            }
+        self.etches = {
+            'wall' : [],
+            'il': [],
+            'features': [],
+            'textures': []
+            }
+        self.outers = {
+            'wall' : [],
+            'il': [],
+            'features': [],
+            'textures': []
+            }
         self.update()
         
     def __str__(self):
@@ -157,16 +174,10 @@ class Wall():
         #print (f"New pos {self.position}")
         
 
-        #print (f'New {self.min_x}, {self.min_y}')
-        #self.update_pos()
-
     # Updates cuts, etches and outers
     # Interlock = None, keep current, otherwise update
+    # Interlock and texture no longer used - instead use through get edges etc.
     def update (self, interlock=None, texture=None):
-        if interlock != None:
-            self.show_interlock = interlock
-        if texture != None:
-            self.show_textures = texture
         #print ("Update - update cuts")
         self.update_cuts()
         #print ("Update - update etches")
@@ -175,23 +186,26 @@ class Wall():
         self.update_outers()
         #print ("Update done")
         
-    # Gets only cuts associated with the wall itself (not features / textures)
-    # Used by wall edit also internally by update_cuts
-    def get_wall_cuts (self):
-        #print ("Getting wall cuts")
-        # First get edges then generate cuts
-        # cut lines is the one that is returned
-        # this can either be used directly (eg. in edit wall)
-        # or saved into self.cut_lines through an update
+    # Gets wall edges - not including interlocking
+    def get_wall_edges (self):
         cut_edges = []
-        cut_lines = []
         # Start at 1 (2nd point) end of first edge
+        # as reference previous in the for loop
         for i in range(1, len(self.points)):
             cut_edges.append([self.points[i-1], self.points[i]])
-        
-        # Convert edges into lines
+        return cut_edges
+
+    def edges_to_lines (self, edges):
+        lines = []
+        for edge in edges:
+            lines.append(CutLine(cut_edges[i][0], cut_edges[i][1]))
+        return lines
+            
+    # Get wall edges with interlocking applied
+    def get_il_edges (self):
+        il_edges = []
+        cut_edges = self.get_wall_edges()
         for i in range(0, len(cut_edges)):
-            #print ("Converting edges into lines")
             # Do any interlocks apply to this edge if so apply interlocks
             # copy edge into list for applying transformations
             this_edge_segments = [cut_edges[i]]
@@ -199,87 +213,115 @@ class Wall():
             end_line = this_edge_segments[0][1]
             edge_ils = None
             
-            # Only handle interlocking if not False
-            if (self.show_interlock == True):
-                #print (f"Wall {self.name} Edge {i}")
-                #print (f"ILs in wall {self.il}")
-                for il in self.il:
-                    #print (f" edge {il.edge}, step {il.step}, start {il.start}")
-                    if il.get_edge() == i:
-                        #print (" Matches edge")
-                        # add interlocks to this edge
-                        edge_ils = il
-                        
+            for il in self.il:
+                if il.get_edge() == i:
+                    # add interlocks to this edge
+                    edge_ils = il
+                    
             # Now sort into order to apply
             # Must not overlap, but only check startpos rather than end
             # Note if interlock = false then we don't have added any edge_ils so don't need to check here
             if edge_ils != None:
-                #print (f" Includes edge ils {edge_ils}")
                 # remove last segment to perform transformations on it
                 remaining_edge_segment = this_edge_segments.pop()
                 # Then add any returned segments back onto the list
                 this_edge_segments.extend(edge_ils.add_interlock_line(start_line, end_line, remaining_edge_segment))
-                # Convert to line objects
-                for this_segment in this_edge_segments:
-                    cut_lines.append(CutLine(this_segment[0], this_segment[1]))
-                    #print (f" Adding il segment {i} {this_segment[0]} , {this_segment[1]}")
+                il_edges.extend(this_edge_segments)
             else:
-                #print (" No edge ils")
-                # otherwise just append his one edge
-                cut_lines.append(CutLine(cut_edges[i][0], cut_edges[i][1]))
-                #print (f"  Adding normal edge {i} : {cut_edges[i][0]} , {cut_edges[i][1]}")
-        return cut_lines
+                il_edges.append(cut_edges[i])
+        return il_edges
+        
+    # Convert edges into line objects
+    def edges_to_lines (self, edges):
+        lines = []
+        for this_edge in edges:
+            lines.append(CutLine(this_edge[0], this_edge[1]))
+        return lines
+            
+    # Gets only cuts associated with the wall itself (not features / textures)
+    # Used by wall edit where need separate from features
+    def get_wall_cuts (self, show_interlock=False, show_textures=False):
+        # Is interlocking turned on?
+        # If not then get without, if it is then get with
+        # Start at 1 (2nd point) end of first edge
+        if (show_interlock == False):
+            return self.cut_lines['wall']
+        #print (f"get wall cuts return il {self.cut_lines['il']}")
+        # with interlocking
+        return self.cut_lines['il']
+        
                 
 
     # Generate all the cuts and store in self.cuts
     # For performance reasons call this initially then just use get_cuts
     # but if update then run this again before running get_cuts
     def update_cuts (self):
-        #print ("Updating cuts")
-        self.cut_lines = self.get_wall_cuts ()
-        #print ("Getting cuts from features")
-        # Add cuts from features
-        feature_cuts = self._get_cuts_features()
-        if feature_cuts != None:
-            self.cut_lines.extend(feature_cuts)
-        return self.cut_lines
+        wall_edges = self.get_wall_edges ()
+        self.cut_lines['wall']=self.edges_to_lines(wall_edges)
+        il_edges = self.get_il_edges ()
+        self.cut_lines['il']=self.edges_to_lines(il_edges)
+        # Add cuts from features 
+        self.cut_lines['features'] = self._get_cuts_features()
         
 
     # Get cuts for outside of wall and any inner cuts (eg. features)
-    def get_cuts (self):
-        return self.cut_lines
+    # Although don't have textures with cuts included for consistancy with edges
+    # show_textures does nothing
+    def get_cuts (self, show_interlock=False, show_textures=False):
+        # Note uses copy to prevent merging features into cut_lines multiple times
+        if (show_interlock == False):
+            cut_lines = copy.copy(self.cut_lines['wall'])
+        else:
+            cut_lines = copy.copy(self.cut_lines['il'])
+        # Add features
+        cut_lines.extend(self.cut_lines['features'])
+        # Add textures
+        if show_textures == True:
+            cut_lines.extend(self.cut_lines['textures'])
+        return cut_lines
     
-    def get_etches (self):
-        return self.etches
+    def get_etches (self, show_interlock=False, show_textures=False):
+        # Note uses copy to prevent merging features into cut_lines multiple times
+        # Wall elements most likely empty, but copy anyway in case
+        if (self.show_interlock == False):
+            etches = copy.copy(self.etches['wall'])
+        else:
+            etches = copy.copy(self.etches['il'])
+        # Add features
+        etches.extend(self.etches['features'])
+        # Add textures
+        if show_textures == True:
+            etches.extend(self.etches['textures'])
+        return etches
     
     def get_texture_etches (self):
-        return self._texture_to_etches()
+        #return self._texture_to_etches()
+        return self.etches['textures']
     
-    # Implement this at the Wall level
     def update_etches (self):
-        #print ("Updating wall etches")
-        self.etches = self._texture_to_etches()
+        # Although we have etches for wall - nothing to do in this version
+        self.etches['textures'] = self._texture_to_etches()
         # Add etches from features
-        #print ("Getting features from etches")
-        feature_etches = self._get_etches_features()
-        #print ("Returned from _get_etches_features")
-        #print (f"Features {feature_etches}")
-        #print (f"Got {self.etches}")
-        if feature_etches != None and feature_etches != []:
-            self.etches.extend(feature_etches)
-        #print ("Features extended")
-        return self.etches
+        self.etches['features'] = self._get_etches_features()
 
-    def get_outers (self):
-        return self.outers
+    def get_outers (self, show_interlock=False, show_textures=False):
+        # Note uses copy to prevent merging features into cut_lines multiple times
+        # Wall elements most likely empty, but copy anyway in case
+        if (self.show_interlock == False):
+            outers = copy.copy(self.outers['wall'])
+        else:
+            outers = copy.copy(self.outers['il'])
+        # Add features
+        outers.extend(self.outers['features'])
+        # Add textures
+        if show_textures == True:
+            outers.extend(self.outers['textures'])
+        return outers
         
     def update_outers (self):
-        #print ("Getting wall outers")
-        self.outers = []
         # Add any accessories (windows etc.)
         for feature in self.features:
-            self.outers.extend(feature.get_outers())
-        return self.outers
+            self.outers['features'].extend(feature.get_outers())
     
     def get_type (self):
         return self.type
@@ -298,8 +340,8 @@ class Wall():
     def get_maxheight (self):
         polygon = Polygon(self.points)
         return polygon.bounds[3] - polygon.bounds[1]
-       
-    
+
+
     # Used by builder class or internally within this
     # Does not update etches
     def add_texture_towall (self, type, area, settings):

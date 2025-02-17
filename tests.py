@@ -27,7 +27,7 @@ class TestWall(unittest.TestCase):
         depth = 1826
         height = 1864
         test_wall = Wall("Wall test add", [(0,0),(depth,0),(depth,height),(0,height),(0,0)])
-        cuts = test_wall.get_cuts()
+        cuts = test_wall.get_cuts(True, True)
         self.assertEqual(cuts[0].get_type(), "line")
         
     def test_wall_maxsize(self):

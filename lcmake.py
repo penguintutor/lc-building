@@ -172,7 +172,7 @@ for wall in walls:
     num_objectsect_size = sc.convert(wall.get_maxsize())
         
     # get the cuts
-    for cut in wall.get_cuts():
+    for cut in wall.get_cuts(True, True):
         svg.add_cut(cut)
             
     # Get the etching
