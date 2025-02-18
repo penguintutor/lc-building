@@ -192,6 +192,7 @@ class Builder(QObject):
     # After loading data this converts into builder objects
     # Deletes any existing entries
     def process_data(self):
+        print ("**Processing Data")
         self.current_status = 0
         self.settings = self.building.get_settings()
         if len(self.settings) > 0:
@@ -316,6 +317,7 @@ class Builder(QObject):
         self.current_status = 20
         self.status_per_wall = 80 / num_walls
         
+        print ("** Starting updates")
 
         # If not thread then use this
         if self.threadpool == None:

@@ -80,6 +80,8 @@ class Wall():
             'features': [],
             'textures': []
             }
+        # Exclude = polygons / rectangles apply after textures, before features
+        self.exclude = []
         self.update()
         
     def __str__(self):
@@ -177,14 +179,29 @@ class Wall():
     # Updates cuts, etches and outers
     # Interlock = None, keep current, otherwise update
     # Interlock and texture no longer used - instead use through get edges etc.
-    def update (self, interlock=None, texture=None):
+    # quick is faster, but not as accurate
+    # for export always used a quick=False
+    def update (self, quick=True):
+        #print (f"Updating wall {self}")
+        #print (f"Updating quick {quick}")
         #print ("Update - update cuts")
         self.update_cuts()
+        #print ("Etches")
         #print ("Update - update etches")
-        self.update_etches()
+        self.update_etches(quick)
+        # If quick then don't need exclude
+        if quick:
+        #    print ("Exclude")
+            self.update_exclude()
+        else:
+            self.exclude = []
+        #print ("Outers")
         #print ("Update - update outers")
         self.update_outers()
         #print ("Update done")
+        
+    def update_exclude(self):
+        pass
         
     # Gets wall edges - not including interlocking
     def get_wall_edges (self):
@@ -298,11 +315,14 @@ class Wall():
         #return self._texture_to_etches()
         return self.etches['textures']
     
-    def update_etches (self):
+    def update_etches (self, quick=True):
         # Although we have etches for wall - nothing to do in this version
-        self.etches['textures'] = self._texture_to_etches()
+        print ("Texture to etches")
+        self.etches['textures'] = self._texture_to_etches(quick)
+        print ("Features to etches")
         # Add etches from features
-        self.etches['features'] = self._get_etches_features()
+        self.etches['features'] = self._get_etches_features(quick)
+        print ("Etches done")
 
     def get_outers (self, show_interlock=False, show_textures=False):
         # Note uses copy to prevent merging features into cut_lines multiple times
@@ -442,15 +462,16 @@ class Wall():
         return self.il[-1]
             
     # This is later stage in get_etches
-    def _texture_to_etches(self):
+    def _texture_to_etches(self, quick):
         etches = []
         exclude_areas = []
-        for feature in self.features:
-            exclude_areas.append(feature.get_points())
-        if self.show_textures:
-            for texture in self.textures:
-                # Each texture can have one or more etches
-                etches.extend(texture.get_etches(exclude_areas))
+        # If quick then don't exclude features
+        if quick == False:
+            for feature in self.features:
+                exclude_areas.append(feature.get_points())
+        for texture in self.textures:
+            # Each texture can have one or more etches
+            etches.extend(texture.get_etches(exclude_areas))
         #print ("Returning from _texture_to_etches")
         #print (f"Returning {etches}")
         return etches
@@ -466,7 +487,7 @@ class Wall():
                     feature_cuts.extend(new_cuts)
         return feature_cuts
     
-    def _get_etches_features (self):
+    def _get_etches_features (self, quick):
         feature_etches = []
         for feature in self.features:
             #print (f"Feature {feature}")

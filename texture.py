@@ -56,6 +56,7 @@ class Texture():
     # excludes is a list of polygons for areas to exclude texture from
     # ie. Features - doors windows etc.
     def get_etches(self, excludes=[]):
+        #print (f"Get etches - excluding {excludes}")
         # Update excludes so that this is applied across the texture
         self.excludes = excludes
         
@@ -131,6 +132,7 @@ class Texture():
     # Returns rect used for bricks / rect tiles (known as tiles)
     # Applies rows of staggered rectangles (such as bricks)
     def _get_etches_rects(self, etch_width, rect_height, rect_width):
+        #print ("Get etches rects")
         lines = []
         etches = []
         
@@ -171,7 +173,7 @@ class Texture():
         return etches
     
     
-    # Break task into small functions, these are multiste            etches.append(EtchLine(line[0], line[1], etch_width=etch_width))p operations
+    # Break task into small functions, these are multistep operations
     # Mostly these are horizontal and vertical lines representing joins between materials
     # such as wood joints and / or motar for bricks
     # Eg for a line call _line
@@ -197,13 +199,22 @@ class Texture():
     # Note that there are ways that this could be optimized
     def _line_zone(self, line):
         return_lines = []
+        # Check if line is completely outside the zone
+        # If so return no line
+        linestring = LineString([line[0], line[1]])
+        if linestring.disjoint(self.polygon):
+            return []
+        
+        start_point = Point(line[0])
+        end_point = Point(line[1])
+        
         # Get angle if needed later
         angle = get_angle(line)
         # Is start of the line within the wall
-        start_point = Point(line[0])
-        end_point = Point(line[1])
+        
         # If start is outside the zone, then increment until it is within the zone
         while not start_point.within(self.polygon):
+            #print (f"start point not within poly {start_point}")
             # Increase start_point until within zone or reach end
             new_pos = add_distance_to_points ((start_point.x,start_point.y), 1, angle)
             start_point = Point(*new_pos)
@@ -212,6 +223,7 @@ class Texture():
                 return []
         # Now check the end_pos
         while not end_point.within(self.polygon):
+            #print (f"end point not within poly {end_point}")
             # Decrease end_point until within zone or go out of bounds
             new_pos = add_distance_to_points ((end_point.x,end_point.y), -1, angle)
             end_point = Point(*new_pos)
@@ -227,6 +239,7 @@ class Texture():
         
         new_pos = (end_point.x, end_point.y)
         while line_string.intersects(poly_as_lines):
+            #print ("Line intersects")
             # start from end of line_string until no longer intersects
             new_pos = add_distance_to_points (new_pos, -1, angle)
             line_string = LineString([start_point, new_pos])
@@ -243,6 +256,7 @@ class Texture():
             next_segments = self._line_zone((new_start_pos, (end_point.x, end_point.y)))
             if next_segments != []:
                 return_lines.extend(next_segments)
+        #print ("Returning lines")
         return return_lines
             
     # Check if the line needs to be excluded, or subdivided due to exclusion areas (features)    
