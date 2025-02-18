@@ -53,6 +53,9 @@ class Builder(QObject):
         # How much to add to status as each wall complete
         self.status_per_wall = 0
         
+        # This used when running a single update ## To decide if this is required
+        #self.wall_update_running = False
+        
     # Only deletes the actual group
     def del_il_group (self, entry_id):
         del self.interlocking_groups[entry_id]
@@ -64,7 +67,6 @@ class Builder(QObject):
         result = self.building.load_file(filename)
         # If successfully load then clear existing data and regenerate
         if result[0] == True:
-            #print ("File loaded - processing data")
             self.process_data()
         else:
             print ("File load failed")
@@ -197,8 +199,6 @@ class Builder(QObject):
             for setting in self.settings.keys():
                 Wall.settings[setting] = self.settings[setting]
         
-        #print ("Getting main data")
-        
         self.building_info = self.building.get_main_data()
         
         self.walls = []
@@ -209,8 +209,6 @@ class Builder(QObject):
         current_wall = 0
 
         for wall in all_walls:
-            #self.current_status = int((current_wall/num_walls)*100)
-            #print (f"Reading in walls {self.current_status}%")
             # Convert from string values to values from bdata
             self.walls.append(Wall(wall[0], wall[1], wall[2], wall[3]))
             current_wall += 1
@@ -239,8 +237,6 @@ class Builder(QObject):
                 area = texture['area']
             self.walls[texture["wall"]].add_texture_towall(texture["type"], area, texture["settings"] )
             current_texture += 1
-        #if num_textures > 0:
-        #    print ("Applying textures 100%")
         
         self.current_status = 5
         if self.gui != None:
@@ -334,15 +330,9 @@ class Builder(QObject):
                 current_wall += 1
         else:
             # Call threaded version of update
-            ## Note interlock and texture are defaults - but may need to get from config in future
-            self.update_walls_td (interlock=False, texture=True, status_signal=self.wall_update_status_signal, complete_signal=self.wall_load_signal)
+            self.update_walls_td (status_signal=self.wall_update_status_signal, complete_signal=self.wall_load_signal)
             
-        #self.current_status = 100
-        #if self.gui != None:
-        #    self.gui.progress_update_signal.emit(self.current_status)
-    
-        #print ("Builder processing data complete\n\n")
-                  
+
     def add_il (self, primary_wall_id, primary_edge, primary_reverse, secondary_wall_id, secondary_edge, secondary_reverse, il_type, step, parameters):
         # il moved to wall and then get back as a reference so it can be added to the interlocking group
         primary_wall = self.walls[primary_wall_id]
@@ -393,7 +383,7 @@ class Builder(QObject):
 
     # Update walls using threadpool
     # Provide Signal as an argument to reply when each wall is done
-    def update_walls_td (self, interlock, texture, status_signal, complete_signal):
+    def update_walls_td (self, status_signal, complete_signal):
         # Don't run if already running
         if self.num_updates_progress > 0:
             print ("Trying to start update when already updating - aborting")
@@ -402,13 +392,21 @@ class Builder(QObject):
         if self.threadpool == None:
             print ("Warning: Attempt to run in threads without a threadpool")
             # Insetad user the normal update
-            self.update_walls(interlock, texture)
+            self.update_walls()
             return
         self.num_updates_progress = 1
-        self.worker = BuilderWallUpdate(_thread_update_all_walls, self.walls, interlock, texture, status_signal, complete_signal)
+        self.worker = BuilderWallUpdate(_thread_update_all_walls, self.walls, status_signal, complete_signal)
         self.threadpool.start(self.worker)
             
-            
+    # Update a single wall
+    # status is optional as delay is not as long as all windows
+    # likely won't update (unless add intermediate checks)
+    def update_wall_td (self, wall, status_signal=None, complete_signal=None):
+        # run this update regardless of any existing updates in progress
+        # this is only called from gui so don't check for threadpool - it must exist
+        wall_worker = BuilderWallUpdate(_thread_update_wall, wall, 0, status_signal, complete_signal)
+        self.threadpool.start(wall_worker)
+        
     ### Different methods depending upon why running update
     # If load then also update progress
     
@@ -433,8 +431,8 @@ class Builder(QObject):
 # Install all arguments must be sent through BuilderWallUpdate constructor
 # Wall num is just a reference for callback (signal), if not relevant then
 # can be set to 0
-def _thread_update_wall(wall, wall_num, interlock, texture, status_emit=None, complete_emit=None):
-    wall.update(interlock, texture)
+def _thread_update_wall(wall, wall_num, status_emit=None, complete_emit=None):
+    wall.update()
     # Update status and complete separately allows sometimes to use progress bar, but not always
     if status_emit != None:
         status_emit.emit (wall_num)
@@ -442,12 +440,12 @@ def _thread_update_wall(wall, wall_num, interlock, texture, status_emit=None, co
         complete_emit.emit ()
 
 # Update all the walls
-def _thread_update_all_walls(walls, interlock, texture, status_emit=None, complete_emit=None):
+def _thread_update_all_walls(walls, status_emit=None, complete_emit=None):
     for wall in walls:
         # Send status update as each wall is complete
         if status_emit != None:
             status_emit.emit()
-        wall.update(interlock, texture)
+        wall.update()
     # Send complete when all updates complete
     if complete_emit != None:
         complete_emit.emit ()

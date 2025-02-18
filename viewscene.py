@@ -1,13 +1,21 @@
 # Draws the view onto the scene - eg. front walls
 # Pulls in relevant objects from builder (eg. walls) and then uses ObjViews to draw
+from PySide6.QtCore import Signal, QObject
 from objview import ObjView
 
-class ViewScene():
+class ViewScene(QObject):
+    
+    update_scene_signal = Signal()
+    
     def __init__(self, scene, builder, gconfig, view_name):
+        super().__init__()
         self.scene = scene
         self.builder = builder
         self.gconfig = gconfig
         self.view_name = view_name
+        
+        self.update_scene_signal.connect(self.update)
+        
         # obj are any objects to manipulate (typically wall objects from builder)
         # which can be used to interact with the wall
         # obj_views is a representation of the object on the screen
@@ -19,7 +27,7 @@ class ViewScene():
     # Clear scene and then add walls
     # Full update / vs partial update - not needed on scene
     # but allowed to set full=True - no difference
-    def update(self, full=True):
+    def update(self):
         #print ("View update")
         #print (f"Update view scene {self.view_name}")
         self.update_obj_pos()

@@ -469,8 +469,12 @@ class WallWindowUI(QMainWindow):
             
         # If wall dimensions changed then also need to update any textures
         self.wall.update_texture_points()
+        # Update this wall
+        self.builder.update_wall_td(self.wall, complete_signal=self.parent.update_views_signal)
+        
         # Update parent (via main window)
-        self.parent.update_all_views()
+        # Update is performed by the callback
+        #self.parent.update_all_views()
         
         # Reset the window and hide
         self.reset()

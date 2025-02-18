@@ -10,19 +10,26 @@ from viewscene import ViewScene
 from laser import Laser
 
 class EditScene(ViewScene):
+    
     def __init__(self, scene, builder, gconfig, view_name):
         super().__init__(scene, builder, gconfig, view_name)
         # We can only have one wall but must be added using edit_wall
         self.wall = None
         
+        
+    # Perform full update using thread and then callback to update
+    def update_full(self):
+        # check for moved objeects
+        self.update_feature_pos()
+        self.builder.update_wall_td(self.wall, complete_signal=self.update_scene_signal)
        
     # Clear scene and then add wall
     # Tried removing objects but risk of chase condition where
     # object deleted but tries to be read - so slower but safer to
     # always do a full update
-    def update(self, full=True):
+    def update(self):
         # check for moved objeects
-        self.update_feature_pos()
+        #self.update_feature_pos()
         # Get list of selected features so we can reselect them after update
         selected_features = []
         for i in range (1, len(self.obj_views)):
@@ -55,8 +62,6 @@ class EditScene(ViewScene):
     # must be called before using this - otherwise we have an empty screen
     def edit_wall(self, wall):
         self.wall = wall
-        # Don't update - this will happen when we switch scene
-        #self.update()
         
     # Gets the scene that the wall is part of
     def get_wall_scene(self):
