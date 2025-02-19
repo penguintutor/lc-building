@@ -116,10 +116,12 @@ class Texture():
     # Returns brick texture
     # typical brick is 215mm x 65mm (x 102.5mm depth) with 10mm motar
     def _get_etches_bricks(self):
+        #print ("Get etches bricks")
         etch_width = self.settings["brick_etch"]
         brick_height = self.settings["brick_height"]
         brick_width = self.settings["brick_width"]
         return self._get_etches_rects(etch_width, brick_height, brick_width)
+        #print ("Etches bricks finished")
     
     # Return tile texture - regular rectangular tiles (eg. slate)
     # Like bricks but larger and possibly thinner etch
@@ -132,6 +134,7 @@ class Texture():
     # Returns rect used for bricks / rect tiles (known as tiles)
     # Applies rows of staggered rectangles (such as bricks)
     def _get_etches_rects(self, etch_width, rect_height, rect_width):
+        #print ("Getting rects")
         #print ("Get etches rects")
         lines = []
         etches = []
@@ -170,6 +173,7 @@ class Texture():
         
         for line in lines:
             etches.append(EtchLine(line[0], line[1], etch_width=etch_width))
+        #print ("Rects done")
         return etches
     
     
@@ -187,12 +191,15 @@ class Texture():
         segments = self._line_zone ((start, end))
         if segments == []:
             return []
-        final_lines = []
-        for segment in segments:
-            sub_lines = self._line_exclude_all(segment)
-            if sub_lines != []:
-                final_lines.extend(sub_lines)
-        return final_lines
+        return segments
+#     
+#     def line_remove_features (self, segments)
+#         final_lines = []
+#         for segment in segments:
+#             sub_lines = self._line_exclude_all(segment)
+#             if sub_lines != []:
+#                 final_lines.extend(sub_lines)
+#         return final_lines
             
         
     # Get lines within wall (or texture zone if that is defined instead)

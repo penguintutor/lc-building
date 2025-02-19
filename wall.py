@@ -68,6 +68,14 @@ class Wall():
             'features': [],
             'textures': []
             }
+        # basic etches is etches but without the exclusions
+        # useful for editscene where features move position
+        self.basic_etches = {
+            'wall' : [],
+            'il': [],
+            'features': [],
+            'textures': []
+            }
         self.etches = {
             'wall' : [],
             'il': [],
@@ -181,14 +189,12 @@ class Wall():
     # Interlock and texture no longer used - instead use through get edges etc.
     # quick is faster, but not as accurate
     # for export always used a quick=False
-    def update (self, quick=False):
+    def update (self):
         self.update_cuts()
-        self.update_etches(quick)
-        # If quick then don't need exclude
-        if quick:
-              self.update_exclude()
-        else:
-            self.exclude = []
+        #print ("Updating etches")
+        self.update_etches()
+        #print ("Etches updated")
+        #self.update_exclude()
         self.update_outers()
 
         
@@ -307,13 +313,17 @@ class Wall():
         #return self._texture_to_etches()
         return self.etches['textures']
     
-    def update_etches (self, quick=True):
+    def update_etches (self):
         # Although we have etches for wall - nothing to do in this version
         #print ("Texture to etches")
-        self.etches['textures'] = self._texture_to_etches(quick)
+        #print ("Getting basic etches")
+        self.basic_etches['textures'] = self._texture_to_etches()
+        #print (f"Basic etches {self.basic_etches['textures']}")
+        self.etches['textures'] = self._texture_remove_features()
+        #print (f"Textures removed {self.etches['textures']}")
         #print ("Features to etches")
         # Add etches from features
-        self.etches['features'] = self._get_etches_features(quick)
+        self.etches['features'] = self._get_etches_features()
         #print ("Etches done")
 
     def get_outers (self, show_interlock=False, show_textures=False):
@@ -453,19 +463,24 @@ class Wall():
         self.il.append(Interlocking(step, edge, primary, reverse, il_type, parameters))
         return self.il[-1]
             
-    # This is later stage in get_etches
-    def _texture_to_etches(self, quick):
-        etches = []
+    def _texture_remove_features(self):
+        #print ("Removing features")
         exclude_areas = []
-        # If quick then don't exclude features
-        if quick == False:
-            for feature in self.features:
-                exclude_areas.append(feature.get_points())
+        #update_lines = []
+        for feature in self.features:
+            exclude_areas.append(feature.get_points())
+        update_lines = line_remove_features(self.basic_etches['textures'], exclude_areas)
+        return update_lines
+            
+    # This is later stage in get_etches
+    def _texture_to_etches(self):
+        etches = []
+        #print ("Texture to etches")
+        #print (f"Self textures {self.textures}")
         for texture in self.textures:
+            #print (f"Getting this texture {texture}")
             # Each texture can have one or more etches
-            etches.extend(texture.get_etches(exclude_areas))
-        #print ("Returning from _texture_to_etches")
-        #print (f"Returning {etches}")
+            etches.extend(texture.get_etches())
         return etches
         
 
@@ -479,7 +494,7 @@ class Wall():
                     feature_cuts.extend(new_cuts)
         return feature_cuts
     
-    def _get_etches_features (self, quick):
+    def _get_etches_features (self):
         feature_etches = []
         for feature in self.features:
             #print (f"Feature {feature}")

@@ -188,6 +188,10 @@ class EtchLine(Etch):
         super().__init__("line", internal_offset)
         #print ("Etchline created")
     
+    # Returns as [(x,y) (x,y)]
+    def get_line(self):
+        return ([self.get_start(), self.get_end()])
+    
     # unformat returns (type, [list_of_values]) 
     def unformat(self):
         return (("line", (self.start, self.end)))
