@@ -181,24 +181,16 @@ class Wall():
     # Interlock and texture no longer used - instead use through get edges etc.
     # quick is faster, but not as accurate
     # for export always used a quick=False
-    def update (self, quick=True):
-        #print (f"Updating wall {self}")
-        #print (f"Updating quick {quick}")
-        #print ("Update - update cuts")
+    def update (self, quick=False):
         self.update_cuts()
-        #print ("Etches")
-        #print ("Update - update etches")
         self.update_etches(quick)
         # If quick then don't need exclude
         if quick:
-        #    print ("Exclude")
-            self.update_exclude()
+              self.update_exclude()
         else:
             self.exclude = []
-        #print ("Outers")
-        #print ("Update - update outers")
         self.update_outers()
-        #print ("Update done")
+
         
     def update_exclude(self):
         pass
@@ -317,12 +309,12 @@ class Wall():
     
     def update_etches (self, quick=True):
         # Although we have etches for wall - nothing to do in this version
-        print ("Texture to etches")
+        #print ("Texture to etches")
         self.etches['textures'] = self._texture_to_etches(quick)
-        print ("Features to etches")
+        #print ("Features to etches")
         # Add etches from features
         self.etches['features'] = self._get_etches_features(quick)
-        print ("Etches done")
+        #print ("Etches done")
 
     def get_outers (self, show_interlock=False, show_textures=False):
         # Note uses copy to prevent merging features into cut_lines multiple times

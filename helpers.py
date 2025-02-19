@@ -1,4 +1,5 @@
 import math
+import shapely
 
 # Helper functions
 def get_angle (line):
@@ -38,3 +39,20 @@ def add_distance_to_points (start, distance, angle):
 def check_distance (start, end, max_dist):
     distance = get_distance(start, end)
     return max_dist - distance
+
+# Takes shapely reponse and returns list of points for corresponding lines 
+def shapely_to_linelist (intersect):
+    return_list = []
+    if intersect.geom_type == "MultiLineString":
+        for linestring in intersect.geoms:
+            return_list.append([linestring.coords[0], linestring.coords[1]])
+            #print (f"Linestring {linestring}")
+    elif intersect.geom_type == "LineString":
+        # Ignore empty entries
+        if (intersect.length > 0):
+            #print (f"Linestring {intersect}")
+            return_list.append([intersect.coords[0], intersect.coords[1]])
+    elif intersect.geom_type == "MultiPoint":
+        #print (f"MultiPoint {intersect}")
+        return_list.append([[intersect.bounds[0], intersect.bounds[1]], [intersect.bounds[2], intersect.bounds[3]]])
+    return return_list
