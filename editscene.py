@@ -18,10 +18,15 @@ class EditScene(ViewScene):
         
         
     # Perform full update using thread and then callback to update
-    def update_full(self):
+    #def update_full(self):
         # check for moved objeects
-        self.update_feature_pos()
-        self.builder.update_wall_td(self.wall, complete_signal=self.update_scene_signal)
+    #    self.update_feature_pos()
+    #    self.builder.update_wall_td(self.wall, complete_signal=self.update_scene_signal)
+    
+    # Call when finished editing to update the wall then tell the new
+    # viewscene to update itself
+    def update_switch(self, new_scene):
+        self.builder.update_wall_td(self.wall, complete_signal=new_scene.update_scene_signal)
        
     # Clear scene and then add wall
     # Tried removing objects but risk of chase condition where
@@ -29,7 +34,7 @@ class EditScene(ViewScene):
     # always do a full update
     def update(self):
         # check for moved objeects
-        #self.update_feature_pos()
+        self.update_feature_pos()
         # Get list of selected features so we can reselect them after update
         selected_features = []
         for i in range (1, len(self.obj_views)):
@@ -95,7 +100,7 @@ class EditScene(ViewScene):
             self.obj_views[0].add_cut(cut)
         # Add texture if enabled
         if self.gconfig.checkbox['texture']:
-            for etch in self.wall.get_texture_etches():
+            for etch in self.wall.get_texture_etches_basic():
                 self.obj_views[0].add_etch(etch)
         #print (f"Wall pos is {self.obj_views[0].get_pos()}")
             
@@ -106,20 +111,26 @@ class EditScene(ViewScene):
             # coords is the start of the wall
             self.obj_views.append(ObjView(self.scene, self.gconfig, coords = [0,0]))
             
+            ### Add background to the feature - this is specific to the edit scene for
+            # performance as the entire background is shown
+            exclude = feature.get_exclude()
+            # Add exclude as a polygon
+            self.obj_views[-1].add_exclude(exclude)
+            
             # Add cuts / outers / etches to the obj_view
             cuts = feature.get_cuts()
             for cut in cuts:
-                self.obj_views[len(self.obj_views)-1].add_cut(cut)
+                self.obj_views[-1].add_cut(cut)
                 
             outers = feature.get_outers()
             if outers != None:
                 for outer in outers:
-                    self.obj_views[len(self.obj_views)-1].add_outer(outer)
+                    self.obj_views[-1].add_outer(outer)
             
             etches = feature.get_etches()
             if etches != None:
                 for etch in etches:
-                    self.obj_views[len(self.obj_views)-1].add_etch(etch)
+                    self.obj_views[-1].add_etch(etch)
  
                     
     def clear(self):

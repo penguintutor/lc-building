@@ -51,7 +51,6 @@ class Cut(Laser):
         
        
 # Start and end are tuples
-
 class CutLine(Cut):
     def __init__(self, start, end, internal_offset=(0,0)):
         self.start = start
@@ -166,7 +165,6 @@ class Etch(Laser):
     
     # Strength is added by the subclass
     strength = None
-    
     def get_strength(self):
         return self.strength
         
@@ -177,16 +175,13 @@ class EtchLine(Etch):
     # Used by etch lines only, but can be accessed by all instances
     global_etch_width = 10
     def __init__(self, start, end, internal_offset=(0,0), strength=5, etch_width=None):
-        #print ("Creating Etch line")
         self.strength = strength
         self.start = start
         self.end = end
         # how wide to cut (cannot have line as lightburn doesn't like it)
         # If set to None (default) then look at class variable global_etch_width
         self.etch_width = etch_width
-        #print ("Calling EtchLine init")
         super().__init__("line", internal_offset)
-        #print ("Etchline created")
     
     # Returns as [(x,y) (x,y)]
     def get_line(self):
@@ -515,6 +510,50 @@ class OuterPolygon(Outer):
         new_points = []
         #for point in self.get_points():
         for point in self.points:
+            sc_point = Laser.vs.convert(point)
+            new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
+        return new_points
+
+# Exclude is not used by the laser, but is used as part of objview
+# Typically polygons to draw as white areas
+class Exclude(Laser):
+    def __init__(self, type, internal_offset):
+        super().__init__(type, internal_offset)
+
+
+class ExcludePolygon(Etch):
+    def __init__(self, points, internal_offset=(0,0), strength=5):
+        self.strength = strength	# not used by exclude
+        self.points = points
+        super().__init__("polygon", internal_offset)
+        
+    # unformat returns (type, [list_of_values]) 
+    def unformat(self):
+        return (("polygon", self.points))
+        
+    def get_points(self):
+        new_points = []
+        for point in self.points:
+            new_points.append((point[0]+self.io[0], point[1]+self.io[1]))
+        return new_points
+    
+    def get_points_offset(self, offset):
+        new_points = []
+        for point in self.get_points():
+            new_points.append([(offset[0]+point[0]),(offset[1]+point[1])])
+        return new_points
+    
+    # Offset is applied to all points
+    def get_points_pixels(self, offset=(0,0)):
+        new_points = []
+        for point in self.get_points():
+            sc_point = Laser.sc.convert(point)
+            new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
+        return new_points
+
+    def get_points_pixels_screen(self, offset=(0,0)):
+        new_points = []
+        for point in self.get_points():
             sc_point = Laser.vs.convert(point)
             new_points.append([(offset[0]+sc_point[0]),(offset[1]+sc_point[1])])
         return new_points

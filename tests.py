@@ -200,7 +200,7 @@ class TestTexture(unittest.TestCase):
         lines = texture._line([1, 20],[2000,20])
         self.assertEqual (lines[0][0][0], 1)
         self.assertEqual (lines[0][0][1], 20)
-        self.assertEqual (lines[0][1][0], 199)
+        self.assertEqual (lines[0][1][0], 200)
         self.assertEqual (lines[0][1][1], 20)
         
     def test_horizontal_line_extend_left(self):
@@ -208,7 +208,7 @@ class TestTexture(unittest.TestCase):
         height = 180
         texture = Texture([(20,0),(depth,0),(depth,height),(20,height),(20,0)])
         lines = texture._line([1, 49],[100,49])
-        self.assertEqual (lines[0][0][0], 21)
+        self.assertEqual (lines[0][0][0], 20)
         self.assertEqual (lines[0][0][1], 49)
         self.assertEqual (lines[0][1][0], 100)
         self.assertEqual (lines[0][1][1], 49)
@@ -231,7 +231,7 @@ class TestTexture(unittest.TestCase):
         self.assertEqual (lines[0][0][0], 1)
         self.assertEqual (lines[0][0][1], 100)
         self.assertEqual (lines[0][1][0], 1)
-        self.assertEqual (lines[0][1][1], 21)
+        self.assertEqual (lines[0][1][1], 20)
 
     def test_vertical_line_extend_below(self):
         depth = 200
@@ -239,7 +239,7 @@ class TestTexture(unittest.TestCase):
         texture = Texture([(0,0),(depth,0),(depth,height),(0,height),(0,0)])
         lines = texture._line([41, 225],[41,100])
         self.assertEqual (lines[0][0][0], 41)
-        self.assertEqual (lines[0][0][1], 179)
+        self.assertEqual (lines[0][0][1], 180)
         self.assertEqual (lines[0][1][0], 41)
         self.assertEqual (lines[0][1][1], 100)
 
@@ -259,10 +259,10 @@ class TestTexture(unittest.TestCase):
         height = 200
         texture = Texture([(0,0),(depth,0),(depth,height),(0,height),(0,0)])
         lines = texture._line([100, 220],[220,100])
-        self.assertEqual (lines[0][0][0], 121)
-        self.assertEqual (lines[0][0][1], 199)
-        self.assertEqual (lines[0][1][0], 199)
-        self.assertEqual (lines[0][1][1], 121)
+        self.assertEqual (lines[0][0][0], 120)
+        self.assertEqual (lines[0][0][1], 200)
+        self.assertEqual (lines[0][1][0], 200)
+        self.assertEqual (lines[0][1][1], 120)
 
 
     # Tests line is split where interacting with edges of polygon
@@ -270,13 +270,13 @@ class TestTexture(unittest.TestCase):
         # Texture is two apex
         texture = Texture([(0,20),(20,0),(40,20),(60,0),(80,20),(80,120),(0,120), (0,20)])
         lines = texture._line([0, 10],[200,10])
-        self.assertEqual (lines[0][0][0], 11)
+        self.assertEqual (lines[0][0][0], 10)
         self.assertEqual (lines[0][0][1], 10)
-        self.assertEqual (lines[0][1][0], 29)
+        self.assertEqual (lines[0][1][0], 30)
         self.assertEqual (lines[0][1][1], 10)
-        self.assertEqual (lines[1][0][0], 51)
+        self.assertEqual (lines[1][0][0], 50)
         self.assertEqual (lines[1][0][1], 10)
-        self.assertEqual (lines[1][1][0], 69)
+        self.assertEqual (lines[1][1][0], 70)
         self.assertEqual (lines[1][1][1], 10)
 
 
@@ -287,18 +287,18 @@ class TestTexture(unittest.TestCase):
         # Texture is 3 apex
         texture = Texture([(0,20),(20,0),(40,20),(60,0),(80,20),(100,0), (120,20),(120,120),(0,120), (0,20)])
         lines = texture._line([0, 10],[200,10])
-        self.assertEqual (lines[0][0][0], 11)
+        self.assertEqual (lines[0][0][0], 10)
         self.assertEqual (lines[0][0][1], 10)
-        self.assertEqual (lines[0][1][0], 29)
+        self.assertEqual (lines[0][1][0], 30)
         self.assertEqual (lines[0][1][1], 10)
-        self.assertEqual (lines[1][0][0], 51)
+        self.assertEqual (lines[1][0][0], 50)
         self.assertEqual (lines[1][0][1], 10)
-        self.assertEqual (lines[1][1][0], 69)
+        self.assertEqual (lines[1][1][0], 70)
         self.assertEqual (lines[1][1][1], 10)
         # Test for final section
-        self.assertEqual (lines[2][0][0], 91)
+        self.assertEqual (lines[2][0][0], 90)
         self.assertEqual (lines[2][0][1], 10)
-        self.assertEqual (lines[2][1][0], 109)
+        self.assertEqual (lines[2][1][0], 110)
         self.assertEqual (lines[2][1][1], 10)
 
 

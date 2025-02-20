@@ -5,7 +5,7 @@
 # Uses laser module and all classes (eg. cuts)
 from laser import *
 from PySide6.QtCore import QPoint, QPointF
-from PySide6.QtGui import QPolygonF
+from PySide6.QtGui import QPolygonF, QPen, QBrush, QColor
 from PySide6.QtWidgets import QGraphicsItem
 
 # Settings is from gconfig
@@ -34,20 +34,14 @@ class ObjView():
         # Save the current position
         pos_point = self.item_group.pos().toPoint()
         self.pos = [pos_point.x(), pos_point.y()]
-        #print (f"Item position {self.pos}")
         # Update new_pos when moved
         #self.new_pos = (0,0)
         
     # Check if moved - and update position if moved 
     def has_moved(self):
-        #print (f"This object {self}")
         new_pos_point = self.item_group.pos().toPoint()
         new_pos = [new_pos_point.x(), new_pos_point.y()]
-        #print (f"Offset {self.offset}")
-        #print (f"Current pos {self.pos}, new pos {new_pos}, scene pos {self.item_group.scenePos()}")
         if new_pos != self.pos:
-            #print ("Moved")
-            #self.new_pos = (new_pos.x(), new_pos.y())
             self.pos = new_pos
             return True
         return False
@@ -70,16 +64,22 @@ class ObjView():
     # standard_object = treat as a line / cut
     # polygon_object = convert to polygon
     def add_cut(self, cut):
-        #print ("Debug adding cut to objview")
         self.add_standard_object (cut, "cut")
         
     def add_outer(self, outer):
         self.add_standard_object (outer, "outer")
+        
+    # Should only be used for editview
+    # Draw polygon for background of features
+    def add_exclude(self, exclude):
+        self.add_standard_object (exclude, "exclude")
 
     # Generic version of add_cut, add_edge, add_outer
     # Pen is the pen type to use "cut", "outer", "etch"
     # If etch is used then optional parameter strength chooses appropriate etch strength
     def add_standard_object (self, object, pen, strength=5):
+        # Default is no fill - only applied to polygon
+        brush_obj = QBrush()
         # Get pen from gconfig
         if pen == "outer":
             pen_obj = self.settings.pen_outer
@@ -87,6 +87,11 @@ class ObjView():
         elif pen == "etch":
             pen_obj = self.settings.pen_etch[strength]
             # Default is a cut
+        elif pen == "exclude":
+            # Not from settings - this is fill for background of features
+            # Set to white
+            pen_obj = QPen(QColor(255,255,255))
+            brush_obj = QBrush(QColor(255,255,255))
         else:
             pen_obj = self.settings.pen_cut
         if (object.get_type() == "line"):
@@ -105,7 +110,7 @@ class ObjView():
             polygon = QPolygonF()
             for point in new_points:
                 polygon.append(QPointF(*point))
-            this_object = self.scene.addPolygon(polygon, pen_obj) 
+            this_object = self.scene.addPolygon(polygon, pen_obj, brush_obj) 
             #print (f"Polygon points {polygon}")
         self.item_group.addToGroup(this_object)
         #print ("Standard object added {self.pos}")
@@ -131,6 +136,5 @@ class ObjView():
             self.item_group.addToGroup(this_etch)
         else:
             self.add_standard_object (etch, "etch", strength) 
-
 
 

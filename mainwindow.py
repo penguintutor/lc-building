@@ -43,8 +43,6 @@ class MainWindowUI(QMainWindow):
         
         # Progress dialog window (create when required)
         self.progress_window = None
-        #self.progress_window = QProgressDialog ("Updating ...", "Cancel", 0, 0)
-        #self.progress_window.setWindowModality(Qt.WindowModal)
         
         self.config = LCConfig()
         # How much we are zoomed in zoom (1 = 100%, 2 = 200%)
@@ -155,7 +153,6 @@ class MainWindowUI(QMainWindow):
         
         self.set_left_buttons("default")
         
-        #print ("Showing UI")
         self.ui.show()
         
         # Set to none, only create when needed and can check if it's created yet
@@ -566,6 +563,13 @@ class MainWindowUI(QMainWindow):
         self.view_scenes[self.current_scene].update()
 
     def change_scene (self, new_scene):
+        # if previous was walledit then need to update
+        # the wall
+        if self.current_scene == "walledit":
+            # perform update of wall on thread then callback to viewscene
+            self.view_scenes[self.current_scene].update_switch(self.view_scenes[new_scene])
+        # Run an update on the new scene anyway - but texture won't be
+        # updated until after the callback from the above update
         self.current_scene = new_scene
         # Does this need an update when changing scene?
         self.view_scenes[new_scene].update()
@@ -596,7 +600,8 @@ class MainWindowUI(QMainWindow):
             # But only the 
             if self.current_scene == "walledit":
                 #self.view_scenes[self.current_scene].update(full=True)
-                self.view_scenes[self.current_scene].update_full()
+                #self.view_scenes[self.current_scene].update_full()
+                self.view_scenes[self.current_scene].update()
             # Todo if not wall edit then may still need to refresh position - but not do a full update
         
     

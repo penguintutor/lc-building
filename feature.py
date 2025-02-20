@@ -30,7 +30,6 @@ class Feature():
         for cut in cuts:
             if cut == []:
                 break
-            #print (f"Creating cut {cut[0]} , {cut[1]}")
             self.cuts.append(Feature.lf.create_cut(cut[0], cut[1], (self.min_x, self.min_y)))
         # Do the same for etches
         self.etches = []
@@ -139,7 +138,7 @@ class Feature():
 
     
     def get_exclude (self):
-        return self.get_points()
+        return ExcludePolygon(self.get_points())
         
     # Creates cuts based around simple rectangle.
     # cut out for the entire window / door etc. no sills eg. shed window
@@ -164,11 +163,8 @@ class Feature():
         return cuts
     
     def get_outers_etches(self):
-        #print ("In get outers etches")
         etches = []
-        #print (f"Outers {self.outers}")
         for outer in self.outers:
-            #print (f"Outer {outer}")
             etches.append(outer.get_etch())
         return etches
         

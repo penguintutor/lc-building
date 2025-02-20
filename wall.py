@@ -88,8 +88,6 @@ class Wall():
             'features': [],
             'textures': []
             }
-        # Exclude = polygons / rectangles apply after textures, before features
-        self.exclude = []
         self.update()
         
     def __str__(self):
@@ -175,13 +173,10 @@ class Wall():
             self.position = pos
 
     def move_rel(self, pos):
-        #print (f"Move from {self.position}")
         # Store current position in history
         self.history.append(["move", self.position])
-        #print (f'Current {self.min_x}, {self.min_y}')
         self.position[0] += pos[0]
         self.position[1] += pos[1]
-        #print (f"New pos {self.position}")
         
 
     # Updates cuts, etches and outers
@@ -309,22 +304,21 @@ class Wall():
             etches.extend(self.etches['textures'])
         return etches
     
+
+    # Returns texture but without excluding features
+    # Used by edit scene for performance reasons
+    def get_texture_etches_basic (self):
+        return self.basic_etches['textures']
+
     def get_texture_etches (self):
-        #return self._texture_to_etches()
         return self.etches['textures']
     
     def update_etches (self):
         # Although we have etches for wall - nothing to do in this version
-        #print ("Texture to etches")
-        #print ("Getting basic etches")
         self.basic_etches['textures'] = self._texture_to_etches()
-        #print (f"Basic etches {self.basic_etches['textures']}")
         self.etches['textures'] = self._texture_remove_features()
-        #print (f"Textures removed {self.etches['textures']}")
-        #print ("Features to etches")
         # Add etches from features
         self.etches['features'] = self._get_etches_features()
-        #print ("Etches done")
 
     def get_outers (self, show_interlock=False, show_textures=False):
         # Note uses copy to prevent merging features into cut_lines multiple times
@@ -414,13 +408,11 @@ class Wall():
     def add_feature (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None, update=True):
         feature_num = self.add_feature_towall (feature_type, feature_template, startpos, points, cuts, etches, outers)
         if update == True:
-            #print ("Update")
             self.update()
         return feature_num
 
     # Add feature loaded from file
     def add_feature_file (self, filename):
-        #print (f"Adding feature from file {filename}")
         # Keep reference to filename loaded
         try:
             with open(filename, 'r') as datafile:

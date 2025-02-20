@@ -27,6 +27,7 @@ When returning from an edit - should return to the edit view
 Ensure profile menu is reset when adding new
 After adding wall switch to that view
 After adding wall then texture is shown even if not ticked
+First move sometimes gets dropped
 
 # Track updates 
 Warn if open etc.
@@ -77,6 +78,8 @@ Delete existing interlocking when opening file
 # Export
 Show status whilst exporting
 
+# Wall.py
+Ensure that all updates that generate textures are in threads
 
 # Track history - with undo and redo
 Currently history is saved on objects - need to save in main windows / edit window instead

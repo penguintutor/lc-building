@@ -36,7 +36,6 @@ class ViewScene(QObject):
         self.obj_views = []
         self.add_walls()
         
-        
     # Deletes the object view and the object
     def del_obj_by_id (self, id):
         del self.objs[id]
@@ -101,23 +100,22 @@ class ViewScene(QObject):
             etches = wall.get_etches(self.gconfig.checkbox['il'], self.gconfig.checkbox['texture'])
             if etches != None:
                 for etch in etches:
-                    self.obj_views[len(self.obj_views)-1].add_etch(etch)
+                    self.obj_views[-1].add_etch(etch)
                     
             # Get the outers (show different pen)
             outers = wall.get_outers(self.gconfig.checkbox['il'], self.gconfig.checkbox['texture'])
             if outers != None:
                 for outer in outers:
-                    self.obj_views[len(self.obj_views)-1].add_outer(outer)
+                    self.obj_views[-1].add_outer(outer)
                     
             cuts = wall.get_cuts(self.gconfig.checkbox['il'], self.gconfig.checkbox['texture'])
             for cut in cuts:
-                self.obj_views[len(self.obj_views)-1].add_cut(cut)
+                self.obj_views[-1].add_cut(cut)
             
             # Set position after adding graphics items
             #print (f"Setting {wall} to {wall.position}")
-            self.obj_views[len(self.obj_views)-1].set_pos(wall.position)
-            #self.obj_views[len(self.obj_views)-1].item_group.setPos(QPoint(*wall.position))
-            #print (f"New posion {self.obj_views[len(self.obj_views)-1].item_group.pos()}")
+            self.obj_views[-1].set_pos(wall.position)
+
  
                     
     def clear(self):
