@@ -13,6 +13,7 @@ from wallwindow import WallWindowUI
 from texturewindow import TextureWindowUI
 from addfeaturewindow import AddFeatureWindowUI
 from interlockingwindow import InterlockingWindowUI
+from history import History
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
@@ -43,6 +44,8 @@ class MainWindowUI(QMainWindow):
         
         # Progress dialog window (create when required)
         self.progress_window = None
+        
+        self.history = History()
         
         self.config = LCConfig()
         # How much we are zoomed in zoom (1 = 100%, 2 = 200%)
@@ -228,12 +231,14 @@ class MainWindowUI(QMainWindow):
                 #print (f"Name: {selected_objs[0].name}")
                 #print (f"Type: {selected_objs[0].type}") 
                 # Copy in builder
-                self.builder.copy_wall(selected_objs[0])
+                new_wall = self.builder.copy_wall(selected_objs[0])
+                old_param = {'wall_copied' : selected_objs[0]}
+                new_param = {'wall_copy': new_wall}
+                self.history.add("Wall copied", "MainWindows copy wall", old_param, new_param) 
                 # Update the scene
                 self.update_view(self.current_scene)                
         return
 
-    
     def edit_wall(self):
         selected_items = self.scenes[self.current_scene].get_selected()
         # If no items selected then just return
@@ -271,6 +276,9 @@ class MainWindowUI(QMainWindow):
         #selected_objs[0]
         confirm_box = QMessageBox.question(self, "Are you sure?", f"Are you sure you want\nto delete the selected wall?\n{selected_objs[0].name}")
         if confirm_box == QMessageBox.Yes:
+            old_params = {'old_wall': selected_objs[0]}
+            new_params = {}
+            self.history.add("Delete wall", "MW Wall del", old_params, new_params)
             #print ("Yes delete wall")
             self.builder.delete_wall(selected_objs[0])
             self.update_current_scene()

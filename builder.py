@@ -188,11 +188,12 @@ class Builder(QObject):
             # This reorders them (see comment in add_texture in wall for more details)
             new_wall.add_texture(texture_details[1], texture_details[0], texture_details[2])
         # Do not copy interlocking (does not make sense to do so)
+        return new_wall
         
     # After loading data this converts into builder objects
     # Deletes any existing entries
     def process_data(self):
-        print ("**Processing Data")
+        #print ("**Processing Data")
         self.current_status = 0
         self.settings = self.building.get_settings()
         if len(self.settings) > 0:
@@ -317,7 +318,7 @@ class Builder(QObject):
         self.current_status = 20
         self.status_per_wall = 80 / num_walls
         
-        print ("** Starting updates")
+        #print ("** Starting updates")
 
         # If not thread then use this
         if self.threadpool == None:

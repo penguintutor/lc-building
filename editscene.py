@@ -34,6 +34,7 @@ class EditScene(ViewScene):
     # always do a full update
     def update(self):
         # check for moved objeects
+        #print ("Update feature position")
         self.update_feature_pos()
         # Get list of selected features so we can reselect them after update
         selected_features = []
