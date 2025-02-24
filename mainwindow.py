@@ -206,6 +206,11 @@ class MainWindowUI(QMainWindow):
         new_scale = self.scale_select_combo.currentText()
         self.sc.set_scale(new_scale)
     
+    def set_scale (self, scale):
+        self.sc.set_scale(scale)
+        
+    def get_scale (self):
+        return self.sc.scale
         
     #If item is double clicked then it gets passed to this
     def double_click (self):

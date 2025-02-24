@@ -49,7 +49,7 @@ class WallWindowUI(QMainWindow):
         self.builder = builder
         
         # Set initially to default scale 
-        self.sc = Scale("OO")
+        #self.sc = Scale("OO")
         
         # Generate lists to allow access to the different fields
         # Simplifies translation and iteration over ui elements
@@ -109,7 +109,8 @@ class WallWindowUI(QMainWindow):
             self.ui.scaleCombo.addItem(this_scale)
         # Defaults to position 1 (OO)
         # May want to do this application wide instead of in this menu
-        self.ui.scaleCombo.setCurrentIndex(1)
+        #self.ui.scaleCombo.setCurrentIndex(1)
+        self.ui.scaleCombo.setCurrentText(self.parent.get_scale())
         
         self.ui.scaleCombo.activated.connect(self.scale_update)
         
@@ -179,8 +180,8 @@ class WallWindowUI(QMainWindow):
         # Should not have changed, but just check
         scale = self.ui.scaleCombo.currentText()
         refresh = False
-        if scale != self.sc.scale:
-            self.sc.set_scale(scale)
+        if scale != self.parent.sc.scale:
+            self.parent.set_scale(scale)
             # if it's not the same then need to update all entries, but continue with this for now
             # as we which is most important (last changed)
             refresh = True
@@ -190,7 +191,7 @@ class WallWindowUI(QMainWindow):
             # check it's a value - using try
             try:
                 current_value = float(current_value)
-                new_value = int(self.sc.scale_convert(current_value))
+                new_value = int(self.parent.sc.scale_convert(current_value))
                 # The text method should not trigger this again (otherwise we end up in a loop)
                 self.wall_elements["input_y"][row].setText(f"{new_value}")
             # If it's not a number then ignore (may be change in progress)
@@ -220,7 +221,7 @@ class WallWindowUI(QMainWindow):
         # Get scale in drop down menu - make sure that scale is set to current factor
         # Should not have changed, but just check
         scale = self.ui.scaleCombo.currentText()
-        self.sc.set_scale(scale)
+        self.parent.set_scale(scale)
         # Read the first 3 x entries and create scale version in y
         for row in range (0, 4):
             current_value = self.wall_elements["input_x"][row].text()
