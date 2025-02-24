@@ -202,7 +202,7 @@ class WallWindowUI(QMainWindow):
             # check it's a value - using try
             try:
                 current_value = float(current_value)
-                new_value = int(self.sc.reverse_scale_convert(current_value))
+                new_value = int(self.parent.sc.reverse_scale_convert(current_value))
                 # The text method should not trigger this again (otherwise we end up in a loop)
                 self.wall_elements["input_x"][row].setText(f"{new_value}")
             # If it's not a number then ignore (may be change in progress)

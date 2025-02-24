@@ -32,6 +32,10 @@ class MainWindowUI(QMainWindow):
     
     def __init__(self):
         super().__init__()
+                
+        self.config = LCConfig()
+        # How much we are zoomed in zoom (1 = 100%, 2 = 200%)
+        self.zoom_level = 1.0
         
         default_scale = "OO"
         
@@ -39,6 +43,7 @@ class MainWindowUI(QMainWindow):
         self.sc = Scale(default_scale)
         # Pass scale instance to laser class
         Laser.sc = self.sc
+        
         
         # Use scale to apply reverse scale to actual material_thickness
         material_thickness = 3
@@ -77,10 +82,7 @@ class MainWindowUI(QMainWindow):
         self.progress_window = None
         
         self.history = History()
-        
-        self.config = LCConfig()
-        # How much we are zoomed in zoom (1 = 100%, 2 = 200%)
-        self.zoom_level = 1.0
+
         
         # Used if need to send a status message (eg. pop-up warning)
         self.status_message = ""
@@ -206,8 +208,11 @@ class MainWindowUI(QMainWindow):
         new_scale = self.scale_select_combo.currentText()
         self.sc.set_scale(new_scale)
     
+    # Set the scale and set the combo box
     def set_scale (self, scale):
         self.sc.set_scale(scale)
+        # Also update this menu
+        self.scale_select_combo.setCurrentText(scale)
         
     def get_scale (self):
         return self.sc.scale
