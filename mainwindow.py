@@ -71,6 +71,8 @@ class MainWindowUI(QMainWindow):
             
         self.scale_select_combo.setCurrentText(default_scale)
         
+        self.scale_select_combo.currentIndexChanged.connect(self.scale_change)
+        
         # Progress dialog window (create when required)
         self.progress_window = None
         
@@ -199,7 +201,11 @@ class MainWindowUI(QMainWindow):
         # texture view option
         self.gconfig.checkbox['texture'] = self.ui.textureCheckBox.isChecked()
     
-        
+    # Scale combo changed
+    def scale_change (self):
+        new_scale = self.scale_select_combo.currentText()
+        self.sc.set_scale(new_scale)
+    
         
     #If item is double clicked then it gets passed to this
     def double_click (self):
