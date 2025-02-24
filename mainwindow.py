@@ -1,6 +1,6 @@
 import os
 from PySide6.QtCore import Qt, QCoreApplication, QThreadPool, Signal, QFileInfo
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QProgressDialog
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QProgressDialog, QLabel, QComboBox
 from PySide6.QtUiTools import QUiLoader
 from builder import Builder
 from viewscene import ViewScene
@@ -14,6 +14,9 @@ from texturewindow import TextureWindowUI
 from addfeaturewindow import AddFeatureWindowUI
 from interlockingwindow import InterlockingWindowUI
 from history import History
+from scale import Scale
+from laser import Laser
+from interlocking import Interlocking
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
@@ -30,6 +33,19 @@ class MainWindowUI(QMainWindow):
     def __init__(self):
         super().__init__()
         
+        default_scale = "OO"
+        
+        # Scale for output - default to OO
+        self.sc = Scale(default_scale)
+        # Pass scale instance to laser class
+        Laser.sc = self.sc
+        
+        # Use scale to apply reverse scale to actual material_thickness
+        material_thickness = 3
+        self.scale_material = self.sc.reverse_scale_convert(material_thickness)
+        # Set material thickness for Interlocking (class variable)
+        Interlocking.material_thickness = self.scale_material
+        
         # Threadpool to maintain responsiveness during load / export
         self.threadpool = QThreadPool()
         
@@ -41,6 +57,19 @@ class MainWindowUI(QMainWindow):
         
         self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
+        
+        self.ui.toolBar.insertSeparator(self.ui.actionVisit_Website)
+        self.scale_label = QLabel("Scale: ")
+        self.ui.toolBar.insertWidget(self.ui.actionVisit_Website, self.scale_label)
+        self.scale_select_combo = QComboBox()
+        self.ui.toolBar.insertWidget(self.ui.actionVisit_Website, self.scale_select_combo)
+        self.ui.toolBar.insertSeparator(self.ui.actionVisit_Website)
+        
+        # Populate the Scale pull-down menu
+        for scale_text in self.sc.scales.keys():
+            self.scale_select_combo.addItem(scale_text)
+            
+        self.scale_select_combo.setCurrentText(default_scale)
         
         # Progress dialog window (create when required)
         self.progress_window = None
