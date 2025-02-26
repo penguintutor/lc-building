@@ -53,37 +53,15 @@ class MainWindowUI(QMainWindow):
         
         # Threadpool to maintain responsiveness during load / export
         self.threadpool = QThreadPool()
-        
-        # Connect signal handler
-        self.load_complete_signal.connect(self.load_complete)
-        self.file_save_warning_signal.connect(self.file_save_warning)
-        self.progress_update_signal.connect(self.update_progress_dialog)
-        self.update_views_signal.connect(self.update_all_views)
-        
+
         self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
-        
-        self.ui.toolBar.insertSeparator(self.ui.actionVisit_Website)
-        self.scale_label = QLabel("Scale: ")
-        self.ui.toolBar.insertWidget(self.ui.actionVisit_Website, self.scale_label)
-        self.scale_select_combo = QComboBox()
-        self.ui.toolBar.insertWidget(self.ui.actionVisit_Website, self.scale_select_combo)
-        self.ui.toolBar.insertSeparator(self.ui.actionVisit_Website)
-        
-        # Populate the Scale pull-down menu
-        for scale_text in self.sc.scales.keys():
-            self.scale_select_combo.addItem(scale_text)
-            
-        self.scale_select_combo.setCurrentText(default_scale)
-        
-        self.scale_select_combo.currentIndexChanged.connect(self.scale_change)
         
         # Progress dialog window (create when required)
         self.progress_window = None
         
         self.history = History()
 
-        
         # Used if need to send a status message (eg. pop-up warning)
         self.status_message = ""
         
@@ -135,6 +113,20 @@ class MainWindowUI(QMainWindow):
         # Default to front view
         self.ui.graphicsView.setScene(self.scenes[self.current_scene])
 
+        ### Additional Windows 
+        # Set to none, only create when needed and can check if it's created yet
+        self.wall_window = None
+        self.texture_window = None
+        self.add_feature_window = None
+        self.interlocking_window = None
+
+        ### Additional GUI configuration
+        # Add signal handlers
+        self.load_complete_signal.connect(self.load_complete)
+        self.file_save_warning_signal.connect(self.file_save_warning)
+        self.progress_update_signal.connect(self.update_progress_dialog)
+        self.update_views_signal.connect(self.update_all_views)
+
         # File Menu
         self.ui.actionOpen.triggered.connect(self.open_file_dialog)
         self.ui.actionSave.triggered.connect(self.save_file)
@@ -154,6 +146,31 @@ class MainWindowUI(QMainWindow):
         self.ui.actionBottom.triggered.connect(self.view_bottom)
         # Help Menu
         self.ui.actionVisit_Website.triggered.connect(self.visit_website)
+        
+        # Additional items on toolbar (none standard, so not added through QT designer)
+        # Scale selector
+        self.ui.toolBar.insertSeparator(self.ui.actionVisit_Website)
+        self.scale_label = QLabel("Scale: ")
+        self.ui.toolBar.insertWidget(self.ui.actionVisit_Website, self.scale_label)
+        self.scale_select_combo = QComboBox()
+        self.ui.toolBar.insertWidget(self.ui.actionVisit_Website, self.scale_select_combo)
+        #self.ui.toolBar.insertSeparator(self.ui.actionVisit_Website)
+        # Populate the Scale pull-down menu
+        for scale_text in self.sc.scales.keys():
+            self.scale_select_combo.addItem(scale_text)
+        self.scale_select_combo.setCurrentText(default_scale)
+        self.scale_select_combo.currentIndexChanged.connect(self.scale_change)
+        # Wall width selector (in real life actual mm)
+        self.wall_width_label = QLabel("Wall width: ")
+        self.ui.toolBar.insertWidget(self.ui.actionVisit_Website, self.wall_width_label)
+        self.wall_width_combo = QComboBox()
+        self.ui.toolBar.insertWidget(self.ui.actionVisit_Website, self.wall_width_combo)
+        self.ui.toolBar.insertSeparator(self.ui.actionVisit_Website)
+        # Populate the Scale pull-down menu
+        for width_option in self.config.wall_width_options:
+            self.wall_width_combo.addItem(f"{width_option}mm")
+        self.wall_width_combo.setCurrentText(f"{self.config.wall_width}mm")
+        self.wall_width_combo.currentIndexChanged.connect(self.width_change)
         
         # View buttons
         self.ui.frontViewButton.pressed.connect(self.view_front)
@@ -189,20 +206,16 @@ class MainWindowUI(QMainWindow):
         
         self.set_left_buttons("default")
         
-        self.ui.show()
-        
-        # Set to none, only create when needed and can check if it's created yet
-        self.wall_window = None
-        self.texture_window = None
-        self.add_feature_window = None
-        self.interlocking_window = None
-
         # Update gconfig based on checkboxes - may need to load these values in future
         # interlocking view option
         self.gconfig.checkbox['il'] = self.ui.interlockCheckBox.isChecked()
         # texture view option
         self.gconfig.checkbox['texture'] = self.ui.textureCheckBox.isChecked()
-    
+        
+        self.ui.show()
+        
+
+    # Scale is stored in self.sc (also in Laser.sc)
     # Scale combo changed
     def scale_change (self):
         new_scale = self.scale_select_combo.currentText()
@@ -216,6 +229,20 @@ class MainWindowUI(QMainWindow):
         
     def get_scale (self):
         return self.sc.scale
+    
+    # Wall width (Wood Width) is kept in config - even when changed
+    # Wall width changes
+    def width_change (self):
+        wall_width_string = self.wall_width_combo.currentText()
+        # Strip off the mm
+        wall_width_string = wall_width_string.rstrip('mm')
+        try:
+            self.config.wall_width = int(wall_width_string)
+        except:
+            print ("Warning invalid wall width")
+        # todo force update with progress
+        
+      
         
     #If item is double clicked then it gets passed to this
     def double_click (self):

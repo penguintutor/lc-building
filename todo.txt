@@ -1,33 +1,24 @@
 # Todo
 
-Replace hardcoded material thickness / interlocking with setting
+Update display when scale / interlocking changed
+# For scale then do we need to do whenever update as may be through wallwindow?
 
 # Need to move some refresh to background or status updates
 # Eg. update all scenes / edit wall
 
 ## In Main Window 
-Show updating status when ticking / unticking interlocking / texture
-Handle checkboxes (different for if edit walls rather than view scene)
-Make view scene honor checkboxes
 When clicking edit but nothing selected give a warning - select object first
 When quit chosen ask if save
-Refresh (update_all_views) does not always appear to update all walls.
-Pressing delete should delete a wall
+Pressing delete should delete a wall (after confirmation)
 When copy - perhaps ask new wall name?
-
 
 ## In add / edit wall window
 Warn and reset values when switching between custom and simplified
 Warn and convert when switching between simplified and custom
-Handle selection of scale
-- when created set it to default
-- when reset go back to default
 Switching to custom set first entry to 0,0
-When returning from an edit - should return to the edit view
 Ensure profile menu is reset when adding new
 After adding wall switch to that view
-After adding wall then texture is shown even if not ticked
-First move sometimes gets dropped
+First move sometimes gets dropped (occassional bug)
 
 # Track updates 
 Warn if open etc.
@@ -35,7 +26,6 @@ Also add "New" button
 
 # Avoid overlap
 When adding wall then prevent it from overlapping existing (by default)
-
 
 # Copy wall
 Prevent overlapping 
@@ -50,18 +40,13 @@ Make it obvious in wall edit mode (not sure how best to achieve)
 Force refresh on relevant scene when exiting edit wall
 Update summary information when feature selected
 
-
 # Add Feature
 Show name instead of filename when adding feature
 perhaps show icons?
 Also apply filters based on type
 
-
 # Textures
 Possibly future plan
-Need to track if entire wall or whether to save polygon 
-(ie. if not specified then entire wall and don't need to save points, but
-if only specific area then do need to save - Not currently handled)
 Update current edit display when adding / updating texture
 Handle removing texture / perhaps set to "None"
 
@@ -73,7 +58,6 @@ Can only delete and readd rather than edit
 Refresh doesn't work when deleting interlocking
 Ensure that re-read walls for the add menu
 Delete existing interlocking when opening file
-
 
 # Export
 Show status whilst exporting
@@ -88,3 +72,5 @@ Currently history is saved on objects - need to save in main windows / edit wind
 Show selected objects better 
 Perhaps texture picker 
 Helpers when doing interlocking (eg. whether forward vs reverse based on direction of edge) and perhaps suggested il for typical building / wizard.
+
+

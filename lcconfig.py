@@ -15,6 +15,12 @@ class LCConfig():
         # 10 strokes (0 to 9)
         # Typically use 3 to 7 (5 is default)
         
+        # Default possible wall widths in mm
+        # Actual side of wood for etching, not scale size
+        self.wall_width_options = [1, 3, 5, 10, 12]
+        # default to 3mm
+        self.wall_width = 3
+        
         # Lightburn colours from 10 to 19 - lighter to darker
         # Baed on rgb values
         self.etch_strokes = [
