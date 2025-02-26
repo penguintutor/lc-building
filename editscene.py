@@ -32,10 +32,18 @@ class EditScene(ViewScene):
     # Tried removing objects but risk of chase condition where
     # object deleted but tries to be read - so slower but safer to
     # always do a full update
-    def update(self):
+    # feature_obj_pos is when moving features elsewhere (eg. align)
+    # instead of use the object_view pos - use the actual pos configured in the feature
+    # normally do not want to override this
+    def update(self, feature_obj_pos=False):
+        #print ("Updating edit scene")
         # check for moved objeects
-        #print ("Update feature position")
-        self.update_feature_pos()
+        if feature_obj_pos == True:
+            # Update view based on feature details
+             self.update_pos_feature()   
+        else:
+            # Update feature details based on view
+            self.update_feature_pos()
         # Get list of selected features so we can reselect them after update
         selected_features = []
         for i in range (1, len(self.obj_views)):
@@ -62,6 +70,18 @@ class EditScene(ViewScene):
             # convert view pos to mm pos
             view_new_pos = Laser.vs.reverse_convert(view_new_pos)
             self.objs[i].move_rel(view_new_pos)
+            
+    # This is the opposite of update_feature_pos
+    # Looks at the feature and updates the obj_views to reflect the updated values
+    # this is used when feature position moved by code (eg. align)
+    def update_pos_feature(self):
+        #print ("Updating position")
+        for i in range (1, len(self.objs)):
+            pos = self.objs[i].get_pos()
+            #print (f"Current feature {i} pos {pos}")
+            obj_pos = Laser.vs.convert(pos)
+            #print (f"Setting pos feature {i} to {obj_pos}")
+            self.obj_views[i].set_pos(obj_pos)
         
     # Add wall to edit
     # Takes object to edit, removes existing objects and replaces with this

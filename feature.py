@@ -51,6 +51,9 @@ class Feature():
     def __str__(self):
         return f"Feature: {self.type}"
     
+    def get_pos (self):
+        return [self.min_x, self.min_y]
+    
     # Don't have a name - return template instead
     def get_summary (self):
         return f"{self.type} - {self.template}"

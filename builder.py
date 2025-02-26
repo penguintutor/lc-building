@@ -18,6 +18,7 @@ class Builder(QObject):
     
     # Used during loading of wall (includes progress)
     wall_load_signal = Signal()
+    wall_update_complete_signal = Signal()
     # Used during normal refresh
     wall_update_status_signal = Signal() # Update status 
     wall_update_signal = Signal(int)
@@ -25,8 +26,8 @@ class Builder(QObject):
     def __init__(self, lcconfig, threadpool=None, gui=None):
         super().__init__()
         self.config = lcconfig
-        self.threadpool = threadpool	# If threads available pass threadpool
-        self.gui = gui					# If call from gui pass mainwindow for sending notifications
+        self.threadpool = threadpool    # If threads available pass threadpool
+        self.gui = gui                  # If call from gui pass mainwindow for sending notifications
         
         # Create empty building data instance - can load or edit
         self.building = BuildingData(self.config)
@@ -45,6 +46,7 @@ class Builder(QObject):
         # Following for creating wall updates on separate threads
         self.num_updates_progress = 0
         self.wall_load_signal.connect (self.wall_load_received)
+        self.wall_update_complete_signal.connect (self.wall_load_received) # Uses same as wall load
         self.wall_update_status_signal.connect(self.wall_update_status)
         self.wall_update_signal.connect (self.wall_update_received)
         

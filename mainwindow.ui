@@ -130,8 +130,14 @@
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
                <widget class="QCheckBox" name="interlockCheckBox">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>Interlocking</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -210,7 +216,7 @@
              <x>0</x>
              <y>0</y>
              <width>284</width>
-             <height>1506</height>
+             <height>1489</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -475,7 +481,7 @@
      <x>0</x>
      <y>0</y>
      <width>1055</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -493,6 +499,8 @@
      <string>Edit</string>
     </property>
     <addaction name="actionAdd_Wall"/>
+    <addaction name="actionInterlocking"/>
+    <addaction name="actionWallTexture"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -525,8 +533,29 @@
     <addaction name="menuProfile"/>
     <addaction name="menuZoom"/>
    </widget>
+   <widget class="QMenu" name="menuFeatures">
+    <property name="title">
+     <string>Features</string>
+    </property>
+    <widget class="QMenu" name="menuAlign">
+     <property name="title">
+      <string>Align</string>
+     </property>
+     <addaction name="actionAlignLeft"/>
+     <addaction name="actionAlignCentre"/>
+     <addaction name="actionAlignRight"/>
+     <addaction name="separator"/>
+     <addaction name="actionAlignTop"/>
+     <addaction name="actionAlignMiddle"/>
+     <addaction name="actionAlignBottom"/>
+    </widget>
+    <addaction name="actionAddFeature"/>
+    <addaction name="actionDeleteFeature"/>
+    <addaction name="menuAlign"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuFeatures"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -653,6 +682,59 @@
   <action name="actionExport">
    <property name="text">
     <string>Export</string>
+   </property>
+  </action>
+  <action name="actionAddFeature">
+   <property name="text">
+    <string>Add Feature</string>
+   </property>
+  </action>
+  <action name="actionDeleteFeature">
+   <property name="text">
+    <string>Delete Feature</string>
+   </property>
+  </action>
+  <action name="actionAlignLeft">
+   <property name="text">
+    <string>Left</string>
+   </property>
+  </action>
+  <action name="actionAlignCentre">
+   <property name="text">
+    <string>Centre</string>
+   </property>
+  </action>
+  <action name="actionAlignRight">
+   <property name="text">
+    <string>Right</string>
+   </property>
+  </action>
+  <action name="actionAlignTop">
+   <property name="text">
+    <string>Top</string>
+   </property>
+  </action>
+  <action name="actionAlignMiddle">
+   <property name="text">
+    <string>Middle</string>
+   </property>
+   <property name="toolTip">
+    <string>Middle</string>
+   </property>
+  </action>
+  <action name="actionAlignBottom">
+   <property name="text">
+    <string>Bottom</string>
+   </property>
+  </action>
+  <action name="actionInterlocking">
+   <property name="text">
+    <string>Interlocking</string>
+   </property>
+  </action>
+  <action name="actionWallTexture">
+   <property name="text">
+    <string>Wall Texture</string>
    </property>
   </action>
  </widget>

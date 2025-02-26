@@ -149,7 +149,7 @@ class BuildingData ():
         # Bdata instead
         if options == None:
             options = {
-                "material_thickness": 3,
+                "material_thickness": self.config.wall_width,
                 "outertype": "etches",
                 "interlocking": "true"
                 }
@@ -183,14 +183,18 @@ class BuildingData ():
         
         #print (f"Checking material thickness {options}")
         
+        # Allow override of material_thickness otherwise take from config
         if "material_thickness" in options.keys():
             material_thickness = options['material_thickness']
-        elif "material_thickness" in bdata.keys():
-            material_thickness = bdata["material_thickness"]
         else:
+            material_thickness = self.config.wall_width
+            
+        #elif "material_thickness" in bdata.keys():
+        #    material_thickness = bdata["material_thickness"]
+        #else:
             # ideally shouldn't get this but use a sensible default
-            print ("Warning using default for material thickness")
-            material_thickness = 3
+        #    print ("Warning using default for material thickness")
+        #    material_thickness = 3
             
         #print (f"Creating scale material {material_thickness}")
         scale_material = int(sc.reverse_scale_convert(material_thickness))

@@ -179,6 +179,26 @@ class Wall():
         self.position[1] += pos[1]
         
 
+    # Align a feature against the wall
+    # Uses current wall and moves feature
+    def wall_feature_align (self, direction, feature):
+        # left or top are simplist as just set to 0
+        if direction == 'left':
+            feature.min_x = 0
+        elif direction == 'top':
+            feature.min_y = 0
+        # for bottom and right then offset based on size of wall and feature
+        elif direction == 'right':
+            feature.min_x = self.get_maxwidth() - feature.get_maxwidth()
+        elif direction == 'bottom':
+            feature.min_y = self.get_maxheight() - feature.get_maxheight()
+        # for middle and centre use 1/2 wall and 1/2 feature
+        elif direction == 'centre':
+            feature.min_x = (self.get_maxwidth()/2) - (feature.get_maxwidth()/2)
+        elif direction == 'middle':
+            feature.min_y = (self.get_maxheight()/2) - (feature.get_maxheight()/2)
+        feature.update_pos()
+
     # Updates cuts, etches and outers
     # Interlock = None, keep current, otherwise update
     # Interlock and texture no longer used - instead use through get edges etc.

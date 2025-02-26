@@ -46,7 +46,7 @@ class MainWindowUI(QMainWindow):
         
         
         # Use scale to apply reverse scale to actual material_thickness
-        material_thickness = 3
+        material_thickness = self.config.wall_width
         self.scale_material = self.sc.reverse_scale_convert(material_thickness)
         # Set material thickness for Interlocking (class variable)
         Interlocking.material_thickness = self.scale_material
@@ -133,8 +133,21 @@ class MainWindowUI(QMainWindow):
         self.ui.actionSave_as.triggered.connect(self.save_as_dialog)
         self.ui.actionExport.triggered.connect(self.export_dialog)
         self.ui.actionExit.triggered.connect(QCoreApplication.quit)
+        
         # Edit Menu
         self.ui.actionAdd_Wall.triggered.connect(self.add_wall)
+        self.ui.actionWallTexture.triggered.connect(self.texture_properties)
+                
+        # Feature Menu (this menu is only shown when it edit mode)
+        self.ui.actionAddFeature.triggered.connect(self.add_feature)
+        self.ui.actionDeleteFeature.triggered.connect(self.delete_feature)
+        self.ui.actionAlignLeft.triggered.connect(lambda: self.feature_align('left'))
+        self.ui.actionAlignCentre.triggered.connect(lambda: self.feature_align('centre'))
+        self.ui.actionAlignRight.triggered.connect(lambda: self.feature_align('right'))
+        self.ui.actionAlignTop.triggered.connect(lambda: self.feature_align('top'))
+        self.ui.actionAlignMiddle.triggered.connect(lambda: self.feature_align('middle'))
+        self.ui.actionAlignBottom.triggered.connect(lambda: self.feature_align('bottom'))
+        
         # View Menu
         self.ui.actionZoom_Out.triggered.connect(self.zoom_out)
         self.ui.actionZoom_In.triggered.connect(self.zoom_in)
@@ -144,6 +157,7 @@ class MainWindowUI(QMainWindow):
         self.ui.actionLeft.triggered.connect(self.view_left)
         self.ui.actionTop.triggered.connect(self.view_top)
         self.ui.actionBottom.triggered.connect(self.view_bottom)
+        
         # Help Menu
         self.ui.actionVisit_Website.triggered.connect(self.visit_website)
         
@@ -171,7 +185,7 @@ class MainWindowUI(QMainWindow):
             self.wall_width_combo.addItem(f"{width_option}mm")
         self.wall_width_combo.setCurrentText(f"{self.config.wall_width}mm")
         self.wall_width_combo.currentIndexChanged.connect(self.width_change)
-        
+
         # View buttons
         self.ui.frontViewButton.pressed.connect(self.view_front)
         self.ui.frontViewImageButton.pressed.connect(self.view_front)
@@ -214,24 +228,52 @@ class MainWindowUI(QMainWindow):
         
         self.ui.show()
         
+    # Align a feature
+    # If no feature ignore
+    # If only one feature selected apply compared to wall
+    # If multiple features then apply to each other - using one that is furthest in that position
+    # Or if centre / middle then midpoint between objects
+    def feature_align(self, direction):
+        # Check we are in wall edit - don't align otherwise
+        # The menu is normally disabled, but check anyway
+        if self.current_scene != 'walledit':
+            return
+        selected_items = self.scenes[self.current_scene].get_selected()
+        # If no features selected do nothing
+        if (len(selected_items) < 1):
+            return
+        # If just one then align against wall
+        if (len(selected_items) == 1):
+            # selected items is obj view - need it as a feature 
+            selected_obj = self.view_scenes[self.current_scene].get_obj_from_obj_view(selected_items[0])
+            self.view_scenes[self.current_scene].wall.wall_feature_align (direction, selected_obj)
+            self.view_scenes[self.current_scene].update(feature_obj_pos=True)
+            
+        # If here then have more than one item
+        # Todo
+        
 
     # Scale is stored in self.sc (also in Laser.sc)
     # Scale combo changed
     def scale_change (self):
         new_scale = self.scale_select_combo.currentText()
-        self.sc.set_scale(new_scale)
+        self.set_scale(new_scale)
     
     # Set the scale and set the combo box
     def set_scale (self, scale):
         self.sc.set_scale(scale)
         # Also update this menu
         self.scale_select_combo.setCurrentText(scale)
+        # Also update the width - note that this will also perform
+        # an update with progress bar
+        self.width_change()
+        
         
     def get_scale (self):
         return self.sc.scale
     
     # Wall width (Wood Width) is kept in config - even when changed
-    # Wall width changes
+    # Wall width changes - also update using progress bar
     def width_change (self):
         wall_width_string = self.wall_width_combo.currentText()
         # Strip off the mm
@@ -240,7 +282,13 @@ class MainWindowUI(QMainWindow):
             self.config.wall_width = int(wall_width_string)
         except:
             print ("Warning invalid wall width")
-        # todo force update with progress
+            return
+        # Update in the Interlocking class
+        material_thickness = self.config.wall_width
+        self.scale_material = self.sc.reverse_scale_convert(material_thickness)
+        # Set material thickness for Interlocking (class variable)
+        Interlocking.material_thickness = self.scale_material
+        self.full_update()
         
       
         
@@ -380,6 +428,7 @@ class MainWindowUI(QMainWindow):
             self.ui.wallTexturesButton.hide()
             self.ui.addFeatureButton.hide()
             self.ui.deleteFeatureButton.hide()
+            self.ui.actionWallTexture.setVisible(False)
             if status == "wallselect":
                 self.ui.copyWallButton.setEnabled(True)
                 self.ui.editWallButton.setEnabled(True)
@@ -388,6 +437,8 @@ class MainWindowUI(QMainWindow):
                 self.ui.copyWallButton.setEnabled(False)
                 self.ui.editWallButton.setEnabled(False)
                 self.ui.deleteWallButton.setEnabled(False)
+            # Also hide features from menubar
+            self.ui.menuFeatures.menuAction().setVisible(False)
         elif status.startswith("walledit"):
             self.ui.addWallButton.hide()
             self.ui.copyWallButton.hide()
@@ -404,6 +455,8 @@ class MainWindowUI(QMainWindow):
                 self.ui.deleteFeatureButton.setEnabled(True)
             else:
                 self.ui.deleteFeatureButton.setEnabled(False)
+            self.ui.menuFeatures.menuAction().setVisible(True)
+            self.ui.actionWallTexture.setVisible(True)
             
     def open_file_dialog(self):
         filename = QFileDialog.getOpenFileName(self, "Open building file", "", "Building file (*.json);;All (*.*)")
@@ -416,6 +469,11 @@ class MainWindowUI(QMainWindow):
         # Create progress window before starting threadpool (needs to be in main thread)
         self.start_progress("Loading ...", 100)
         self.threadpool.start(self.file_open)
+        
+    # Full update of all files with progress bar
+    def full_update(self):
+        self.start_progress("Updating ...", 100)
+        self.builder.update_walls_td (status_signal=self.builder.wall_update_status_signal, complete_signal=self.builder.wall_update_complete_signal)
         
     # Note save_file is called from the UI
     # file_save is then called subsequently (typically in a threadpool)
@@ -537,9 +595,6 @@ class MainWindowUI(QMainWindow):
         if site == None:
             webbrowser.open("https://www.penguintutor.com/projects/laser-cut-buildings")
 
-    def edit_menu(self):
-        pass
-    
     # File open is called as a separate thread
     def file_open(self):
         # Prevent duplicate file opens (or saving when opening etc.)

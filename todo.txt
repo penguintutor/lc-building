@@ -18,7 +18,7 @@ Warn and convert when switching between simplified and custom
 Switching to custom set first entry to 0,0
 Ensure profile menu is reset when adding new
 After adding wall switch to that view
-First move sometimes gets dropped (occassional bug)
+First move sometimes gets dropped (occasional bug)
 
 # Track updates 
 Warn if open etc.
@@ -28,7 +28,7 @@ Also add "New" button
 When adding wall then prevent it from overlapping existing (by default)
 
 # Copy wall
-Prevent overlapping 
+Prevent overlapping  
 Possibly - rename copied walls (1) etc. instead of (copy)
 
 # Delete wall
@@ -36,9 +36,7 @@ Note need to update any interlockinggroups to refer to new wall references
 Does not appear to delete all interlocking references
 
 # Edit wall 
-Make it obvious in wall edit mode (not sure how best to achieve)
-Force refresh on relevant scene when exiting edit wall
-Update summary information when feature selected
+Make it obvious in wall edit mode - Possibly display mode / view in top left of graphicsView 
 
 # Add Feature
 Show name instead of filename when adding feature
