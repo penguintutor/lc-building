@@ -12,6 +12,7 @@ import webbrowser
 from wallwindow import WallWindowUI
 from texturewindow import TextureWindowUI
 from addfeaturewindow import AddFeatureWindowUI
+from featureposwindow import FeaturePosWindowUI
 from interlockingwindow import InterlockingWindowUI
 from history import History
 from scale import Scale
@@ -119,6 +120,7 @@ class MainWindowUI(QMainWindow):
         self.texture_window = None
         self.add_feature_window = None
         self.interlocking_window = None
+        self.feature_pos_window = None
 
         ### Additional GUI configuration
         # Add signal handlers

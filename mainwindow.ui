@@ -216,7 +216,7 @@
              <x>0</x>
              <y>0</y>
              <width>284</width>
-             <height>1489</height>
+             <height>1506</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -481,7 +481,7 @@
      <x>0</x>
      <y>0</y>
      <width>1055</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -551,6 +551,7 @@
     </widget>
     <addaction name="actionAddFeature"/>
     <addaction name="actionDeleteFeature"/>
+    <addaction name="actionPositionFeature"/>
     <addaction name="menuAlign"/>
    </widget>
    <addaction name="menuFile"/>
@@ -735,6 +736,11 @@
   <action name="actionWallTexture">
    <property name="text">
     <string>Wall Texture</string>
+   </property>
+  </action>
+  <action name="actionPositionFeature">
+   <property name="text">
+    <string>Position Feature</string>
    </property>
   </action>
  </widget>
