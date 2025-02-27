@@ -3,7 +3,7 @@
 # In particular allows capturing some of the events (eg. mouse events) that would
 # otherwise be past direct to higher level widgets
 from PySide6.QtWidgets import QGraphicsScene
-from PySide6.QtGui import QWheelEvent
+from PySide6.QtGui import QWheelEvent, QCursor
 from PySide6.QtCore import Qt, Signal
 #from wallwindow import WallWindowUI
 
@@ -34,8 +34,17 @@ class ViewGraphicsScene (QGraphicsScene):
         # Pass the event to the QGraphicScene method - otherwise unable to select other objects
         super().mouseReleaseEvent (event)
         #print ("Mouse released")
-        # Has anything moved
-        self.main_window.check_moved_update()
+        # Is this right button (eg. pop-up menu)
+        if event.button()==Qt.RightButton:
+            if self.main_window.current_scene == "walledit":
+                # Pop-up menu
+                # event.pos always returns 0,0 from vgraphicscene
+                # Instead user QCursor
+                cursor_pos = QCursor.pos()
+                self.main_window.ui.menuFeatures.popup(cursor_pos)
+        else:
+            # Has anything moved
+            self.main_window.check_moved_update()
         
     ## Code to handle CTRL & Scroll Wheel for zoom
     def wheelEvent(self, event):

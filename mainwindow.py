@@ -243,15 +243,18 @@ class MainWindowUI(QMainWindow):
         if (len(selected_items) < 1):
             return
         # If just one then align against wall
-        if (len(selected_items) == 1):
+        elif (len(selected_items) == 1):
             # selected items is obj view - need it as a feature 
             selected_obj = self.view_scenes[self.current_scene].get_obj_from_obj_view(selected_items[0])
             self.view_scenes[self.current_scene].wall.wall_feature_align (direction, selected_obj)
             self.view_scenes[self.current_scene].update(feature_obj_pos=True)
-            
-        # If here then have more than one item
-        # Todo
-        
+        else:
+            # If here then have more than one item
+            objs = []
+            for item in selected_items:
+                objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(item))
+            self.view_scenes[self.current_scene].wall.features_align (direction, objs)
+            self.view_scenes[self.current_scene].update(feature_obj_pos=True)
 
     # Scale is stored in self.sc (also in Laser.sc)
     # Scale combo changed
@@ -403,8 +406,6 @@ class MainWindowUI(QMainWindow):
             self.builder.delete_wall(selected_objs[0])
             self.update_current_scene()
             # Force refresh of all walls to update any interlocking that has been removed
-            ## Todo - For performance may look at only if view interlocking is turned on
-            ## although that will do nothing for worst case - so is it much of a benefit
             self.update_all_views()
         else:
             #print ("No do not delete")
@@ -566,7 +567,6 @@ class MainWindowUI(QMainWindow):
     # Performs the actual save (normally triggered in a threadpool)
     def file_save(self):
         print (f"Saving file {self.new_filename}")
-        # Todo implement this
         success = self.builder.save_file(self.new_filename)
         # If successful then confirm new filename
         if success[0] == True:
@@ -579,7 +579,6 @@ class MainWindowUI(QMainWindow):
     # Performs the actual save (normally triggered in a threadpool)
     def file_export(self):
         #print (f"Exporting file {self.export_filename}")
-        # Todo implement this
         success = self.builder.export_file(self.export_filename)
         # If successful then confirm new filename
         # If not then give an error message - need to pass back to GUI thread
@@ -601,7 +600,6 @@ class MainWindowUI(QMainWindow):
         self.disable_file_actions()
         result = self.builder.load_file(self.new_filename)
         if result[0] == False:
-            #Todo show error message
             print (f"Error {result[1]}")
             self.ui.statusbar.showMessage ("Error "+result[1])
         else:
@@ -736,9 +734,7 @@ class MainWindowUI(QMainWindow):
             if self.current_scene == "walledit":
                 #self.view_scenes[self.current_scene].update(full=True)
                 #self.view_scenes[self.current_scene].update_full()
-                self.view_scenes[self.current_scene].update()
-            # Todo if not wall edit then may still need to refresh position - but not do a full update
-        
+                self.view_scenes[self.current_scene].update()       
     
     # Updates table showing status of objects
     # Update based on selection in viewgraphicsscene
@@ -750,13 +746,19 @@ class MainWindowUI(QMainWindow):
 
         # reset all table rows
         self.ui.infoTable.setRowCount(0)
+        
+        # Potential race condition - where selected_items is being updated could result in
+        # one of the fields being None - so check at each point that have a valid object 
 
         # First check if some items are selection
-        if selected_items != None:
+        if selected_items != None and len(selected_items)>0 and selected_items[0]!=None:
             selected_objs = []
             # Call get info to find information on what is selected
-            for this_obj in selected_items:
-                selected_objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj))
+            for this_obj_view in selected_items:
+                this_obj = self.view_scenes[self.current_scene].get_obj_from_obj_view(this_obj_view)
+                if this_obj == None:
+                    continue
+                selected_objs.append(this_obj)
             if (len(selected_objs) > 1):
                 self.ui.infoLabel.setText(f"{len(selected_objs)} objects selected")
                 self.ui.infoTable.setRowCount(len(selected_objs))

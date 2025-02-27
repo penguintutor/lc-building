@@ -199,6 +199,91 @@ class Wall():
             feature.min_y = (self.get_maxheight()/2) - (feature.get_maxheight()/2)
         feature.update_pos()
 
+    # Align features against each other.
+    # Aligns against the one that is furthest in that direction
+    def features_align (self, direction, features):
+        # left and top just use the one with the lowest value
+        if direction == "left":
+            # Set minimum to first, then see if any are lower
+            min_x = features[0].min_x
+            # Get the lowest value and then apply to all objects
+            for i in range (1, len(features)):
+                if min_x > features[i].min_x:
+                    min_x = features[i].min_x
+            # Now set all features to the lowest value
+            for feature in features:
+                feature.min_x = min_x
+                feature.update_pos()
+        elif direction == "top":
+            # Set minimum to first, then see if any are lower
+            min_y = features[0].min_y
+            # Get the lowest value and then apply to all objects
+            for i in range (1, len(features)):
+                if min_y > features[i].min_y:
+                    min_y = features[i].min_y
+            # Now set all features to the lowest value
+            for feature in features:
+                feature.min_y = min_y
+                feature.update_pos()
+        # right and bottom are similar, but need to use max
+        elif direction == "right":
+            # Set minimum to first, then see if any are lower
+            max_x = features[0].get_max_x()
+            # Get the highest value and then apply to all objects
+            for i in range (1, len(features)):
+                if max_x < features[i].get_max_x():
+                    max_x = features[i].get_max_x()
+            # Now set all features to the highest value
+            for feature in features:
+                feature.move_max_x (max_x)
+                feature.update_pos()
+        elif direction == "bottom":
+            # Set minimum to first, then see if any are lower
+            max_y = features[0].get_max_y()
+            # Get the highest value and then apply to all objects
+            for i in range (1, len(features)):
+                if max_y < features[i].get_max_y():
+                    max_y = features[i].get_max_y()
+            # Now set all features to the highest value
+            for feature in features:
+                feature.move_max_y (max_y)
+                feature.update_pos()
+        # Centre / Middle - get average difference between each object
+        elif direction == "centre":
+            # Get lowest mid point - also store total of mids for later
+            num_features = len(features)
+            min_mid_x = features[0].get_mid_x()
+            total_mids = min_mid_x
+            for i in range (1, num_features):
+                this_mid = features[i].get_mid_x()
+                if min_mid_x > this_mid:
+                    min_mid_x = this_mid
+                total_mids += this_mid
+            # work out meaning average by first subtracting len * num entries and dividing
+            average = (total_mids - (num_features * min_mid_x)) / num_features
+            # set all to new mid
+            mid_align = average + min_mid_x
+            for feature in features:
+                feature.move_mid_x (mid_align)
+                feature.update_pos()
+        elif direction == "middle":
+            # Get lowest mid point - also store total of mids for later
+            num_features = len(features)
+            min_mid_y = features[0].get_mid_y()
+            total_mids = min_mid_y
+            for i in range (1, num_features):
+                this_mid = features[i].get_mid_y()
+                if min_mid_y > this_mid:
+                    min_mid_y = this_mid
+                total_mids += this_mid
+            # work out meaning average by first subtracting len * num entries and dividing
+            average = (total_mids - (num_features * min_mid_y)) / num_features
+            # set all to new mid
+            mid_align = average + min_mid_y
+            for feature in features:
+                feature.move_mid_y (mid_align)
+                feature.update_pos()
+
     # Updates cuts, etches and outers
     # Interlock = None, keep current, otherwise update
     # Interlock and texture no longer used - instead use through get edges etc.

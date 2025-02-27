@@ -70,8 +70,33 @@ class Feature():
     def get_size_string (self):
         return (f"{int(self.get_maxwidth()):,d}mm x {int(self.get_maxheight()):,d}mm")
 
+    def get_max_x (self):
+        return self.min_x + self.get_maxwidth()
+    
+    def get_max_y (self):
+        return self.min_y + self.get_maxheight()
+    
+    def get_mid_x (self):
+        return self.min_x + (self.get_maxwidth()/2)
+    
+    def get_mid_y (self):
+        return self.min_y + (self.get_maxheight()/2)
+
     def get_maxsize (self):
         return (self.get_maxwidth(), self.get_maxheight())
+    
+    # Move so that the max position is the new value
+    def move_max_y (self, value):
+        self.min_y = value - self.get_maxheight()
+    
+    def move_max_x (self, value):
+        self.min_x = value - self.get_maxwidth()
+        
+    def move_mid_y (self, value):
+        self.min_y = value - (self.get_maxheight()/2)
+    
+    def move_mid_x (self, value):
+        self.min_x = value - (self.get_maxwidth()/2)
     
     # max distance x
     def get_maxwidth (self):
