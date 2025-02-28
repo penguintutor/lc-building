@@ -143,6 +143,7 @@ class MainWindowUI(QMainWindow):
         # Feature Menu (this menu is only shown when it edit mode)
         self.ui.actionAddFeature.triggered.connect(self.add_feature)
         self.ui.actionDeleteFeature.triggered.connect(self.delete_feature)
+        self.ui.actionPositionFeature.triggered.connect(self.feature_position)
         self.ui.actionAlignLeft.triggered.connect(lambda: self.feature_align('left'))
         self.ui.actionAlignCentre.triggered.connect(lambda: self.feature_align('centre'))
         self.ui.actionAlignRight.triggered.connect(lambda: self.feature_align('right'))
@@ -257,6 +258,24 @@ class MainWindowUI(QMainWindow):
                 objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(item))
             self.view_scenes[self.current_scene].wall.features_align (direction, objs)
             self.view_scenes[self.current_scene].update(feature_obj_pos=True)
+            
+    # Launch feature position window
+    def feature_position (self):
+        # This will only be called from wall edit (menu hidden on other screens)
+        # But check just in case
+        if self.current_scene != "walledit":
+            return
+        # First need to know feature to use
+        # Currently only allows a single feature to be selected and it is positioned relative to the wall
+        selected_items = self.scenes[self.current_scene].get_selected()
+        # If none or more than one selected then just ignore (at the moment)
+        if len(selected_items)!= 1:
+            return
+        feature = self.view_scenes[self.current_scene].get_obj_from_obj_view(selected_items[0])
+        # If first run create window - else use edit_position to reopen window
+        if self.feature_pos_window == None:
+            self.feature_pos_window = FeaturePosWindowUI(self, self.config, self.gconfig, self.builder)
+        self.feature_pos_window.edit_position(self.view_scenes[self.current_scene].wall, feature)
 
     # Scale is stored in self.sc (also in Laser.sc)
     # Scale combo changed

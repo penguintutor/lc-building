@@ -19,7 +19,7 @@ app_title = "Position feature relative to wall"
 
 class FeaturePosWindowUI(QMainWindow):
            
-    def __init__(self, parent, config, gconfig, builder, wall):
+    def __init__(self, parent, config, gconfig, builder):
         super().__init__()
         
         self.parent = parent
@@ -30,64 +30,76 @@ class FeaturePosWindowUI(QMainWindow):
         self.config = config
         self.gconfig = gconfig
         self.builder = builder
-        self.wall = wall
+        # Wall and feature are added through edit_position method 
+        self.wall = None
+        self.feature = None
         
 
         # Connect buttons to method to update distance calculation
         # Use same for wall and feature and check both for changes
-        self.ui.wallTopLeftRadio.toggled.connect(self.radio_updated)
-        self.ui.wallTopRadio.toggled.connect(self.radio_updated)
-        self.ui.wallTopRightRadio.toggled.connect(self.radio_updated)
-        self.ui.wallLeftRadio.toggled.connect(self.radio_updated)
-        self.ui.wallCentreRadio.toggled.connect(self.radio_updated)
-        self.ui.wallRightRadio.toggled.connect(self.radio_updated)
-        self.ui.wallBottomLeftRadio.toggled.connect(self.radio_updated)
-        self.ui.wallBottomRadio.toggled.connect(self.radio_updated)
-        self.ui.wallBottomRightRadio.toggled.connect(self.radio_updated)
-        self.ui.featureTopLeftRadio.toggled.connect(self.radio_updated)
-        self.ui.featureTopRadio.toggled.connect(self.radio_updated)
-        self.ui.featureTopRightRadio.toggled.connect(self.radio_updated)
-        self.ui.featureLeftRadio.toggled.connect(self.radio_updated)
-        self.ui.featureCentreRadio.toggled.connect(self.radio_updated)
-        self.ui.featureRightRadio.toggled.connect(self.radio_updated)
-        self.ui.featureBottomLeftRadio.toggled.connect(self.radio_updated)
-        self.ui.featureBottomRadio.toggled.connect(self.radio_updated)
-        self.ui.wallBottomRightRadio.toggled.connect(self.radio_updated)
+        # Uses clicked instead of toggled, so only triggered once per change
+        # otherwise triggered when twice because one is selected and one is deselected
+        self.ui.WallTopLeftRadio.clicked.connect(self.radio_updated)
+        self.ui.WallTopRadio.clicked.connect(self.radio_updated)
+        self.ui.WallTopRightRadio.clicked.connect(self.radio_updated)
+        self.ui.WallLeftRadio.clicked.connect(self.radio_updated)
+        self.ui.WallCentreRadio.clicked.connect(self.radio_updated)
+        self.ui.WallRightRadio.clicked.connect(self.radio_updated)
+        self.ui.WallBottomLeftRadio.clicked.connect(self.radio_updated)
+        self.ui.WallBottomRadio.clicked.connect(self.radio_updated)
+        self.ui.WallBottomRightRadio.clicked.connect(self.radio_updated)
+        self.ui.FeatureTopLeftRadio.clicked.connect(self.radio_updated)
+        self.ui.FeatureTopRadio.clicked.connect(self.radio_updated)
+        self.ui.FeatureTopRightRadio.clicked.connect(self.radio_updated)
+        self.ui.FeatureLeftRadio.clicked.connect(self.radio_updated)
+        self.ui.FeatureCentreRadio.clicked.connect(self.radio_updated)
+        self.ui.FeatureRightRadio.clicked.connect(self.radio_updated)
+        self.ui.FeatureBottomLeftRadio.clicked.connect(self.radio_updated)
+        self.ui.FeatureBottomRadio.clicked.connect(self.radio_updated)
+        self.ui.FeatureBottomRightRadio.clicked.connect(self.radio_updated)
         
 
         self.ui.buttonBox.rejected.connect(self.cancel)
         self.ui.buttonBox.accepted.connect(self.accept)
         
-        self.radio_updated()
-        
         self.ui.show()
     
     
-    def set_wall (self, wall):
+    #def set_wall (self, wall):
+    #    self.wall = wall
+     
+    def edit_position (self, wall, feature):
+        # Currently only support relative to wall - so just need wall and feature
+        # perhaps allow position relative to other features in future?
         self.wall = wall
+        self.feature = feature
+        
+        self.radio_updated()
+        
+        self.ui.show()
 
     # Call if an of the radio buttons changed
-    # Also used initially for setup
+    # Also used initially for setup of edit position
     def radio_updated (self):
         # Get coords for wall position
         # default to centre and change if another is selected
         wall_pos = [self.wall.get_maxwidth()/2, self.wall.get_maxheight()/2]
-        if self.ui.wallTopLeftRadio.isChecked():
+        if self.ui.WallTopLeftRadio.isChecked():
             wall_pos = [0,0]
-        elif self.ui.wallTopRadio.isChecked():
+        elif self.ui.WallTopRadio.isChecked():
             wall_pos = [self.wall.get_maxwidth()/2, 0]
-        elif self.ui.wallTopRightRadio.isChecked():
+        elif self.ui.WallTopRightRadio.isChecked():
             wall_pos = [self.wall.get_maxwidth(), 0]
-        elif self.ui.wallLeftRadio.isChecked():
-            wall_pos = [0, wall.get_maxheight()/2]
-        elif self.ui.wallRightRadio.isChecked():
-            wall_pos = [wall.get_maxwidth(), wall.get_maxheight()/2]
-        elif self.ui.wallBottomLeftRadio.isChecked():
-            wall_pos = [0, wall.get_maxheight()]
-        elif self.ui.wallBottomRadio.isChecked():
-            wall_pos = [wall.get_maxwidth()/2, wall.get_maxheight()]
-        elif self.ui.wallBottomRightRadio.isChecked():
-            wall_pos = [wall.get_maxwidth(), wall.get_maxheight()]
+        elif self.ui.WallLeftRadio.isChecked():
+            wall_pos = [0, self.wall.get_maxheight()/2]
+        elif self.ui.WallRightRadio.isChecked():
+            wall_pos = [self.wall.get_maxwidth(), self.wall.get_maxheight()/2]
+        elif self.ui.WallBottomLeftRadio.isChecked():
+            wall_pos = [0, self.wall.get_maxheight()]
+        elif self.ui.WallBottomRadio.isChecked():
+            wall_pos = [self.wall.get_maxwidth()/2, self.wall.get_maxheight()]
+        elif self.ui.WallBottomRightRadio.isChecked():
+            wall_pos = [self.wall.get_maxwidth(), self.wall.get_maxheight()]
         print (f"Wall position {wall_pos}")
         
         
