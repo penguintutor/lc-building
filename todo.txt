@@ -37,6 +37,7 @@ Does not appear to delete all interlocking references
 
 # Edit wall 
 Make it obvious in wall edit mode - Possibly display mode / view in top left of graphicsView 
+When choose align / position from right menu and no feature selected but is in position of menu then use that
 
 # Add Feature
 Show name instead of filename when adding feature
@@ -65,6 +66,10 @@ Ensure that all updates that generate textures are in threads
 
 # Track history - with undo and redo
 Currently history is saved on objects - need to save in main windows / edit window instead
+
+# Feature Position Window
+Allow two objects to be selected - first is treated as though it is the wall (does not move)
+Assuming both feature and wall share some common methods (eg. get_maxwidth / get_maxheight) then should work the same
 
 # Future 
 Show selected objects better 

@@ -34,6 +34,9 @@ class FeaturePosWindowUI(QMainWindow):
         self.wall = None
         self.feature = None
         
+        # Default position top left (but normally override before use)
+        self.wall_pos = [0,0]
+        
 
         # Connect buttons to method to update distance calculation
         # Use same for wall and feature and check both for changes
@@ -83,25 +86,50 @@ class FeaturePosWindowUI(QMainWindow):
     def radio_updated (self):
         # Get coords for wall position
         # default to centre and change if another is selected
-        wall_pos = [self.wall.get_maxwidth()/2, self.wall.get_maxheight()/2]
+        # Save self.wall_pos as saves recalculating later - but just use the feature position
+        # to populate the ui
+        self.wall_pos = [self.wall.get_maxwidth()/2, self.wall.get_maxheight()/2]
         if self.ui.WallTopLeftRadio.isChecked():
-            wall_pos = [0,0]
+            self.wall_pos = [0,0]
         elif self.ui.WallTopRadio.isChecked():
-            wall_pos = [self.wall.get_maxwidth()/2, 0]
+            self.wall_pos = [self.wall.get_maxwidth()/2, 0]
         elif self.ui.WallTopRightRadio.isChecked():
-            wall_pos = [self.wall.get_maxwidth(), 0]
+            self.wall_pos = [self.wall.get_maxwidth(), 0]
         elif self.ui.WallLeftRadio.isChecked():
-            wall_pos = [0, self.wall.get_maxheight()/2]
+            self.wall_pos = [0, self.wall.get_maxheight()/2]
         elif self.ui.WallRightRadio.isChecked():
-            wall_pos = [self.wall.get_maxwidth(), self.wall.get_maxheight()/2]
+            self.wall_pos = [self.wall.get_maxwidth(), self.wall.get_maxheight()/2]
         elif self.ui.WallBottomLeftRadio.isChecked():
-            wall_pos = [0, self.wall.get_maxheight()]
+            self.wall_pos = [0, self.wall.get_maxheight()]
         elif self.ui.WallBottomRadio.isChecked():
-            wall_pos = [self.wall.get_maxwidth()/2, self.wall.get_maxheight()]
+            self.wall_pos = [self.wall.get_maxwidth()/2, self.wall.get_maxheight()]
         elif self.ui.WallBottomRightRadio.isChecked():
-            wall_pos = [self.wall.get_maxwidth(), self.wall.get_maxheight()]
-        print (f"Wall position {wall_pos}")
+            self.wall_pos = [self.wall.get_maxwidth(), self.wall.get_maxheight()]
+
+        feature_pos = [self.feature.min_x + self.feature.get_maxwidth()/2, self.feature.min_y + self.feature.get_maxheight()/2]
+        if self.ui.FeatureTopLeftRadio.isChecked():
+            feature_pos = [self.feature.min_x, self.feature.min_y]
+        elif self.ui.FeatureTopRadio.isChecked():
+            feature_pos = [self.feature.min_x + self.feature.get_maxwidth()/2, self.feature.min_y]
+        elif self.ui.FeatureTopRightRadio.isChecked():
+            feature_pos = [self.feature.min_x + self.feature.get_maxwidth(), self.feature.min_y]
+        elif self.ui.FeatureLeftRadio.isChecked():
+            feature_pos = [self.feature.min_x + 0, self.feature.min_y + self.feature.get_maxheight()/2]
+        elif self.ui.FeatureRightRadio.isChecked():
+            feature_pos = [self.feature.min_x + self.feature.get_maxwidth(), self.feature.min_y + self.feature.get_maxheight()/2]
+        elif self.ui.FeatureBottomLeftRadio.isChecked():
+            feature_pos = [self.feature.min_x, self.feature.min_y + self.feature.get_maxheight()]
+        elif self.ui.FeatureBottomRadio.isChecked():
+            feature_pos = [self.feature.min_x + self.feature.get_maxwidth()/2, self.feature.min_y + self.feature.get_maxheight()]
+        elif self.ui.FeatureBottomRightRadio.isChecked():
+            feature_pos = [self.feature.min_x + self.feature.get_maxwidth(), self.feature.min_y + self.feature.get_maxheight()]
+
+        x_dist = feature_pos[0] - self.wall_pos[0] 
+        y_dist = feature_pos[1] - self.wall_pos[1] 
         
+        self.ui.XDistanceEdit.setText(str(int(x_dist)))
+        self.ui.YDistanceEdit.setText(str(int(y_dist)))
+
         
     # hide entire windows
     def hide(self):
@@ -114,15 +142,58 @@ class FeaturePosWindowUI(QMainWindow):
     # Accept button is pressed
     def accept(self):
         
-        index_pos = self.ui.listView.currentIndex().row()
-            
-        # Add this feature
-        # (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None):
-        self.wall.add_feature_file (self.feature_directory+"/"+self.list_features[index_pos][0])
+        x_dist_str = self.ui.XDistanceEdit.text()
+        # check it's an integer string and if so convert to int
+        try:
+            x_dist = int(x_dist_str)
+        except ValueError:
+            QMessageBox.warning(self, "X distance is not a number", "X distance is not a number. Please provide a distance in mm.")
+            return
+        # Also check it's not a negative number, or ridiculously large (over 100m)
+        if x_dist < -10000 or x_dist > 10000:
+            QMessageBox.warning(self, "X distance is invalid", "X distance is not a valid number. Please provide a valid size in mm.")
+            return
         
-        self.parent.update_current_scene()
-        self.hide()
+        y_dist_str = self.ui.YDistanceEdit.text()
+        # check it's an integer string and if so convert to int
+        try:
+            y_dist = int(y_dist_str)
+        except ValueError:
+            QMessageBox.warning(self, "Y distance is not a number", "Y distance is not a number. Please provide a distance in mm.")
+            return
+        # Also check it's not a negative number, or ridiculously large (over 100m)
+        if y_dist < -10000 or y_dist > 10000:
+            QMessageBox.warning(self, "Y distance is invalid", "Y distance is not a valid number. Please provide a valid size in mm.")
+            return
         
+        # Update the x_dist / y_dist based on the selected position
+        # current value is relative to top left - so default to that
+        if self.ui.FeatureTopRadio.isChecked():
+            x_dist -= self.feature.get_maxwidth()/2
+        elif self.ui.FeatureTopRightRadio.isChecked():
+            x_dist -= self.feature.get_maxwidth()
+        elif self.ui.FeatureLeftRadio.isChecked():
+            y_dist -= self.feature.get_maxheight()/2
+        elif self.ui.FeatureCentreRadio.isChecked():
+            x_dist -= self.feature.get_maxwidth()/2
+            y_dist -= self.feature.get_maxheight()/2
+        elif self.ui.FeatureRightRadio.isChecked():
+            x_dist -= self.feature.get_maxwidth()
+            y_dist -= self.feature.get_maxheight()/2
+        elif self.ui.FeatureBottomLeftRadio.isChecked():
+            y_dist -= self.feature.get_maxheight()
+        elif self.ui.FeatureBottomRadio.isChecked():
+            x_dist -= self.feature.get_maxwidth()/2
+            y_dist -= self.feature.get_maxheight()
+        elif self.ui.FeatureBottomRightRadio.isChecked():
+            x_dist -= self.feature.get_maxwidth()
+            y_dist -= self.feature.get_maxheight()
+        
+        # Update the Feature position
+        self.feature.min_x = self.wall_pos[0] + x_dist
+        self.feature.min_y = self.wall_pos[1] + y_dist
 
+        self.feature.update_pos()
+        self.parent.feature_position_update()
+        self.ui.hide()
         
-

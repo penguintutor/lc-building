@@ -56,9 +56,9 @@
    <widget class="QDialogButtonBox" name="buttonBox">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>595</x>
       <y>550</y>
-      <width>166</width>
+      <width>171</width>
       <height>25</height>
      </rect>
     </property>

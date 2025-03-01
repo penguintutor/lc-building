@@ -276,6 +276,9 @@ class MainWindowUI(QMainWindow):
         if self.feature_pos_window == None:
             self.feature_pos_window = FeaturePosWindowUI(self, self.config, self.gconfig, self.builder)
         self.feature_pos_window.edit_position(self.view_scenes[self.current_scene].wall, feature)
+        
+    def feature_position_update (self):
+        self.view_scenes[self.current_scene].update(feature_obj_pos=True)
 
     # Scale is stored in self.sc (also in Laser.sc)
     # Scale combo changed
