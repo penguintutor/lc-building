@@ -1,11 +1,5 @@
 # Todo
 
-Update display when scale / interlocking changed
-# For scale then do we need to do whenever update as may be through wallwindow?
-
-# Need to move some refresh to background or status updates
-# Eg. update all scenes / edit wall
-
 ## In Main Window 
 When clicking edit but nothing selected give a warning - select object first
 When quit chosen ask if save

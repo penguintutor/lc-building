@@ -134,7 +134,8 @@ class MainWindowUI(QMainWindow):
         self.ui.actionSave.triggered.connect(self.save_file)
         self.ui.actionSave_as.triggered.connect(self.save_as_dialog)
         self.ui.actionExport.triggered.connect(self.export_dialog)
-        self.ui.actionExit.triggered.connect(QCoreApplication.quit)
+        self.ui.actionExit.triggered.connect(self.quit_app)
+        #self.ui.actionExit.triggered.connect(self.closeEvent)
         
         # Edit Menu
         self.ui.actionAdd_Wall.triggered.connect(self.add_wall)
@@ -229,7 +230,9 @@ class MainWindowUI(QMainWindow):
         # texture view option
         self.gconfig.checkbox['texture'] = self.ui.textureCheckBox.isChecked()
         
-        self.ui.show()
+        #self.ui.show()
+        self.setCentralWidget(self.ui)
+        self.show()
         
     # Align a feature
     # If no feature ignore
@@ -877,3 +880,24 @@ class MainWindowUI(QMainWindow):
     def update_progress_dialog (self, value):
         #print (f"Updating dialog with emit value {value}")
         self.progress_window.setValue(value)
+        
+    def quit_app(self):
+        QCoreApplication.quit()
+        
+    def closeEvent (self, event):
+    # Quit app - check with user first
+    #def quit_app (self):
+        # Temporary - until history fully implemented set file to changed
+        self.history.file_changed = True
+        if self.history.file_changed == True:
+            # Confirm with user 
+            confirm_box = QMessageBox.question(self, "Quit without saving", f"Changes to file\nQuit without saving?")
+            if confirm_box == QMessageBox.Yes:
+                QCoreApplication.quit()
+            else:
+                return
+        # Consider saving geometry
+        #settings = QSettings("MyCompany", "MyApp")
+        #settings.setValue("geometry", self.saveGeometry())
+        #settings.setValue("windowState", self.saveState())
+        #QMainWindow.closeEvent(self, event)
