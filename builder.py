@@ -11,6 +11,7 @@ from interlocking import Interlocking
 from interlockinggroup import InterlockingGroup
 from lcconfig import LCConfig
 from datetime import datetime
+from history import History
 
 # If threadpool provided then that can be used - otherwise threadpool = None and operations run sequentially
 # Must be a QObject so that can use signals
@@ -28,6 +29,10 @@ class Builder(QObject):
         self.config = lcconfig
         self.threadpool = threadpool    # If threads available pass threadpool
         self.gui = gui                  # If call from gui pass mainwindow for sending notifications
+        if self.gui != None:
+            self.history = self.gui.history
+        else:
+            self.history = History()
         
         # Create empty building data instance - can load or edit
         self.building = BuildingData(self.config)
@@ -73,6 +78,7 @@ class Builder(QObject):
         else:
             print ("File load failed")
         #print (f"Walls are {self.walls}")
+        self.history.file_changed = False
         return result
         
     # Saves the file
@@ -170,6 +176,9 @@ class Builder(QObject):
         # Todo Calculate position
         position = [0,0]
         self.walls.append(Wall(wall_data['name'], wall_data['points'], wall_data['view'], position))
+        new_params = wall_data.copy()
+        old_params = {"new_wall" : self.walls[-1]}
+        self.history.add(f"Add wall {wall_data['name']}", "Add wall", old_params, new_params)
         # Return wall so it can be used elsewhere
         return self.walls[-1]
         
@@ -189,6 +198,9 @@ class Builder(QObject):
             # When adding texture to wall it takes different order to Texture constructor
             # This reorders them (see comment in add_texture in wall for more details)
             new_wall.add_texture(texture_details[1], texture_details[0], texture_details[2])
+        new_params = {"copy_of" : wall_to_copy}
+        old_params = {"copy_wall" : new_wall}
+        self.history.add(f"Copy wall {new_wall.name}", "Copy wall", old_params, new_params)
         # Do not copy interlocking (does not make sense to do so)
         return new_wall
         

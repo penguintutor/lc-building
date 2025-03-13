@@ -2,7 +2,6 @@
 
 ## In Main Window 
 When clicking edit but nothing selected give a warning - select object first
-When quit chosen ask if save
 Pressing delete should delete a wall (after confirmation)
 When copy - perhaps ask new wall name?
 
