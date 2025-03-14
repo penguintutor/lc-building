@@ -58,7 +58,10 @@ Show status whilst exporting
 Ensure that all updates that generate textures are in threads
 
 # Track history - with undo and redo
-Currently history is saved on objects - need to save in main windows / edit window instead
+Remove any history saved on objects
+Builder history is now added, but also needed for any updates that are outside
+of the builder class (eg. add texture applied to the wall class) 
+Also implement undo and redo options based on saved history
 
 # Feature Position Window
 Allow two objects to be selected - first is treated as though it is the wall (does not move)
