@@ -30,6 +30,8 @@ class MainWindowUI(QMainWindow):
     file_save_warning_signal = Signal()
     progress_update_signal = Signal(int)
     update_views_signal = Signal()
+    undo_menu_signal = Signal(str)
+    redo_menu_signal = Signal(str)
     
     def __init__(self):
         super().__init__()
@@ -44,7 +46,6 @@ class MainWindowUI(QMainWindow):
         self.sc = Scale(default_scale)
         # Pass scale instance to laser class
         Laser.sc = self.sc
-        
         
         # Use scale to apply reverse scale to actual material_thickness
         material_thickness = self.config.wall_width
@@ -61,7 +62,7 @@ class MainWindowUI(QMainWindow):
         # Progress dialog window (create when required)
         self.progress_window = None
         
-        self.history = History()
+        self.history = History(self)
 
         # Used if need to send a status message (eg. pop-up warning)
         self.status_message = ""
@@ -128,6 +129,8 @@ class MainWindowUI(QMainWindow):
         self.file_save_warning_signal.connect(self.file_save_warning)
         self.progress_update_signal.connect(self.update_progress_dialog)
         self.update_views_signal.connect(self.update_all_views)
+        self.undo_menu_signal.connect(self.update_undo_menu)
+        self.redo_menu_signal.connect(self.update_redo_menu)
 
         # File Menu
         self.ui.actionOpen.triggered.connect(self.open_file_dialog)
@@ -138,6 +141,11 @@ class MainWindowUI(QMainWindow):
         #self.ui.actionExit.triggered.connect(self.closeEvent)
         
         # Edit Menu
+        self.ui.actionUndo.triggered.connect(self.undo)
+        self.ui.actionRedo.triggered.connect(self.redo)
+        # Undo and Redo are disabled until have some history
+        self.ui.actionUndo.setEnabled(False)
+        self.ui.actionRedo.setEnabled(False)
         self.ui.actionAdd_Wall.triggered.connect(self.add_wall)
         self.ui.actionWallTexture.triggered.connect(self.texture_properties)
                 
@@ -382,9 +390,10 @@ class MainWindowUI(QMainWindow):
                 #print (f"Type: {selected_objs[0].type}") 
                 # Copy in builder
                 new_wall = self.builder.copy_wall(selected_objs[0])
-                old_param = {'wall_copied' : selected_objs[0]}
-                new_param = {'wall_copy': new_wall}
-                self.history.add("Wall copied", "MainWindows copy wall", old_param, new_param) 
+                # History moved to builder class
+                #old_param = {'wall_copied' : selected_objs[0]}
+                #new_param = {'wall_copy': new_wall}
+                #self.history.add("Wall copied", "MainWindows copy wall", old_param, new_param) 
                 # Update the scene
                 self.update_view(self.current_scene)                
         return
@@ -426,9 +435,9 @@ class MainWindowUI(QMainWindow):
         #selected_objs[0]
         confirm_box = QMessageBox.question(self, "Are you sure?", f"Are you sure you want\nto delete the selected wall?\n{selected_objs[0].name}")
         if confirm_box == QMessageBox.Yes:
-            old_params = {'old_wall': selected_objs[0]}
-            new_params = {}
-            self.history.add("Delete wall", "MW Wall del", old_params, new_params)
+            #old_params = {'old_wall': selected_objs[0]}
+            #new_params = {}
+            #self.history.add("Delete wall", "MW Wall del", old_params, new_params)
             #print ("Yes delete wall")
             self.builder.delete_wall(selected_objs[0])
             self.update_current_scene()
@@ -901,3 +910,21 @@ class MainWindowUI(QMainWindow):
         #settings.setValue("geometry", self.saveGeometry())
         #settings.setValue("windowState", self.saveState())
         #QMainWindow.closeEvent(self, event)
+
+    def update_undo_menu(self, action):
+        print (f"Updating undo menu {action}")
+        self.ui.actionUndo.setEnabled(True)
+        self.ui.actionUndo.setText(f"Undo: {action}")
+        self.ui.actionRedo.setEnabled(False)
+    
+    
+    def update_redo_menu(self, action):
+        self.ui.actionRedo.setEnabled(True)
+        self.ui.actionRedo.setText(f"Redo: {action}")
+        
+    def undo (self):
+        pass
+    
+    def redo (self):
+        pass
+    

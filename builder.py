@@ -78,7 +78,8 @@ class Builder(QObject):
         else:
             print ("File load failed")
         #print (f"Walls are {self.walls}")
-        self.history.file_changed = False
+        # Loaded file so reset the history
+        self.history.reset()
         return result
         
     # Saves the file
@@ -358,7 +359,19 @@ class Builder(QObject):
         secondary_il = secondary_wall.add_interlocking(step, secondary_edge, "secondary", secondary_reverse, il_type, parameters)
         self.interlocking_groups.append(InterlockingGroup(primary_wall_id, primary_il, secondary_wall_id, secondary_il))
         #self.print_il()
-            
+        new_params = {
+            'primary_wall_id': primary_wall_id,
+            'primary_edge': primary_edge,
+            'primary_reverse': primary_reverse,
+            'secondary_wall_id': secondary_wall_id,
+            'secondary_edge': secondary_edge,
+            'secondary_reverse': secondary_reverse,
+            'il_type': il_type,
+            'step': step,
+            'parameters': parameters
+            }
+        old_params = {}
+        self.history.add(f"Add IL", "Add IL", old_params, new_params)    
             
     def print_il (self):
         print (f"IL entries:")
@@ -375,12 +388,18 @@ class Builder(QObject):
                 # Delete the wall - also removes textures and features on the wall
                 self.walls.pop(i)
                 return
+        new_params = {}
+        old_params = wall.copy()
+        self.history.add(f"Delete wall {wall.name}", "Delete wall", old_params, new_params)
         
     # Delete interlocking objects referencing the wall ID
     # Reduce the number of all subsequent walls by 1
     def delete_wall_il(self, wall_id):
+        old_params = {}
+        new_params = {}
         for ilg in self.interlocking_groups:
             if ilg.primary_wall == wall_id or ilg.secondary_wall == wall_id:
+                old_params['ilg'] = ilg.copy()
                 # Delete the il entries
                 if ilg.primary_wall != wall_id:
                     self.walls[ilg.primary_wall].delete_il(ilg.primary_il.edge)
@@ -388,6 +407,8 @@ class Builder(QObject):
                     self.walls[ilg.secondary_wall].delete_il(ilg.secondary_il.edge)
                 # Delete the group
                 self.interlocking_groups.remove(ilg)
+        self.history.add(f"Delete IL", "Delete IL", old_params, new_params)
+        
 
 
     # update_walls_td replaced with a single thred version
