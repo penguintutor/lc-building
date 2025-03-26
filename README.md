@@ -27,7 +27,7 @@ If you are running Linux Mint then you may also need to install additional packa
     sudo apt install python3.12-venv 
     sudo apt install libxcb-cursor0
     
-On systems you may also need to install pip using
+On some systems you may also need to install pip using
 
     sudo apt install python3-pip
 
@@ -98,23 +98,16 @@ taken into consideration.
 
 ### Limitations of small scales
 Small scales (smaller than HO/OO) may have problems when dealing with small
-size shapes. These may need to be edit in Inkscape before burning, or choose
-an "N friendly" template
+size shapes. These may need to be edited in a vector image editor (such as 
+Inkscape) before burning, or choose an "N friendly" template
 
 ### Single texture per wall
 Currently only allows a single texture per wall which covers entire wall.
-For split walls (eg. half brick half render) then split into multiple walls
-
-### Delay in updating the info box
-Under some circumstances when an object is selected there may be a delay before
-the information box in the bottom right is updated. It is unknown why this is, 
-perhaps related to internal redrawing of the object when it receives focus. It is 
-not known to have another other impact on the software operation.
+For split walls (eg. half brick, half render) then split into multiple walls.
+If required they can then be merged within a vector image editor or your 
+laser cutter software.
 
 ### History undo etc. not yet implemented
 Changes are implemented immediately, but there is not currently a way to undo those changes, 
 other than not saving them. 
-Data is included in some of the functions and is likely to be included in future. Note that the history of edits is independant so changes to different parts may have unintentional consequences.
-
-### Performance issues
-Performance is under review. Attempted multithreading for updates (thread per wall), but due to GIL and additional overheads this was noticeably slower.
+This is likely to be included in future.
