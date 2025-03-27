@@ -139,8 +139,6 @@ class WallWindowUI(QMainWindow):
         
         self.simple_interface()
         
-        #self.ui.show()
-        
     # Use when using the window to edit existing wall instead of new
     def edit_properties (self, wall):
         self.wall = wall

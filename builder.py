@@ -13,6 +13,10 @@ from lcconfig import LCConfig
 from datetime import datetime
 from history import History
 
+# To support history many of the methods have an optional variable history
+# If it's default / true then we add history record (allow undo)
+# if not then we don't add to the history eg. it's an undo
+
 # If threadpool provided then that can be used - otherwise threadpool = None and operations run sequentially
 # Must be a QObject so that can use signals
 class Builder(QObject):
@@ -177,7 +181,9 @@ class Builder(QObject):
         # Todo Calculate position
         position = [0,0]
         self.walls.append(Wall(wall_data['name'], wall_data['points'], wall_data['view'], position))
+        # New params are the steps required to repeat this
         new_params = wall_data.copy()
+        # Old params are the steps to undo
         old_params = {"new_wall" : self.walls[-1]}
         self.history.add(f"Add wall {wall_data['name']}", "Add wall", old_params, new_params)
         # Return wall so it can be used elsewhere
@@ -378,7 +384,7 @@ class Builder(QObject):
         for il_group in self.interlocking_groups:
             print (f" {il_group}")
             
-    def delete_wall (self, wall):
+    def delete_wall (self, wall, history=True):
         for i in range (0, len(self.walls)):
             if self.walls[i] == wall:
                 #print (f"Deleting wall {i}")

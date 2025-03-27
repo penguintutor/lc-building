@@ -923,8 +923,9 @@ class MainWindowUI(QMainWindow):
         self.ui.actionRedo.setText(f"Redo: {action}")
         
     def undo (self):
-        pass
+        self.history.undo()
     
+    # Redo not implemented yet
     def redo (self):
         pass
     
