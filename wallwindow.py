@@ -137,10 +137,23 @@ class WallWindowUI(QMainWindow):
         self.ui.buttonBox.rejected.connect(self.cancel)
         self.ui.buttonBox.accepted.connect(self.accept)
         
+        # Store old params here in case undo needed.
+        # These are the steps to undo (what the current values are before changing)
+        self.old_params = {}
+        
         self.simple_interface()
         
     # Use when using the window to edit existing wall instead of new
     def edit_properties (self, wall):
+        # Need to store old_params in case need to undo
+        # These are the steps to undo (what the current values are before changing)
+        self.old_params = {
+            "wall": wall,
+            "name": wall.name,
+            "points": copy.deepcopy(wall.points),
+            "view": wall.view
+            }
+        
         self.wall = wall
         # clear any previous data
         self.reset()
@@ -323,7 +336,6 @@ class WallWindowUI(QMainWindow):
         self.simple_interface()
         
     # Accept button is pressed
-    # Todo - allow update as well as new
     def accept(self):
         # Validate data - doesn't matter if some fields are not filled in, but need at least 3 points (triangular wall)
         # Add to builder, then reset and hide window
@@ -458,8 +470,19 @@ class WallWindowUI(QMainWindow):
         if self.wall == None:
             # Add this wall
             self.wall = self.builder.add_wall(wall_data)
+            # No need to add history as that will happen in the builder
         # If this is existing wall then update it
         else:
+            # Store changes into history
+            # New params are the steps required to repeat this (redo)
+            new_params = {
+                'wall_name': wall_data['name'],
+                'wall_points' : copy.deepcopy(wall_data['points']),
+                'wall_view': wall_data['view']
+                }
+            # Old params are the steps to undo (what the current values are before changing) - already saved when edit properties called
+            self.parent.history.add(f"Edit wall {wall_data['name']}", "Edit wall", self.old_params, new_params)
+
             self.wall.name = wall_data['name']
             # create copy of the list - rather than pass the list which will be edited in future
             self.wall.points = copy.deepcopy(wall_data['points'])
@@ -470,10 +493,6 @@ class WallWindowUI(QMainWindow):
         self.wall.update_texture_points()
         # Update this wall
         self.builder.update_wall_td(self.wall, complete_signal=self.parent.update_views_signal)
-        
-        # Update parent (via main window)
-        # Update is performed by the callback
-        #self.parent.update_all_views()
         
         # Reset the window and hide
         self.reset()

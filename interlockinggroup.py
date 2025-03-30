@@ -1,5 +1,6 @@
 # Used to track combination of Interlocking Primary and Secondary entries
 
+# Note some are objects some are IDs !!!
 # _wall = wall_id
 # _il = Interlocking object
 class InterlockingGroup():

@@ -607,6 +607,7 @@ class Wall():
 
     # Delete interlock on an edge
     # as stated only one interlock should be applied to an edge, but delete any that reference this edge.
+    # Don't add to history (captured at builder / group level)
     def delete_il (self, edge):
         for this_il in self.il:
             if this_il.edge == edge:

@@ -43,15 +43,22 @@ class History():
         print (f"Undoing activity {self.activity[self.activity_pos -1].title}")
         # Call appropriate method based on action type
         this_activity = self.activity[self.activity_pos -1]
-        if (this_activity.action == "Add wall"):
+        if this_activity.action == "Add wall" or this_activity.action == "Copy wall":
             print (f"Deleting wall {this_activity.title}")
             self.gui.builder.delete_wall(this_activity.old_parameters["new_wall"], history=False)
+        elif this_activity.action == "Delete wall":
+            print (f"Restoring wall {this_activity.title}")
+            self.gui.builder.restore_wall(this_activity.old_parameters, history=False)
+        elif this_activity.action == "Edit wall": # wall properties
+            print (f"Restoring wall properties {this_activity.title}")
+            self.gui.builder.restore_wall_properties(this_activity.old_parameters, history=False)
+            
         # move the activity counter back down
         self.activity_pos -= 1
         # Update the undo menu
         next_undo = ""
         if self.activity_pos > 0:
-            next_undo = self.activity[self.activity_pos -1].action
+            next_undo = self.activity[self.activity_pos -1].action       
         self.gui.undo_menu_signal.emit(next_undo)
         self.gui.update_views_signal.emit()
         

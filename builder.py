@@ -12,6 +12,7 @@ from interlockinggroup import InterlockingGroup
 from lcconfig import LCConfig
 from datetime import datetime
 from history import History
+import copy
 
 # To support history many of the methods have an optional variable history
 # If it's default / true then we add history record (allow undo)
@@ -177,19 +178,40 @@ class Builder(QObject):
         
     # Takes a dictionary with the wall data where points is a list within the dictionary
     # Wall args are: name, points, view="front", position=[0,0]
-    def add_wall(self, wall_data):
+    def add_wall(self, wall_data, history=True):
+        print ("Add Wall")
         # Todo Calculate position
         position = [0,0]
         self.walls.append(Wall(wall_data['name'], wall_data['points'], wall_data['view'], position))
-        # New params are the steps required to repeat this
+        # New params are the steps required to repeat this (redo)
+        # A copy of the dictionary 
         new_params = wall_data.copy()
-        # Old params are the steps to undo
+        # Old params are the steps to undo (link to the wall object)
         old_params = {"new_wall" : self.walls[-1]}
         self.history.add(f"Add wall {wall_data['name']}", "Add wall", old_params, new_params)
         # Return wall so it can be used elsewhere
         return self.walls[-1]
+    
+    # Restores wall properties from an undo property change
+    def restore_wall_properties(self, wall_data, history=False):
+        # Find this wall
+        for wall in self.walls:
+            if wall == wall_data["wall"]:
+                wall.name = wall_data["name"]
+                wall.points = copy.deepcopy(wall_data["points"])
+                wall.view = wall_data["view"]
+                # If wall dimensions changed then also need to update any textures
+                wall.update_texture_points()
+                # Update this wall
+                self.update_wall_td(wall, complete_signal=self.gui.update_views_signal)
+                break
         
-    def copy_wall(self, wall_to_copy):
+    # Restores wall from an undo request
+    def restore_wall(self, wall_data, history=False):
+        self.walls.append(wall_data)
+        
+    def copy_wall(self, wall_to_copy, history=True):
+        print ("Copy Wall")
         position = [0,0]
         # Copy the wall object (excluding features etc. - do that afterwards)
         self.walls.append(Wall(wall_to_copy.name+" (Copy)", wall_to_copy.points, wall_to_copy.view, position))
@@ -207,7 +229,8 @@ class Builder(QObject):
             new_wall.add_texture(texture_details[1], texture_details[0], texture_details[2])
         new_params = {"copy_of" : wall_to_copy}
         old_params = {"copy_wall" : new_wall}
-        self.history.add(f"Copy wall {new_wall.name}", "Copy wall", old_params, new_params)
+        if history == True:
+            self.history.add(f"Copy wall {new_wall.name}", "Copy wall", old_params, new_params)
         # Do not copy interlocking (does not make sense to do so)
         return new_wall
         
@@ -358,6 +381,7 @@ class Builder(QObject):
             
 
     def add_il (self, primary_wall_id, primary_edge, primary_reverse, secondary_wall_id, secondary_edge, secondary_reverse, il_type, step, parameters):
+        print ("Adding IL")
         # il moved to wall and then get back as a reference so it can be added to the interlocking group
         primary_wall = self.walls[primary_wall_id]
         primary_il = primary_wall.add_interlocking(step, primary_edge, "primary", primary_reverse, il_type, parameters)
@@ -365,6 +389,7 @@ class Builder(QObject):
         secondary_il = secondary_wall.add_interlocking(step, secondary_edge, "secondary", secondary_reverse, il_type, parameters)
         self.interlocking_groups.append(InterlockingGroup(primary_wall_id, primary_il, secondary_wall_id, secondary_il))
         #self.print_il()
+        # New parameters are redo - how we create if we ever needed to recreate it
         new_params = {
             'primary_wall_id': primary_wall_id,
             'primary_edge': primary_edge,
@@ -376,7 +401,8 @@ class Builder(QObject):
             'step': step,
             'parameters': parameters
             }
-        old_params = {}
+        # Old parameters are used for undo (ie. what would we delete)
+        old_params = {"primary_il": primary_il, "secondary_il": secondary_il, "il_group": self.interlocking_groups[-1]}
         self.history.add(f"Add IL", "Add IL", old_params, new_params)    
             
     def print_il (self):
@@ -385,6 +411,7 @@ class Builder(QObject):
             print (f" {il_group}")
             
     def delete_wall (self, wall, history=True):
+        print ("Deleting wall")
         for i in range (0, len(self.walls)):
             if self.walls[i] == wall:
                 #print (f"Deleting wall {i}")
@@ -393,19 +420,37 @@ class Builder(QObject):
                 self.delete_wall_il(i)
                 # Delete the wall - also removes textures and features on the wall
                 self.walls.pop(i)
+                new_params = {}
+                old_params = wall
+                if history == True:
+                    self.history.add(f"Delete wall {wall.name}", "Delete wall", old_params, new_params)
                 return
-        new_params = {}
-        old_params = wall.copy()
-        self.history.add(f"Delete wall {wall.name}", "Delete wall", old_params, new_params)
         
     # Delete interlocking objects referencing the wall ID
     # Reduce the number of all subsequent walls by 1
-    def delete_wall_il(self, wall_id):
+    def delete_wall_il(self, wall_id, history=True):
         old_params = {}
         new_params = {}
         for ilg in self.interlocking_groups:
             if ilg.primary_wall == wall_id or ilg.secondary_wall == wall_id:
-                old_params['ilg'] = ilg.copy()
+                # new parameters are used for redo - how we delete this il if asked to again
+                new_params["wall_id"] = wall_id
+                # Old parameters used for undo - how we undo delete (recreate)
+                # Parameters required for:
+                #add_il (self, primary_wall_id, primary_edge, primary_reverse, secondary_wall_id, secondary_edge, secondary_reverse, il_type, step, parameters):
+                old_params["primary_wall_id"] = ilg.primary_wall
+                old_params["primary_edge"] = ilg.primary_il.edge
+                old_params["primary_reverse"] = ilg.primary_il.reverse
+                old_params["secondary_wall_id"] = ilg.secondary_wall
+                old_params["secondary_edge"] = ilg.secondary_il.edge
+                old_params["secondary_reverse"] = ilg.secondary_ilg.reverse
+                # Get other params from primary wall il
+                old_params["il_type"] = ilg.primary_il.il_type
+                old_params["step"] = ilg.primary_il.step
+                old_params["parameters"] = ilg.primary_il.parameters
+                
+                if history == True:
+                    self.history.add(f"Delete Wall IL", "Delete Wall IL", old_params, new_params)
                 # Delete the il entries
                 if ilg.primary_wall != wall_id:
                     self.walls[ilg.primary_wall].delete_il(ilg.primary_il.edge)
@@ -413,14 +458,11 @@ class Builder(QObject):
                     self.walls[ilg.secondary_wall].delete_il(ilg.secondary_il.edge)
                 # Delete the group
                 self.interlocking_groups.remove(ilg)
-        self.history.add(f"Delete IL", "Delete IL", old_params, new_params)
         
-
-
+        
     # update_walls_td replaced with a single thred version
     # Note that this needs to be run in separate thread to gui otherwise app not responding
     # Due to GIL running in more than one addition thread has a negative impact on performance
-    # In one particular test 37 seconds for single thread vs 47 seconds for thread per wall
     # Approx 20% slower by splitting threads
     # Possibly move to completely different process (difficult due to the data that would need to be passed)
     # or removal of GIL may improve this
