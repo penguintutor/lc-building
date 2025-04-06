@@ -228,7 +228,7 @@ class Builder(QObject):
             # This reorders them (see comment in add_texture in wall for more details)
             new_wall.add_texture(texture_details[1], texture_details[0], texture_details[2])
         new_params = {"copy_of" : wall_to_copy}
-        old_params = {"copy_wall" : new_wall}
+        old_params = {"new_wall" : new_wall}
         if history == True:
             self.history.add(f"Copy wall {new_wall.name}", "Copy wall", old_params, new_params)
         # Do not copy interlocking (does not make sense to do so)
