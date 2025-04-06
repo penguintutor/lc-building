@@ -2,6 +2,10 @@
 # A wall is something that is cut out which could be a wall or a roof
 # Can have texures applied or features added
 
+# Todo
+# History is commented out in preperation for moving to appropriate window
+# should not create history in the wall class
+
 # Create using actual dimensions in mm, then many of the methods return scaled dimensions
 import math
 from texture import *
@@ -52,7 +56,7 @@ class Wall():
         self.il = []              # Interlocking - only one allowed per edge, but multiple allowed on a wall
         self.textures = []        # Typically one texture per wall, but can have multiple if zones used - must not overlap
         self.features = []        # Features for this wall
-        self.history = []
+        #self.history = []
         # by default are a wall, or could be roof - in future wall & roof are same
         # type will likely be used for different ways of creating a wall (eg. rectangle vs apex)
         #self.type = "wall"
@@ -169,12 +173,12 @@ class Wall():
     def move_pos(self, pos):
         # only add to history if changed
         if self.position != pos:
-            self.history.append(["move", self.position])
+            #self.history.append(["move", self.position])
             self.position = pos
 
     def move_rel(self, pos):
         # Store current position in history
-        self.history.append(["move", self.position])
+        #self.history.append(["move", self.position])
         self.position[0] += pos[0]
         self.position[1] += pos[1]
         
