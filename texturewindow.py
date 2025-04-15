@@ -52,6 +52,7 @@ class TextureWindowUI(QMainWindow):
         #self.load_complete_signal.connect(self.load_complete)
         #self.name_warning_signal.connect(self.name_warning)
         self.parent = parent
+        self.gui = parent  # same as self.parent but helps keep consistancy for history
         
         # Wall should be set when choosing edit properties (launching this window)
         self.wall = None
@@ -237,8 +238,12 @@ class TextureWindowUI(QMainWindow):
             style_settings[this_texture_setting[0]] = num_value
             
             
-        # If existing update
+        # If existing texture then update
         if self.texture != None:
+            # Store old settings for history
+            old_params = {"fullwall": self.texture.fullwall, "points": self.texture.points, "style": self.texture.style, "settings": copy.copy(self.texture.settings)}
+            new_params = {"fullwall": self.texture.fullwall, "points": self.textures.points, "style": style, "settings": copy.copy(style_settings)}
+            self.gui.history.add (f"Change texture for {self.wall.name}", "Change texture", old_params, new_params)
             self.texture.change_texture(style, style_settings)
         else:
             # otherwise this is a new texture

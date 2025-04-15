@@ -22,6 +22,11 @@ class History():
         self.activity_pos = 0
         self.file_changed = False
         
+    # Adds a history instance to allow undo / redo
+    # Title is a user friendly title (typically action perhaps with additional name of wall or similar)
+    # action is what the action type is (limited set of actions - see undo method for list)
+    # old_parameters are what was there before this change (undo)
+    # new_parameters is what this change does (redo)
     def add(self, title, action, old_parameters, new_parameters):
         print (f"Adding history {title} : {action}")
         self.file_changed = True
