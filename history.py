@@ -57,6 +57,10 @@ class History():
         elif this_activity.action == "Edit wall": # wall properties
             print (f"Restoring wall properties {this_activity.title}")
             self.gui.builder.restore_wall_properties(this_activity.old_parameters, history=False)
+        elif this_activity.action == "Change texture":
+            print (f"Restoring texture properties {this_activity.title}")
+            wall = this_activity.new_parameters['wall']
+            wall.restore_texture(this_activity.new_parameters['texture'], this_activity.old_parameters, history=False)
             
         # move the activity counter back down
         self.activity_pos -= 1

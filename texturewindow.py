@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QMainWindow, QMessageBox
 from PySide6.QtUiTools import QUiLoader
 from lcconfig import LCConfig
 from gconfig import GConfig
+import copy
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
@@ -238,22 +239,24 @@ class TextureWindowUI(QMainWindow):
             style_settings[this_texture_setting[0]] = num_value
             
             
+        new_params = {"wall": self.wall, "fullwall": True, "points": [], "style": style, "settings": copy.copy(style_settings)}
         # If existing texture then update
         if self.texture != None:
             # Store old settings for history
-            old_params = {"fullwall": self.texture.fullwall, "points": self.texture.points, "style": self.texture.style, "settings": copy.copy(self.texture.settings)}
-            new_params = {"fullwall": self.texture.fullwall, "points": self.textures.points, "style": style, "settings": copy.copy(style_settings)}
-            self.gui.history.add (f"Change texture for {self.wall.name}", "Change texture", old_params, new_params)
+            old_params = {"wall": self.wall, "fullwall": self.texture.fullwall, "points": self.texture.points, "style": self.texture.style, "settings": copy.copy(self.texture.settings)}
             self.texture.change_texture(style, style_settings)
+            new_params['texture'] = self.texture
+            self.gui.history.add (f"Change texture for {self.wall.name}", "Change texture", old_params, new_params)
         else:
             # otherwise this is a new texture
+            old_params = None
             # Create new (note [] denotes full wall - which is only option at the moment
-            self.wall.add_texture(style, [], style_settings)
-
-        #print (f"Style {style}")
-        #print (f"Details {style_settings}")
+            this_texture = self.wall.add_texture(style, [], style_settings)
+            new_params['texture'] = this_texture
+            self.gui.history.add (f"Add texture for {self.wall.name}", "Change texture", old_params, new_params)
             
         # Note need to update edit view as well
+        self.wall.update_etches()
         # Update parent
         self.parent.update_all_views()
         

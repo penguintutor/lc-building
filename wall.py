@@ -467,6 +467,10 @@ class Wall():
         return polygon.bounds[3] - polygon.bounds[1]
 
 
+    def del_texture (self, texture):
+        self.textures.remove(texture)
+
+
     # Used by builder class or internally within this
     # Does not update etches
     def add_texture_towall (self, type, area, settings):
@@ -475,15 +479,29 @@ class Wall():
             area = self.points
         # reordered here when passed to constructor
         self.textures.append(Texture(area, type, settings))
+        return self.textures[-1]
         
     # Note that this is different order to texture constructor as
     # in constructor type is optional - but not in here
     # area can be [] which means entire wall
     def add_texture (self, type, area, settings, update=True):
-        self.add_texture_towall (type, area, settings)
+        this_texture = self.add_texture_towall (type, area, settings)
         if update == True:
             # Only update etches as that is limit of textures
             self.update_etches()
+        return this_texture
+            
+    def restore_texture(self, current_texture, old_params, history=False):
+        # if no old params then it's was a new texture so just remove the texture
+        if old_params == None:
+            self.del_texture(current_texture)
+        # otherwise update with old params
+        else:
+            current_texture.fullwall = old_params['fullwall']
+            current_texture.points = old_params['points']
+            current_texture.style = old_params['style']
+            current_texture.settings = old_params['settings']
+        self.update_etches()
 
     # This is internal method - or one to be used when loading from file
     # Does not perform update - also used by add_feature but then performs update

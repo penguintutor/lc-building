@@ -38,9 +38,7 @@ perhaps show icons?
 Also apply filters based on type
 
 # Textures
-Possibly future plan
-Update current edit display when adding / updating texture
-Handle removing texture / perhaps set to "None"
+Handle removing texture
 
 # Add Interlocking
 No checking for duplicates
@@ -58,7 +56,6 @@ Show status whilst exporting
 Ensure that all updates that generate textures are in threads
 
 # Track history - with undo and redo
-Remove any history saved on objects
 Builder history is now added, but also needed for any updates that are outside
 of the builder class (eg. add texture applied to the wall class) 
 Also implement undo and redo options based on saved history
@@ -69,7 +66,8 @@ Assuming both feature and wall share some common methods (eg. get_maxwidth / get
 
 # Future 
 Show selected objects better 
-Perhaps texture picker 
+Perhaps texture picker
+Texture allow zones within a wall
 Helpers when doing interlocking (eg. whether forward vs reverse based on direction of edge) and perhaps suggested il for typical building / wizard.
 
 
