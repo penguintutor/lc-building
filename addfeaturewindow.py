@@ -97,6 +97,19 @@ class AddFeatureWindowUI(QMainWindow):
         # (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None):
         self.wall.add_feature_file (self.feature_directory+"/"+self.list_features[index_pos][0])
         
+        # New params is the info needed to redo if we undo
+        new_params = {
+                'feature_file': self.list_features[index_pos][0]
+                }
+        # Old params are the steps to undo (what the current values are before changing), in this case the feature
+        # added so that we can delete it
+        old_params = {
+            'wall': self.wall,
+            'feature': self.wall.features[-1]
+            }
+        self.parent.history.add(f"Add feature {self.list_features[index_pos][0]}", "Add feature", old_params, new_params)
+        
+        
         self.parent.update_current_scene()
         self.hide()
         

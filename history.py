@@ -61,6 +61,10 @@ class History():
             print (f"Restoring texture properties {this_activity.title}")
             wall = this_activity.new_parameters['wall']
             wall.restore_texture(this_activity.new_parameters['texture'], this_activity.old_parameters, history=False)
+        elif this_activity.action == "Add feature":
+            print ("Deleting feature")
+            wall = this_activity.old_parameters['wall']
+            wall.del_feature_obj (this_activity.old_parameters['feature'], history=False)
             
         # move the activity counter back down
         self.activity_pos -= 1

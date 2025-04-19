@@ -520,11 +520,11 @@ class Wall():
         return feature_num
     
     # Delete a feature by id
-    def del_feature (self, feature_num):
+    def del_feature_id (self, feature_num):
         del self.features[feature_num]
         
     # delete feature by obj
-    def del_feature_obj (self, obj):
+    def del_feature_obj (self, obj, history=False):
         for i in range (0, len(self.features)):
             if self.features[i] == obj:
                 del self.features[i]    

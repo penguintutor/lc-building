@@ -447,7 +447,6 @@ class MainWindowUI(QMainWindow):
             #print ("No do not delete")
             return
 
-
     # Set which of the left menu buttons are hidden / disabled
     # status = default (top level - add button (enabled) / copy button (disabled) / edit wall (disabled)
     # status = wallselect when single wall selected (top level - copy button active and edit wall active)
