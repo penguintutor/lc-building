@@ -525,9 +525,16 @@ class Wall():
         
     # delete feature by obj
     def del_feature_obj (self, obj, history=False):
+        
         for i in range (0, len(self.features)):
             if self.features[i] == obj:
                 del self.features[i]    
+
+    # Restores feature from an undo
+    def restore_feature (self, old_params, history=False):
+        self.add_feature (old_params['feature_type'], old_params['feature_template'],
+            old_params['startpos'], old_params['points'],
+            old_params['cuts'], old_params['etches'], old_params['outers'])
 
     # Add a feature - such as a window
     # cuts, etches and outers should all be lists
@@ -569,7 +576,7 @@ class Wall():
                 ]
                 
         self.add_feature (feature_data["type"], feature_data["template"], pos, points, feature_data['cuts'], feature_data['etches'], feature_data['outers'])
-        # Send signal to editscene to refresh
+        # Calling function needs to send signal to editscene to refresh
 
 
     # add any interlock rules for the edges

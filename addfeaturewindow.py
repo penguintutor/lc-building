@@ -109,7 +109,6 @@ class AddFeatureWindowUI(QMainWindow):
             }
         self.parent.history.add(f"Add feature {self.list_features[index_pos][0]}", "Add feature", old_params, new_params)
         
-        
         self.parent.update_current_scene()
         self.hide()
         

@@ -65,6 +65,11 @@ class History():
             print ("Deleting feature")
             wall = this_activity.old_parameters['wall']
             wall.del_feature_obj (this_activity.old_parameters['feature'], history=False)
+        elif this_activity.action == "Del feature":
+            print (f"Restoring feature {this_activity.title}")
+            this_activity.old_parameters['wall'].restore_feature (this_activity.old_parameters, history=False)
+            # Need to update scene to regenerate object
+            self.gui.update_current_scene()
             
         # move the activity counter back down
         self.activity_pos -= 1

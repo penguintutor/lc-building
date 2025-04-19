@@ -2,13 +2,14 @@ import os
 from PySide6.QtCore import Qt, QCoreApplication, QThreadPool, Signal, QFileInfo
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QProgressDialog, QLabel, QComboBox
 from PySide6.QtUiTools import QUiLoader
+from vgraphicsscene import ViewGraphicsScene
+import webbrowser
+import copy
 from builder import Builder
 from viewscene import ViewScene
 from editscene import EditScene
 from lcconfig import LCConfig
 from gconfig import GConfig
-from vgraphicsscene import ViewGraphicsScene
-import webbrowser
 from wallwindow import WallWindowUI
 from texturewindow import TextureWindowUI
 from addfeaturewindow import AddFeatureWindowUI
@@ -859,17 +860,34 @@ class MainWindowUI(QMainWindow):
 
     def delete_feature (self):
         selected_items = self.scenes[self.current_scene].get_selected()
-
         # First check if some items are selection
         if selected_items != None and len(selected_items) == 1:
             # Get the object to remove from the wall
             obj = self.view_scenes[self.current_scene].get_obj_from_obj_view(selected_items[0])
+            # create history    
+            new_params = {
+                # this is a copy of the entire wall - perhaps just get the id instead
+                'feature': copy.copy(obj)
+                }
+            # Old params are the steps to undo (what the current values are before changing), in this case the feature
+            # added so that we can delete it
+            old_params = {
+                'wall': self.view_scenes["walledit"].wall,
+                'feature_type': obj.type,
+                'feature_template': obj.template,
+                'startpos': [obj.min_x, obj.min_y],
+                'points': obj.points,
+                'cuts': copy.copy(obj.cuts),
+                'etches': copy.copy(obj.etches),
+                'outers': copy.copy(obj.outers)
+                }
+            self.history.add(f"Del feature {obj.template}", "Del feature", old_params, new_params)
             # Delete that obj from the wall
-            # Note only works when in walledit - as that is the one that references the wal
+            # Note only works when in walledit - as that is the one that references the wall
+            # But the option isn't shown if not in walledit
             self.view_scenes["walledit"].wall.del_feature_obj(obj)
             # delete from the scene
-            # not required instead just call an update
-            #self.view_scenes["walledit"].del_obj_from_obj_view(selected_items[1])
+            # not required to specifically remove from view instead just call an update
             self.view_scenes["walledit"].update()
 
 

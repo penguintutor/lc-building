@@ -30,23 +30,38 @@ class Feature():
         for cut in cuts:
             if cut == []:
                 break
-            self.cuts.append(Feature.lf.create_cut(cut[0], cut[1], (self.min_x, self.min_y)))
+            # If already a cut object (eg. CutRect) then add directly
+            if isinstance(cut, Cut):
+                self.cuts.append(cut)
+            else:
+                # if not then create a cut object using the laser factory
+                self.cuts.append(Feature.lf.create_cut(cut[0], cut[1], (self.min_x, self.min_y)))
         # Do the same for etches
         self.etches = []
         for etch in etches:
             if etch == []:
                 break
-            # strength is etch [2] - optional
-            # etch should have parameter offset before strength, so if strength set offset to (0,0)
-            if len(etch)>2:
-                self.etches.append(Feature.lf.create_etch(etch[0], etch[1], (self.min_x, self.min_y), etch[2]))
+            # If already an etch object (eg. EtchRect) then add directly
+            if isinstance(etch, Etch):
+                self.etches.append(etch)
             else:
-                self.etches.append(Feature.lf.create_etch(etch[0], etch[1], (self.min_x, self.min_y)))
+                # if not then create an etch object using the laser factory
+                # strength is etch [2] - optional
+                # etch should have parameter offset before strength, so if strength set offset to (0,0)
+                if len(etch)>2:
+                    self.etches.append(Feature.lf.create_etch(etch[0], etch[1], (self.min_x, self.min_y), etch[2]))
+                else:
+                    self.etches.append(Feature.lf.create_etch(etch[0], etch[1], (self.min_x, self.min_y)))
         self.outers = []
         for outer in outers:
             if outer == []:
                 break
-            self.outers.append(Feature.lf.create_outer(outer[0], outer[1], (self.min_x, self.min_y)))
+            # If already an outer object (eg. OuterRect) then add directly
+            if isinstance(outer, Outer):
+                self.outers.append(outer)
+            else:
+                # if not then create a outer object using the laser factory
+                self.outers.append(Feature.lf.create_outer(outer[0], outer[1], (self.min_x, self.min_y)))
         
     def __str__(self):
         return f"Feature: {self.type}"
