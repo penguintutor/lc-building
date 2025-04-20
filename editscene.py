@@ -11,8 +11,8 @@ from laser import Laser
 
 class EditScene(ViewScene):
     
-    def __init__(self, scene, builder, gconfig, view_name):
-        super().__init__(scene, builder, gconfig, view_name)
+    def __init__(self, main_window, scene, builder, gconfig, view_name):
+        super().__init__(main_window, scene, builder, gconfig, view_name)
         # We can only have one wall but must be added using edit_wall
         self.wall = None
         
@@ -64,11 +64,28 @@ class EditScene(ViewScene):
     ## For each of the features get current pos from obj view and update feature
     # When moving a feature then it is relative to the wall (which is at 0,0),
     # and we need to convert to mm before applying to object
-    def update_feature_pos(self):
+    def update_feature_pos(self, history=True):
         for i in range (1, len(self.objs)):
             view_new_pos = self.obj_views[i].pos
+            # If not moved then ignore
+            if view_new_pos[0] == 0 and view_new_pos[1] == 0:
+                continue
             # convert view pos to mm pos
             view_new_pos = Laser.vs.reverse_convert(view_new_pos)
+            if history == True:
+                # old_parameters are what was there before this change (undo)
+                old_params = {
+                    'feature': self.objs[i],
+                    'min_x': self.objs[i].min_x,
+                    'min_y': self.objs[i].min_y
+                    }
+                # new_parameters is what this change does (redo)
+                new_params = {
+                    'change_x': view_new_pos[0],
+                    'change_y': view_new_pos[1]
+                    }        
+                # Store current position in history
+                self.gui.history.add(f"Move feature {self.objs[i].template}", "Move feature", old_params, new_params)
             self.objs[i].move_rel(view_new_pos)
             
     # This is the opposite of update_feature_pos

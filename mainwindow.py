@@ -104,13 +104,13 @@ class MainWindowUI(QMainWindow):
         for scene_name in self.config.allowed_views:
             #self.scenes[scene_name] = QGraphicsScene()
             self.scenes[scene_name] = ViewGraphicsScene(self)
-            self.view_scenes[scene_name] = ViewScene(self.scenes[scene_name], self.builder, self.gconfig, scene_name)
+            self.view_scenes[scene_name] = ViewScene(self, self.scenes[scene_name], self.builder, self.gconfig, scene_name)
             # Signal for change in viewgraphicsscene (item selected / deselected)
             self.scenes[scene_name].focus_changed.connect(self.update_selected_view)
 
         # One more scene which is called "walledit" which is used to edit a particular wall
         self.scenes["walledit"] = ViewGraphicsScene(self)
-        self.view_scenes['walledit'] = EditScene(self.scenes["walledit"], self.builder, self.gconfig, "walledit")
+        self.view_scenes['walledit'] = EditScene(self, self.scenes["walledit"], self.builder, self.gconfig, "walledit")
         self.scenes["walledit"].focus_changed.connect(self.update_selected_view)
         
         # Default to front view

@@ -56,7 +56,6 @@ class Wall():
         self.il = []              # Interlocking - only one allowed per edge, but multiple allowed on a wall
         self.textures = []        # Typically one texture per wall, but can have multiple if zones used - must not overlap
         self.features = []        # Features for this wall
-        #self.history = []
         # by default are a wall, or could be roof - in future wall & roof are same
         # type will likely be used for different ways of creating a wall (eg. rectangle vs apex)
         #self.type = "wall"

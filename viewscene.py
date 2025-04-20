@@ -7,8 +7,9 @@ class ViewScene(QObject):
     
     update_scene_signal = Signal()
     
-    def __init__(self, scene, builder, gconfig, view_name):
+    def __init__(self, main_window, scene, builder, gconfig, view_name):
         super().__init__()
+        self.gui = main_window
         self.scene = scene
         self.builder = builder
         self.gconfig = gconfig

@@ -70,6 +70,9 @@ class History():
             this_activity.old_parameters['wall'].restore_feature (this_activity.old_parameters, history=False)
             # Need to update scene to regenerate object
             self.gui.update_current_scene()
+        elif this_activity.action == "Move feature":
+            print (f"Restoring feature position {this_activity.title}")
+            this_activity.old_parameters['feature'].move((this_activity.old_parameters['min_x'],this_activity.old_parameters['min_y']))
             
         # move the activity counter back down
         self.activity_pos -= 1
