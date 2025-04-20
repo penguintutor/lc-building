@@ -45,6 +45,9 @@ class History():
         
     # Undo last change from history list
     def undo(self):
+        # If no history to undo
+        if self.activity_pos == 0:
+            return
         print (f"Undoing activity {self.activity[self.activity_pos -1].title}")
         # Call appropriate method based on action type
         this_activity = self.activity[self.activity_pos -1]
