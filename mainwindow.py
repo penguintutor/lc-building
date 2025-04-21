@@ -248,7 +248,7 @@ class MainWindowUI(QMainWindow):
     # If only one feature selected apply compared to wall
     # If multiple features then apply to each other - using one that is furthest in that position
     # Or if centre / middle then midpoint between objects
-    def feature_align(self, direction):
+    def feature_align(self, direction, history=True):
         # Check we are in wall edit - don't align otherwise
         # The menu is normally disabled, but check anyway
         if self.current_scene != 'walledit':
@@ -261,15 +261,56 @@ class MainWindowUI(QMainWindow):
         elif (len(selected_items) == 1):
             # selected items is obj view - need it as a feature 
             selected_obj = self.view_scenes[self.current_scene].get_obj_from_obj_view(selected_items[0])
+            # old_parameters are what was there before this change (undo)
+            old_params = {
+                'feature': selected_obj,
+                'min_x': selected_obj.min_x,
+                'min_y': selected_obj.min_y
+                }
             self.view_scenes[self.current_scene].wall.wall_feature_align (direction, selected_obj)
+            if history == True:
+                # new_parameters is what this change does (redo)
+                new_params = {
+                    'feature': selected_obj,
+                    'min_x': selected_obj.min_x,
+                    'min_y': selected_obj.min_y
+                    }        
+                # Align against wall is the same as a move - so use move as the history 
+                self.history.add(f"Align feature {selected_obj.template}", "Move feature", old_params, new_params)
             self.view_scenes[self.current_scene].update(feature_obj_pos=True)
         else:
             # If here then have more than one item
             objs = []
+            # need to store all the different values 
+            old_params = {
+                'features': [],
+                'min_x': [],
+                'min_y': []
+                }
+            # New params - save the features and the direction so we can repeat 
+            new_params = {
+                'features': [],
+                'direction': direction
+                }
             for item in selected_items:
-                objs.append(self.view_scenes[self.current_scene].get_obj_from_obj_view(item))
+                obj = self.view_scenes[self.current_scene].get_obj_from_obj_view(item)
+                old_params['features'].append(obj)
+                new_params['features'].append(obj)
+                old_params['min_x'].append(obj.min_x)
+                old_params['min_y'].append(obj.min_y)
+                objs.append(obj)
             self.view_scenes[self.current_scene].wall.features_align (direction, objs)
             self.view_scenes[self.current_scene].update(feature_obj_pos=True)
+            self.history.add(f"Align features", "Align features", old_params, new_params)
+            
+            
+    # Undo feature align - only used when multiple objects moved
+    def feature_align_undo (self, old_params, history=False):
+        for i in range (0, len(old_params['features'])):
+            old_params['features'][i].min_x = old_params['min_x'][i]
+            old_params['features'][i].min_y = old_params['min_y'][i]
+            old_params['features'][i].update_pos()
+        self.view_scenes[self.current_scene].update(feature_obj_pos=True)
             
     # Launch feature position window
     def feature_position (self):

@@ -79,14 +79,16 @@ class EditScene(ViewScene):
                     'min_x': self.objs[i].min_x,
                     'min_y': self.objs[i].min_y
                     }
+            self.objs[i].move_rel(view_new_pos)
+            if history == True:
                 # new_parameters is what this change does (redo)
                 new_params = {
-                    'change_x': view_new_pos[0],
-                    'change_y': view_new_pos[1]
+                    'feature': self.objs[i],
+                    'min_x': self.objs[i].min_x,
+                    'min_y': self.objs[i].min_y
                     }        
                 # Store current position in history
                 self.gui.history.add(f"Move feature {self.objs[i].template}", "Move feature", old_params, new_params)
-            self.objs[i].move_rel(view_new_pos)
             
     # This is the opposite of update_feature_pos
     # Looks at the feature and updates the obj_views to reflect the updated values

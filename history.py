@@ -76,6 +76,9 @@ class History():
         elif this_activity.action == "Move feature":
             print (f"Restoring feature position {this_activity.title}")
             this_activity.old_parameters['feature'].move((this_activity.old_parameters['min_x'],this_activity.old_parameters['min_y']))
+        elif this_activity.action == "Align features":
+            print (f"Restoring move alignment")
+            self.gui.feature_align_undo (this_activity.old_parameters)
             
         # move the activity counter back down
         self.activity_pos -= 1

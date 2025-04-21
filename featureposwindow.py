@@ -23,6 +23,7 @@ class FeaturePosWindowUI(QMainWindow):
         super().__init__()
         
         self.parent = parent
+        self.gui = parent
         
         self.ui = loader.load(os.path.join(basedir, "featureposwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
@@ -189,10 +190,25 @@ class FeaturePosWindowUI(QMainWindow):
             x_dist -= self.feature.get_maxwidth()
             y_dist -= self.feature.get_maxheight()
         
+        old_params = {
+            'feature': self.feature,
+            'min_x': self.feature.min_x,
+            'min_y': self.feature.min_y
+            }
+        
         # Update the Feature position
         self.feature.min_x = self.wall_pos[0] + x_dist
         self.feature.min_y = self.wall_pos[1] + y_dist
 
+        # new_parameters is what this change does (redo)
+        new_params = {
+            'feature': self.feature,
+            'min_x': self.feature.min_x,
+            'min_y': self.feature.min_y
+            }        
+        # Align against wall is the same as a move - so use move as the history 
+        self.gui.history.add(f"Move feature {self.feature.template}", "Move feature", old_params, new_params)
+        
         self.feature.update_pos()
         self.parent.feature_position_update()
         self.ui.hide()
