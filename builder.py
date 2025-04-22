@@ -403,15 +403,31 @@ class Builder(QObject):
             }
         # Old parameters are used for undo (ie. what would we delete)
         old_params = {"primary_il": primary_il, "secondary_il": secondary_il, "il_group": self.interlocking_groups[-1]}
-        self.history.add(f"Add IL", "Add IL", old_params, new_params)    
+        self.history.add(f"Add IL", "Add IL", old_params, new_params) 
             
     def print_il (self):
         print (f"IL entries:")
         for il_group in self.interlocking_groups:
             print (f" {il_group}")
             
+    # Deletes il entries and group based on just group
+    # used by undo
+    def del_il_complete(self, il_group):
+        wall2 = self.walls[il_group.secondary_wall]
+        il2 = il_group.secondary_il
+        wall2.il.remove(il2)
+        # update the wall cuts
+        wall2.update_cuts()
+        wall1 = self.walls[il_group.primary_wall]
+        il1 = il_group.primary_il
+        wall1.il.remove(il1)
+        wall1.update_cuts()
+        # Remove group last (otherwise can't get details)
+        for this_group in self.interlocking_groups:
+            if this_group == il_group:
+                self.interlocking_groups.remove(this_group)
+            
     def delete_wall (self, wall, history=True):
-        print ("Deleting wall")
         for i in range (0, len(self.walls)):
             if self.walls[i] == wall:
                 #print (f"Deleting wall {i}")

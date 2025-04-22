@@ -1,4 +1,4 @@
-# Window to add / update texture to a wall
+# Window which shows interlocking and ability to add (through edit window) or delete
 
 import os
 from PySide6.QtCore import QCoreApplication, QThreadPool, Signal, QFileInfo, QObject, Qt
@@ -73,7 +73,10 @@ class InterlockingWindowUI(QMainWindow):
         wall1.il.remove(il1)
         # Remove from group last (otherwise can't get details)
         self.builder.del_il_group(entry_id)
-
+        
+        # Update the walls
+        wall2.update_cuts()
+        wall1.update_cuts()
 
         # Update the current window
         self.update()
@@ -113,7 +116,7 @@ class InterlockingWindowUI(QMainWindow):
             wall1_edge = group.primary_il.edge +1
             wall1_string = f"Primary: {wall1_wall}, edge {wall1_edge}"
             # Get type from primary
-            il_type = group.primary_il.il_type
+            il_type = f"{group.primary_il.il_type}, {group.primary_il.step}"
             
             self.il_elements['edge1'][num_groups].setText(wall1_string)
             wall2_wall = self.builder.walls[group.secondary_wall].name

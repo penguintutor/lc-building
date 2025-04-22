@@ -982,6 +982,8 @@ class MainWindowUI(QMainWindow):
         
     def undo (self):
         self.history.undo()
+        # After undo perform an update all
+        self.update_all_views()
     
     # Redo not implemented yet
     def redo (self):

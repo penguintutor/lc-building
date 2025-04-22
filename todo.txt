@@ -4,6 +4,7 @@
 When clicking edit but nothing selected give a warning - select object first
 Pressing delete should delete a wall (after confirmation)
 When copy - perhaps ask new wall name?
+Closing Windows needs to close all other windows
 
 ## In add / edit wall window
 Warn and reset values when switching between custom and simplified
@@ -48,6 +49,7 @@ Can only delete and readd rather than edit
 Refresh doesn't work when deleting interlocking
 Ensure that re-read walls for the add menu
 Delete existing interlocking when opening file
+Update display after changes
 
 # Export
 Show status whilst exporting

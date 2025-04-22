@@ -27,6 +27,7 @@ class EditInterlockingWindowUI(QMainWindow):
         super().__init__()
         
         self.parent = parent
+        self.gui = parent
         
         self.ui = loader.load(os.path.join(basedir, "editinterlockingwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
@@ -152,7 +153,6 @@ class EditInterlockingWindowUI(QMainWindow):
     # This is new
     # Todo add ability to edit for future
     def accept(self):
-        
         primary_wall_id = self.ui.primaryWallCombo.currentIndex() - 1
         if primary_wall_id < 0:
             QMessageBox.warning(self, f"Select primary wall", f"Primary wall not selected, select a wall from the list.")
@@ -212,7 +212,7 @@ class EditInterlockingWindowUI(QMainWindow):
         self.builder.walls[primary_wall_id].update_cuts()
         self.builder.walls[secondary_wall_id].update_cuts()
         
-        self.parent.update()
+        self.parent.update(parent=True)
         self.clear()
         self.ui.hide()
 

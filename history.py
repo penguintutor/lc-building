@@ -79,6 +79,9 @@ class History():
         elif this_activity.action == "Align features":
             print (f"Restoring move alignment")
             self.gui.feature_align_undo (this_activity.old_parameters)
+        elif this_activity.action == "Add IL":
+            print (f"Deleting IL")
+            self.gui.builder.del_il_complete(this_activity.old_parameters["il_group"])
             
         # move the activity counter back down
         self.activity_pos -= 1
