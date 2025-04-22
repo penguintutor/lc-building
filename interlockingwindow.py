@@ -13,6 +13,7 @@ from gconfig import GConfig
 from vgraphicsscene import ViewGraphicsScene
 from wall import Wall
 from editinterlockingwindow import EditInterlockingWindowUI
+import copy
 
 loader = QUiLoader()
 basedir = os.path.dirname(__file__)
@@ -26,6 +27,7 @@ class InterlockingWindowUI(QMainWindow):
         super().__init__()
         
         self.parent = parent
+        self.gui = parent
         
         self.ui = loader.load(os.path.join(basedir, "interlockingwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
@@ -67,9 +69,29 @@ class InterlockingWindowUI(QMainWindow):
         groups = self.builder.interlocking_groups
         wall2 = self.builder.walls[groups[entry_id].secondary_wall]
         il2 = groups[entry_id].secondary_il
-        wall2.il.remove(il2)
         wall1 = self.builder.walls[groups[entry_id].primary_wall]
         il1 = groups[entry_id].primary_il
+        
+        
+        # Old parameters are used for undo (ie. what would we restore)
+        old_params = {
+            'primary_wall_id': groups[entry_id].primary_wall,
+            'primary_edge': il1.edge,
+            'primary_reverse': il1.reverse,
+            'secondary_wall_id': groups[entry_id].secondary_wall,
+            'secondary_edge': il2.edge,
+            'secondary_reverse': il2.reverse,
+            'il_type': il1.il_type,
+            'step': il1.step,
+            'parameters': copy.copy(il1.parameters)
+            }
+        # New parameters are redo - how we create if we ever needed to recreate it
+        new_params = {"primary_il": il1, "secondary_il": il2, "il_group": groups[entry_id]}
+        
+        self.gui.history.add(f"Delete IL", "Delete IL", old_params, new_params) 
+        
+        
+        wall2.il.remove(il2)
         wall1.il.remove(il1)
         # Remove from group last (otherwise can't get details)
         self.builder.del_il_group(entry_id)

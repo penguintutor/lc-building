@@ -82,6 +82,14 @@ class History():
         elif this_activity.action == "Add IL":
             print (f"Deleting IL")
             self.gui.builder.del_il_complete(this_activity.old_parameters["il_group"])
+        elif this_activity.action == "Delete IL":
+            print (f"Restoring IL")
+            # restore is just to shorten rather than typing this every entry
+            restore = this_activity.old_parameters
+            self.gui.builder.add_il (
+                restore['primary_wall_id'], restore['primary_edge'], restore['primary_reverse'],
+                restore['secondary_wall_id'], restore['secondary_edge'], restore['secondary_reverse'], restore['il_type'],
+                restore['step'], restore['parameters'], history=False)
             
         # move the activity counter back down
         self.activity_pos -= 1

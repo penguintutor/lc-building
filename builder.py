@@ -380,7 +380,7 @@ class Builder(QObject):
             self.update_walls_td (status_signal=self.wall_update_status_signal, complete_signal=self.wall_load_signal)
             
 
-    def add_il (self, primary_wall_id, primary_edge, primary_reverse, secondary_wall_id, secondary_edge, secondary_reverse, il_type, step, parameters):
+    def add_il (self, primary_wall_id, primary_edge, primary_reverse, secondary_wall_id, secondary_edge, secondary_reverse, il_type, step, parameters, history=True):
         print ("Adding IL")
         # il moved to wall and then get back as a reference so it can be added to the interlocking group
         primary_wall = self.walls[primary_wall_id]
@@ -389,21 +389,29 @@ class Builder(QObject):
         secondary_il = secondary_wall.add_interlocking(step, secondary_edge, "secondary", secondary_reverse, il_type, parameters)
         self.interlocking_groups.append(InterlockingGroup(primary_wall_id, primary_il, secondary_wall_id, secondary_il))
         #self.print_il()
-        # New parameters are redo - how we create if we ever needed to recreate it
-        new_params = {
-            'primary_wall_id': primary_wall_id,
-            'primary_edge': primary_edge,
-            'primary_reverse': primary_reverse,
-            'secondary_wall_id': secondary_wall_id,
-            'secondary_edge': secondary_edge,
-            'secondary_reverse': secondary_reverse,
-            'il_type': il_type,
-            'step': step,
-            'parameters': parameters
-            }
-        # Old parameters are used for undo (ie. what would we delete)
-        old_params = {"primary_il": primary_il, "secondary_il": secondary_il, "il_group": self.interlocking_groups[-1]}
-        self.history.add(f"Add IL", "Add IL", old_params, new_params) 
+        if history == True:
+            # New parameters are redo - how we create if we ever needed to recreate it
+            # Currently store same as old_params - may need to review this when implementing redo
+            new_params = {
+                'primary_wall_id': primary_wall_id,
+                'primary_edge': primary_edge,
+                'primary_reverse': primary_reverse,
+                'secondary_wall_id': secondary_wall_id,
+                'secondary_edge': secondary_edge,
+                'secondary_reverse': secondary_reverse,
+                'il_type': il_type,
+                'step': step,
+                'parameters': parameters
+                }
+            # Old parameters are used for undo (ie. what would we delete)
+            old_params = {
+                'il_group': self.interlocking_groups[-1]
+                }
+            self.history.add(f"Add IL", "Add IL", old_params, new_params)
+        # update both the walls
+        primary_wall.update_cuts()
+        secondary_wall.update_cuts()
+        self.gui.update_all_views()
             
     def print_il (self):
         print (f"IL entries:")
