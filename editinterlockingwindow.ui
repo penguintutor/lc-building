@@ -225,6 +225,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QLabel" name="suggestLabel">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>360</y>
+      <width>191</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Suggested step size: xxmm</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

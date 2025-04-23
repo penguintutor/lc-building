@@ -27,6 +27,17 @@ class Texture():
         self.disable = False   # Allows to disable completely if not required
         self.excludes = []     # Excludes is replaced each time get_etches is called to ensure always updated
         
+    # based on texture get suggested step size (eg. for brick this is height of brick + mortor
+    def get_step_size(self):
+        size = 150
+        if self.style == "brick":
+            size = self.settings["brick_etch"] + self.settings["brick_height"]
+        elif self.style == "tile":
+            size = self.settings["tile_etch"] + self.settings["tile_height"]
+        elif self.style == "wood":
+            size = self.settings["wood_etch"] + self.settings["wood_height"]
+        return size
+        
     # Change texture
     # Can just change texture style, or can also change all settings
     # old settings will not be retained

@@ -43,6 +43,9 @@ class EditInterlockingWindowUI(QMainWindow):
         
         self.ui.primaryWallCombo.activated.connect(self.update_edge_primary)
         self.ui.secondaryWallCombo.activated.connect(self.update_edge_secondary)
+        
+        # Clear text until a wall selected
+        self.ui.suggestLabel.setText("")
        
         self.update()
         self.ui.show()
@@ -86,9 +89,23 @@ class EditInterlockingWindowUI(QMainWindow):
             
     def update_edge_primary (self):
         self.update_edge_combo("primary")
+        # Set suggested text based on primary wall texture
+        self.ui.suggestLabel.setText(f"Suggested step size {self.get_suggested_size()}mm")
     
     def update_edge_secondary (self):
         self.update_edge_combo("secondary")
+    
+    # Gets suggested size based on texture (if applied)
+    # Otherwise default to 150mm (sensible size for OO)
+    def get_suggested_size (self):
+        suggestion = 150
+        primary_wall_id = self.ui.primaryWallCombo.currentIndex() - 1
+        if primary_wall_id >= 0:
+            this_wall = self.builder.walls[primary_wall_id]
+            # get first texture
+            if len(this_wall.textures) > 0:
+                suggestion = this_wall.textures[0].get_step_size()
+        return suggestion
     
     # Update the edge combo based on the wall combo
     # updates can be none (do nothing), "primary", "secondary" or "both"
