@@ -7,6 +7,7 @@ from laser import *
 from PySide6.QtCore import QPoint, QPointF
 from PySide6.QtGui import QPolygonF, QPen, QBrush, QColor
 from PySide6.QtWidgets import QGraphicsItem
+from objgroup import ObjGroup
 
 # Settings is from gconfig
 # Each objectview is a wall (or similar)
@@ -22,7 +23,10 @@ class ObjView():
         self.type = type
         # Item Group (create later after creating first cut)
         #self.item_group = None
-        self.item_group = self.scene.createItemGroup([])
+        #self.item_group = self.scene.createItemGroup([])
+        self.item_group = ObjGroup()
+        self.scene.addItem(self.item_group)
+        #self.item_group.addToGroup()
         # If wall edit then wall is not selectable or moveable
         if moveable:
             self.item_group.setFlag(QGraphicsItem.ItemIsMovable)
@@ -36,6 +40,7 @@ class ObjView():
         self.pos = [pos_point.x(), pos_point.y()]
         # Update new_pos when moved
         #self.new_pos = (0,0)
+
         
     # Check if moved - and update position if moved 
     def has_moved(self):

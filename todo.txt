@@ -4,7 +4,6 @@
 When clicking edit but nothing selected give a warning - select object first
 Pressing delete should delete a wall (after confirmation)
 When copy - perhaps ask new wall name?
-Closing Windows needs to close all other windows
 
 ## In add / edit wall window
 Warn and reset values when switching between custom and simplified
