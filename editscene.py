@@ -30,7 +30,7 @@ class EditScene(ViewScene):
        
     # Clear scene and then add wall
     # Tried removing objects but risk of chase condition where
-    # object deleted but tries to be read - so slower but safer to
+    # object deleted but tries to be read - this is slower but safer to
     # always do a full update
     # feature_obj_pos is when moving features elsewhere (eg. align)
     # instead of use the object_view pos - use the actual pos configured in the feature
@@ -57,7 +57,7 @@ class EditScene(ViewScene):
         self.add_wall() # includes textures
         self.add_features() # Add features seperately
         # reselect those that should be selected
-        for i in range(0, len(selected_features)):
+        for i in selected_features:
             self.obj_views[i].item_group.setSelected(True)
 
         
@@ -65,6 +65,15 @@ class EditScene(ViewScene):
     # When moving a feature then it is relative to the wall (which is at 0,0),
     # and we need to convert to mm before applying to object
     def update_feature_pos(self, history=True):
+        # Avoid problem where object becomes unselected after move
+        # Store selected objects, then restore which are selected
+        # Get list of selected features so we can reselect them after update
+        selected_features = []
+        for i in range (1, len(self.obj_views)):
+            if self.obj_views[i].item_group.isSelected():
+                selected_features.append(self.obj_views[i].item_group)
+        #print (f"Selected items {selected_features}")
+                
         for i in range (1, len(self.objs)):
             view_new_pos = self.obj_views[i].pos
             # If not moved then ignore
@@ -89,6 +98,13 @@ class EditScene(ViewScene):
                     }        
                 # Store current position in history
                 self.gui.history.add(f"Move feature {self.objs[i].template}", "Move feature", old_params, new_params)
+        #print (f"Selected objs after move {selected_features}")
+        # unselect all features
+        for this_object in self.obj_views:
+            this_object.item_group.setSelected(False)
+        # reselect those that should be selected
+        for this_group in selected_features:
+            this_group.setSelected(True)
             
     # This is the opposite of update_feature_pos
     # Looks at the feature and updates the obj_views to reflect the updated values
