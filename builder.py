@@ -467,7 +467,7 @@ class Builder(QObject):
                 old_params["primary_reverse"] = ilg.primary_il.reverse
                 old_params["secondary_wall_id"] = ilg.secondary_wall
                 old_params["secondary_edge"] = ilg.secondary_il.edge
-                old_params["secondary_reverse"] = ilg.secondary_ilg.reverse
+                old_params["secondary_reverse"] = ilg.secondary_il.reverse
                 # Get other params from primary wall il
                 old_params["il_type"] = ilg.primary_il.il_type
                 old_params["step"] = ilg.primary_il.step

@@ -2,6 +2,7 @@ import os
 from PySide6.QtCore import Qt, QCoreApplication, QThreadPool, Signal, QFileInfo
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QProgressDialog, QLabel, QComboBox
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtGui import QKeyEvent
 from vgraphicsscene import ViewGraphicsScene
 import webbrowser
 import copy
@@ -929,7 +930,7 @@ class MainWindowUI(QMainWindow):
             self.view_scenes["walledit"].wall.del_feature_obj(obj)
             # delete from the scene
             # not required to specifically remove from view instead just call an update
-            self.view_scenes["walledit"].update()
+            self.view_scenes["walledit"].update(selection=False)
 
 
     def start_progress (self, status, maximum):
@@ -989,3 +990,11 @@ class MainWindowUI(QMainWindow):
     def redo (self):
         pass
     
+    def keyReleaseEvent(self, event):
+        if isinstance(event, QKeyEvent):
+            key = event.key()
+            if key == Qt.Key_Delete:
+                if self.current_scene == "walledit":
+                    self.delete_feature()
+                else:
+                    self.delete_wall()

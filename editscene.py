@@ -35,7 +35,10 @@ class EditScene(ViewScene):
     # feature_obj_pos is when moving features elsewhere (eg. align)
     # instead of use the object_view pos - use the actual pos configured in the feature
     # normally do not want to override this
-    def update(self, feature_obj_pos=False):
+    # Selection is default which indicates that those that were selected should still be
+    # If any objects have been deleted then it should be set to false becaues otherwise
+    # will try and select objects that are deleted.
+    def update(self, feature_obj_pos=False, selection=True):
         #print ("Updating edit scene")
         # check for moved objeects
         if feature_obj_pos == True:
@@ -44,11 +47,12 @@ class EditScene(ViewScene):
         else:
             # Update feature details based on view
             self.update_feature_pos()
-        # Get list of selected features so we can reselect them after update
-        selected_features = []
-        for i in range (1, len(self.obj_views)):
-            if self.obj_views[i].item_group.isSelected():
-                selected_features.append(i)
+        if selection == True:
+            # Get list of selected features so we can reselect them after update
+            selected_features = []
+            for i in range (1, len(self.obj_views)):
+                if self.obj_views[i].item_group.isSelected():
+                    selected_features.append(i)
         # clear scene
         self.scene.clear()
         # delete all views by resetting the list
@@ -56,9 +60,11 @@ class EditScene(ViewScene):
         # add wall and features
         self.add_wall() # includes textures
         self.add_features() # Add features seperately
-        # reselect those that should be selected
-        for i in selected_features:
-            self.obj_views[i].item_group.setSelected(True)
+        if selection == True:
+            # reselect those that should be selected
+            for i in selected_features:
+                # check if selected_feature still exists - if not then ignore
+                self.obj_views[i].item_group.setSelected(True)
 
         
     ## For each of the features get current pos from obj view and update feature

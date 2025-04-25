@@ -1,8 +1,6 @@
 # Todo
 
 ## In Main Window 
-When clicking edit but nothing selected give a warning - select object first
-Pressing delete should delete a wall (after confirmation)
 When copy - perhaps ask new wall name?
 
 ## In add / edit wall window
@@ -68,5 +66,7 @@ Show selected objects better
 Perhaps texture picker
 Texture allow zones within a wall
 Helpers when doing interlocking (eg. whether forward vs reverse based on direction of edge) and perhaps suggested il for typical building / wizard.
+Allow multiple deletes (walls / features)
+Is delete "Are you sure" still needed now we can undo?
 
 

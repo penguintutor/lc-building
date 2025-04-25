@@ -524,10 +524,10 @@ class Wall():
         
     # delete feature by obj
     def del_feature_obj (self, obj, history=False):
-        
         for i in range (0, len(self.features)):
             if self.features[i] == obj:
-                del self.features[i]    
+                self.features.pop(i)
+                return
 
     # Restores feature from an undo
     def restore_feature (self, old_params, history=False):
