@@ -1,15 +1,15 @@
 # Todo
 
 ## In Main Window 
-When copy - perhaps ask new wall name?
+Fix quit option 
 
 ## In add / edit wall window
+Perhaps warn not required if cancel can be used instead?
 Warn and reset values when switching between custom and simplified
 Warn and convert when switching between simplified and custom
 Switching to custom set first entry to 0,0
 Ensure profile menu is reset when adding new
 After adding wall switch to that view
-First move sometimes gets dropped (occasional bug)
 
 # Track updates 
 Warn if open etc.

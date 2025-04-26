@@ -956,13 +956,14 @@ class MainWindowUI(QMainWindow):
     # Quit app - check with user first
     #def quit_app (self):
         # Temporary - until history fully implemented set file to changed
-        self.history.file_changed = True
+        #self.history.file_changed = True
         if self.history.file_changed == True:
             # Confirm with user 
             confirm_box = QMessageBox.question(self, "Quit without saving", f"Changes to file\nQuit without saving?")
             if confirm_box == QMessageBox.Yes:
                 QCoreApplication.quit()
             else:
+                event.ignore()
                 return
         # Consider saving geometry
         #settings = QSettings("MyCompany", "MyApp")
