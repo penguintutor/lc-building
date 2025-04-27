@@ -1,7 +1,6 @@
 # Todo
 
 ## In Main Window 
-Fix quit option 
 
 ## In add / edit wall window
 Perhaps warn not required if cancel can be used instead?

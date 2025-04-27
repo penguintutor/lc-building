@@ -545,6 +545,11 @@ class WallWindowUI(QMainWindow):
 
     # Simple interface used for basic rectangular wall (or initial setup for apex)
     def simple_interface(self):
+        # If switching to simple from custom then look for best guess values
+        # eg. if rectangle use min&max width and height
+        # If apex then look to see if there is a "next highest" value
+        
+        
         # Change information at the top of the screen
         self.ui.dimensionsText1.setText("Enter dimensions in mm.")
         self.ui.dimensionsText2.setText("")
