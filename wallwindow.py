@@ -294,17 +294,93 @@ class WallWindowUI(QMainWindow):
             self.num_rows += 1
         #print (f"Add entry {entry_num}")
     
+    # read custom dimensions find width, max height and second max height (if apex)
+    def get_custom_size(self):
+        values = {
+            'max_x': 0,
+            'max_y': 0,
+            'mid_y': 0
+            }
+        for row in range (0, self.num_rows):
+            this_x = self.wall_elements["input_x"][row].text()
+            this_y = self.wall_elements["input_y"][row].text()
+            # convert to int - if either fail then ignore
+            try:
+                this_x = int(this_x)
+                this_y = int(this_y)
+            except ValueError:
+                # If error then skip this entry
+                continue
+            else:
+                if this_x > values['max_x']:
+                    values['max_x'] = this_x
+                if this_y > values['max_y']:
+                    # if current max_y > mid_y then make it mid_y
+                    if values['max_y'] > values['mid_y']:
+                        values['mid_y'] = values['max_y']
+                    values['max_y'] = this_y
+                # If this is less than max, but greater than mid it becomes new mid
+                # still need to check it's not equal to max even though elif
+                elif this_y < values['max_y'] and this_y > values['mid_y']:
+                    values['mid_y'] = this_y
+
+        # Because of way that custom works it actually means we have difference in -y direction
+        # so need to subtract mid_y from max_y
+
+        # if don't have mid_y then set it to max_y
+        if values['mid_y'] == 0:
+            values['mid_y'] = values['max_y']
+        else:
+            values['mid_y'] = values['max_y'] - values['mid_y']
+        return values
+        
     # Change the view based on type combo selection
     def set_view(self):
+        # If switching from custom to another then work out extremes to set values
+        # Otherwise translate values across
+        # Note that for Apex - switching to custom then needs to use opposite
+        values = None
         selected = self.ui.wallTypeCombo.currentIndex()
+        
+        # If first field says mm then ignore other values as not changed
+        if self.ui.wall_input_x_0.text() != "mm":
+            # If currently custom
+            if self.wall_elements["label"][0].text() == "Point 1":
+                values = self.get_custom_size()
+            # If currently Apex (row 3 not hidden)
+            elif self.ui.wall_label_2.text() == "Wall height:":
+                try:
+                    values = {
+                        'max_x': int(self.ui.wall_input_x_0.text()),
+                        'max_y': int(self.ui.wall_input_x_1.text()),
+                        'mid_y': int(self.ui.wall_input_x_2.text())
+                        }
+                
+                except ValueError:
+                # If any are not value then don't use and reset to default
+                    values = None
+            # Else it's a rectangle
+            else:
+                try:
+                    values = {
+                        'max_x': int(self.ui.wall_input_x_0.text()),
+                        'max_y': int(self.ui.wall_input_x_1.text()),
+                        'mid_y': int(self.ui.wall_input_x_1.text()) # mid and max same - if using apex
+                        }
+                except ValueError:
+                # If any are not value then don't use and reset to default
+                    values = None
+                
+        # If values != None then we use the values captured previously
+        
         # 0 is rectangle - simplified view
         if selected == 0:
-            self.simple_interface()
+            self.simple_interface(values)
         # Apex view
         elif selected == 1:
-            self.apex_interface()
+            self.apex_interface(values)
         else:
-            self.custom_interface()
+            self.custom_interface(values)
     
     # Show entire window - for add new window
     def new(self):
@@ -522,33 +598,61 @@ class WallWindowUI(QMainWindow):
         if row < self.max_rows - 1:
             self.wall_elements["add"][row].show()
         
-    def custom_interface(self):
+    def custom_interface(self, values=None):
         # Change information at the top of the screen
         self.ui.dimensionsText1.setText("Enter dimensions in mm full size (1:1).")
         self.ui.dimensionsText2.setText("All points relative to top left position.")
+        # Set right labels to Y instead of Scale
+        self.ui.wall_label_y_0.setText("Y")
+        self.ui.wall_label_y_1.setText("Y")
+        self.ui.wall_label_y_2.setText("Y")
         # Hide scale option
         self.ui.scaleCombo.hide()
         self.ui.scaleLabel.hide()
         # Minimum of 4 entries (assumes back to start for 5)
         for i in range (0, 4):
             # Change text fields for the main entries
-            self.wall_elements["label"][i].setText(f"Point {i+1}")
-            # Enable the X and Y labels and input fields
-            self.wall_elements["label_x"][i].show()
-            self.wall_elements["label_y"][i].setText("Y")
-            self.wall_elements["label_y"][i].show()
-            self.wall_elements["input_x"][i].show()
-            self.wall_elements["input_y"][i].show()
-            self.wall_elements["delete"][i].show()
-            self.wall_elements["add"][i].show()
+            self.show_row(i)
+        # if we have values then set it as values
+        if values != None:
+            # Do we have rectangle (mid_y = max_y) - or apex
+            if values['mid_y'] == values['max_y']:
+                self.wall_elements["input_x"][0].setText("0")
+                self.wall_elements["input_y"][0].setText("0")
+                self.wall_elements["input_x"][1].setText(str(values['max_x']))
+                self.wall_elements["input_y"][1].setText("0")
+                self.wall_elements["input_x"][2].setText(str(values['max_x']))
+                self.wall_elements["input_y"][2].setText(str(values['max_y']))
+                self.wall_elements["input_x"][3].setText("0")
+                self.wall_elements["input_y"][3].setText(str(values['max_y']))
+                self.wall_elements["input_x"][4].setText("0")
+                self.wall_elements["input_y"][4].setText("0")
+            else:
+                max_y = values['max_y']
+                mid_y = values['max_y'] - values['mid_y']
+                max_x = values['max_x']
+                self.show_row(4)
+                self.show_row(5)
+                self.wall_elements["input_x"][0].setText("0")
+                self.wall_elements["input_y"][0].setText(str(mid_y))
+                self.wall_elements["input_x"][1].setText(str(max_x/2))
+                self.wall_elements["input_y"][1].setText("0")
+                self.wall_elements["input_x"][2].setText(str(max_x))
+                self.wall_elements["input_y"][2].setText(str(mid_y))
+                self.wall_elements["input_x"][3].setText(str(max_x))
+                self.wall_elements["input_y"][3].setText(str(max_y))
+                self.wall_elements["input_x"][4].setText("0")
+                self.wall_elements["input_y"][4].setText(str(max_y))
+                self.wall_elements["input_x"][5].setText("0")
+                self.wall_elements["input_y"][5].setText(str('mid_y'))
+                
             
 
     # Simple interface used for basic rectangular wall (or initial setup for apex)
-    def simple_interface(self):
+    def simple_interface(self, values=None):
         # If switching to simple from custom then look for best guess values
         # eg. if rectangle use min&max width and height
         # If apex then look to see if there is a "next highest" value
-        
         
         # Change information at the top of the screen
         self.ui.dimensionsText1.setText("Enter dimensions in mm.")
@@ -577,10 +681,20 @@ class WallWindowUI(QMainWindow):
             self.wall_elements["label_y"][i].hide()
             self.wall_elements["input_x"][i].hide()
             self.wall_elements["input_y"][i].hide()
-
+            
+        # If we've got any values then they take precedent
+        if values != None:
+            self.wall_elements["input_x"][0].setText(str(values['max_x']))
+            self.wall_elements["input_x"][1].setText(str(values['max_y']))
+            # update the "y" values 
+            self.entry_change ("x", 0)
+            self.entry_change ("x", 1)
+            
         
     # Based on simple interface then adds extra field for additional wall height
-    def apex_interface(self):
+    def apex_interface(self, values=None):
+        # Use simple interface for initial setup
+        # No values sent to simple_interface - add those here
         self.simple_interface()
         # Set text of the wall height 1 to max
         self.ui.wall_label_1.setText("Wall height max:")
@@ -590,6 +704,17 @@ class WallWindowUI(QMainWindow):
         self.ui.wall_label_y_2.show()
         self.ui.wall_input_x_2.show()
         self.ui.wall_input_y_2.show()
+        
+        # If we've got any values then they take precedent
+        if values != None:
+            self.wall_elements["input_x"][0].setText(str(values['max_x']))
+            self.wall_elements["input_x"][1].setText(str(values['max_y']))
+            self.wall_elements["input_x"][2].setText(str(values['mid_y']))
+            
+        # update the "y" values 
+        self.entry_change ("x", 0)
+        self.entry_change ("x", 1)
+        self.entry_change ("x", 2)
         
         
 
