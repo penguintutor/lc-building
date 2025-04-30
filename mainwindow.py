@@ -135,6 +135,7 @@ class MainWindowUI(QMainWindow):
         self.redo_menu_signal.connect(self.update_redo_menu)
 
         # File Menu
+        self.ui.actionNew.triggered.connect(self.file_new)
         self.ui.actionOpen.triggered.connect(self.open_file_dialog)
         self.ui.actionSave.triggered.connect(self.save_file)
         self.ui.actionSave_as.triggered.connect(self.save_as_dialog)
@@ -536,7 +537,41 @@ class MainWindowUI(QMainWindow):
                 self.ui.deleteFeatureButton.setEnabled(False)
             self.ui.menuFeatures.menuAction().setVisible(True)
             self.ui.actionWallTexture.setVisible(True)
-            
+    
+    
+    def file_new(self):
+        if self.history.file_changed == True:
+            # Confirm with user 
+            confirm_box = QMessageBox.question(self, "File changed", f"Changes to existing file\nOpen file anyway?")
+            if confirm_box != QMessageBox.Yes:
+                return
+        # todo add here
+        # Reset values
+        self.filename = ""
+        self.history = History(self)
+        self.current_scene = 'front'
+        
+        self.builder = Builder(self.config, self.threadpool, self)
+        
+        self.scenes = {}
+        self.view_scenes = {}
+        for scene_name in self.config.allowed_views:
+            #self.scenes[scene_name] = QGraphicsScene()
+            self.scenes[scene_name] = ViewGraphicsScene(self)
+            self.view_scenes[scene_name] = ViewScene(self, self.scenes[scene_name], self.builder, self.gconfig, scene_name)
+            # Signal for change in viewgraphicsscene (item selected / deselected)
+            self.scenes[scene_name].focus_changed.connect(self.update_selected_view)
+
+        # One more scene which is called "walledit" which is used to edit a particular wall
+        self.scenes["walledit"] = ViewGraphicsScene(self)
+        self.view_scenes['walledit'] = EditScene(self, self.scenes["walledit"], self.builder, self.gconfig, "walledit")
+        self.scenes["walledit"].focus_changed.connect(self.update_selected_view)
+        
+        # Default to front view
+        self.ui.graphicsView.setScene(self.scenes[self.current_scene])
+
+
+
     def open_file_dialog(self):
         if self.history.file_changed == True:
             # Confirm with user 

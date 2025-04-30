@@ -1,9 +1,5 @@
 # Todo
 
-# Track updates 
-Warn if open etc.
-Also add "New" button
-
 # Avoid overlap
 When adding wall then prevent it from overlapping existing (by default)
 
