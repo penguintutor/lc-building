@@ -538,6 +538,12 @@ class MainWindowUI(QMainWindow):
             self.ui.actionWallTexture.setVisible(True)
             
     def open_file_dialog(self):
+        if self.history.file_changed == True:
+            # Confirm with user 
+            confirm_box = QMessageBox.question(self, "File changed", f"Changes to existing file\nOpen file anyway?")
+            if confirm_box != QMessageBox.Yes:
+                return
+        
         filename = QFileDialog.getOpenFileName(self, "Open building file", "", "Building file (*.json);;All (*.*)")
         # possibly check for valid file
         if filename[0] == '':
@@ -954,9 +960,6 @@ class MainWindowUI(QMainWindow):
         
     def closeEvent (self, event):
     # Quit app - check with user first
-    #def quit_app (self):
-        # Temporary - until history fully implemented set file to changed
-        #self.history.file_changed = True
         if self.history.file_changed == True:
             # Confirm with user 
             confirm_box = QMessageBox.question(self, "Quit without saving", f"Changes to file\nQuit without saving?")
