@@ -1,10 +1,5 @@
 # Todo
 
-## In Main Window 
-
-## In add / edit wall window
-After adding wall switch to that view
-
 # Track updates 
 Warn if open etc.
 Also add "New" button

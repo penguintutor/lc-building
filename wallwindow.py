@@ -570,6 +570,9 @@ class WallWindowUI(QMainWindow):
         # Update this wall
         self.builder.update_wall_td(self.wall, complete_signal=self.parent.update_views_signal)
         
+        # Switch the main window to same as the view
+        self.parent.ui.graphicsView.setScene(self.parent.scenes[self.wall.view])
+        
         # Reset the window and hide
         self.reset()
         self.hide()
