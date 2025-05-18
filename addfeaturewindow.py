@@ -5,8 +5,9 @@
 # interprets the different types
 
 import os
+import json
 from PySide6.QtCore import QThreadPool, Signal
-from PySide6.QtWidgets import QMainWindow, QMessageBox
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QTreeWidget, QTreeWidgetItem
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtUiTools import QUiLoader
 from lcconfig import LCConfig
@@ -34,22 +35,18 @@ class AddFeatureWindowUI(QMainWindow):
         self.wall = wall
         
         # Load features from directory
-        self.list_features = self.get_list_features (self.feature_directory)
-        #print (f"List features {self.list_features}")
-        # Need to create list as
-        # QtCore.QAbstractListModel
-        self.features_model = QStandardItemModel(self.ui.listView)
+        self.feature_dict = self.get_dict_features(self.feature_directory)
         
-        for feature in self.list_features:
-            item = QStandardItem(feature[1])
+        items = []
+        for key, values in self.feature_dict.items():
+            item = QTreeWidgetItem([key])
+            for value in values:
+                #ext = value.split(".")[-1].upper()
+                child = QTreeWidgetItem([value[0], value[1]])
+                item.addChild(child)
+            items.append(item)
 
-            # Add a checkbox to it
-            #item.setCheckable(True)
-
-            # Add the item to the model
-            self.features_model.appendRow(item)
-            
-        self.ui.listView.setModel(self.features_model)
+        self.ui.treeWidget.insertTopLevelItems(0, items)
         
         self.ui.buttonBox.rejected.connect(self.cancel)
         self.ui.buttonBox.accepted.connect(self.accept)
@@ -60,19 +57,37 @@ class AddFeatureWindowUI(QMainWindow):
     def set_wall (self, wall):
         self.wall = wall
     
-    def get_list_features (self, directory):
+    # Gets list of features and stores into a dict
+    # Index is the category, and then list of the elements
+    def get_dict_features (self, directory):
         # currently just get list of files
         # Update to scan contents for titles & types
-        file_data = []
+        file_data = {}
         files = os.listdir(directory) 
         for file in files:
-            #print (f"File is {file}")
-            # Convert into summary indexed by filename
-            # Todo load the file read the "name" entry and put it instead of the
-            # second entry
-            file_data.append ([file,f"{file}"])
+            file_info = self.read_feature_file_summary (self.feature_directory+"/"+file)
+            if not (file_info[1] in file_data):
+                file_data[file_info[1]] = [[file_info[0],file_info[2]]]
+            else:
+                file_data[file_info[1]].append ([file_info[0], file_info[2]])
         return file_data
-    
+
+
+    # Read summary information from feature file
+    # Ie Title and Category - also adds filename to the returned data
+    # Returns [title, category, filename]
+    def read_feature_file_summary (self, filename):
+        try:
+            with open(filename, 'r') as datafile:
+                feature_data = json.load(datafile)
+        except Exception as err:
+            print (f"Error {err}")
+            return
+        # Get the name - otherwise return None
+        if 'name' not in feature_data.keys():
+            print ("Invalid feature file")
+            return None
+        return [feature_data['name'], feature_data['type'], filename]
     
     # Show entire window
     def show(self):
@@ -91,15 +106,19 @@ class AddFeatureWindowUI(QMainWindow):
     # Accept button is pressed
     def accept(self):
         
-        index_pos = self.ui.listView.currentIndex().row()
+        index = self.ui.treeWidget.selectedIndexes()[0]
             
+        parent = index.parent().data()
+        child = index.row()
+        filename = self.feature_dict[parent][child][1]
+        
         # Add this feature
         # (self, feature_type, feature_template, startpos, points, cuts=None, etches=None, outers=None):
-        self.wall.add_feature_file (self.feature_directory+"/"+self.list_features[index_pos][0])
+        self.wall.add_feature_file (filename)
         
         # New params is the info needed to redo if we undo
         new_params = {
-                'feature_file': self.list_features[index_pos][0]
+                'feature_file': filename
                 }
         # Old params are the steps to undo (what the current values are before changing), in this case the feature
         # added so that we can delete it
@@ -107,11 +126,8 @@ class AddFeatureWindowUI(QMainWindow):
             'wall': self.wall,
             'feature': self.wall.features[-1]
             }
-        self.parent.history.add(f"Add feature {self.list_features[index_pos][0]}", "Add feature", old_params, new_params)
+        self.parent.history.add(f"Add feature {filename}", "Add feature", old_params, new_params)
         
         self.parent.update_current_scene()
         self.hide()
         
-
-        
-

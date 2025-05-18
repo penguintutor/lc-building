@@ -127,7 +127,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QListView" name="listView">
+   <widget class="QTreeWidget" name="treeWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
