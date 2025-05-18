@@ -3,6 +3,18 @@
 # Avoid overlap
 When adding wall then prevent it from overlapping existing (by default)
 
+In progress - position to be updated in builder add_wall
+Calculation to happen in viewscene objects_info
+
+
+Basic test for overlap
+If blank scene then just add at 0,0
+If 1 object then put it next to it horizontally
+If multiple then split into approx. grid - where grid width determined
+by object positions and find suitable position
+
+
+
 # Copy wall
 Prevent overlapping  
 Possibly - rename copied walls (1) etc. instead of (copy)
@@ -14,11 +26,6 @@ Does not appear to delete all interlocking references
 # Edit wall 
 Make it obvious in wall edit mode - Possibly display mode / view in top left of graphicsView 
 When choose align / position from right menu and no feature selected but is in position of menu then use that
-
-# Add Feature
-Show name instead of filename when adding feature
-perhaps show icons?
-Also apply filters based on type
 
 # Textures
 Handle removing texture
@@ -53,5 +60,6 @@ Texture allow zones within a wall
 Helpers when doing interlocking (eg. whether forward vs reverse based on direction of edge) and perhaps suggested il for typical building / wizard.
 Allow multiple deletes (walls / features)
 Is delete "Are you sure" still needed now we can undo?
+Add feature - possible preview / icon or similar
 
 

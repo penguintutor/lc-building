@@ -18,13 +18,13 @@ class ObjView():
     def __init__ (self, scene, settings, coords = (0,0), type="unknown", moveable=True):
         #print ("Adding objview to scene {scene}")
         #print (f"Creating object moveable {moveable}")
-        self.settings = settings
+        self.settings = settings  # also known as gconfig
         self.scene = scene
         self.type = type
         # Item Group (create later after creating first cut)
         #self.item_group = None
         #self.item_group = self.scene.createItemGroup([])
-        self.item_group = ObjGroup()
+        self.item_group = ObjGroup(self.settings)
         self.scene.addItem(self.item_group)
         #self.item_group.addToGroup()
         # If wall edit then wall is not selectable or moveable
@@ -40,7 +40,30 @@ class ObjView():
         self.pos = [pos_point.x(), pos_point.y()]
         # Update new_pos when moved
         #self.new_pos = (0,0)
+        # Use min and max to track size of the group
+        self.x_min = 0
+        self.y_min = 0
+        self.x_max = 0
+        self.y_max = 0
 
+    # return minx, miny, maxx, maxy
+    def get_bounding (self):
+        return [
+            self.pos[0] + self.x_min,
+            self.pos[1] + self.y_min,
+            self.pos[0] + self.x_max,
+            self.pos[1] + self.y_max
+            ]
+
+    def get_width(self):
+        return self.x_max - self.x_min
+    
+    def get_height(self):
+        return self.y_max - self.y_min
+    
+    def get_size (self):
+        return [self.get_width(), self.get_height()]
+        
         
     # Check if moved - and update position if moved 
     def has_moved(self):
@@ -78,6 +101,18 @@ class ObjView():
     # Draw polygon for background of features
     def add_exclude(self, exclude):
         self.add_standard_object (exclude, "exclude")
+        
+    def _upd_x_size (self, xval):
+        if xval < self.x_min:
+            self.x_min = xval
+        if xval > self.x_max:
+            self.x_max = xval
+            
+    def _upd_y_size (self, yval):
+        if yval < self.y_min:
+            self.y_min = yval
+        if yval > self.y_max:
+            self.y_max = yval
 
     # Generic version of add_cut, add_edge, add_outer
     # Pen is the pen type to use "cut", "outer", "etch"
@@ -103,12 +138,20 @@ class ObjView():
             # get as pixels with offset added
             start_line = object.get_start_pixels_screen(self.offset)
             end_line = object.get_end_pixels_screen(self.offset)
+            self._upd_x_size(start_line[0])
+            self._upd_x_size(end_line[0])
+            self._upd_y_size(start_line[1])
+            self._upd_y_size(end_line[1])
             #print (f"     Start line {start_line},  End line {end_line}")
             this_object = self.scene.addLine(*start_line, *end_line, pen_obj) 
         elif (object.get_type() == "rect"):
             start_rect = object.get_start_pixels_screen(self.offset)
             rect_size = object.get_size_pixels_screen()
-            this_object = self.scene.addRect(*start_rect, *rect_size, pen_obj) 
+            this_object = self.scene.addRect(*start_rect, *rect_size, pen_obj)
+            self._upd_x_size(start_rect[0])
+            self._upd_x_size(start_rect[0]+rect_size[0])
+            self._upd_y_size(start_rect[1])
+            self._upd_y_size(start_rect[1]+rect_size[1])
             #print (f"Rect points {start_rect} size {rect_size}")
         elif (object.get_type() == "polygon"):
             new_points = object.get_points_pixels_screen(self.offset)

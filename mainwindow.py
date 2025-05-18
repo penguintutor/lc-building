@@ -997,7 +997,7 @@ class MainWindowUI(QMainWindow):
     # Quit app - check with user first
         if self.history.file_changed == True:
             # Confirm with user 
-            confirm_box = QMessageBox.question(self, "Quit without saving", f"Changes to file\nQuit without saving?")
+            confirm_box = QMessageBox.question(self, "Quit without saving", f"Changes have not been saved.\nQuit without saving?")
             if confirm_box == QMessageBox.Yes:
                 QCoreApplication.quit()
             else:

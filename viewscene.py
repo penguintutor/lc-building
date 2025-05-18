@@ -24,6 +24,33 @@ class ViewScene(QObject):
         self.objs = []
         self.obj_views = []
         
+    # Get information about the objects on the viewscene
+    def objects_info (self):
+        min_x = 0
+        max_x = 0
+        min_y = 0
+        max_y = 0
+        print ("Getting information")
+        for i in range(0,len(self.obj_views)):
+            # Get position / dimensions
+            pos = self.obj_views[i].get_pos()
+            size = self.obj_views[i].get_size()
+            bounding = self.obj_views[i].get_bounding()
+            #size = self.objs[i].get_size_string()
+            print (f"Object {i} - pos {pos}, size {size} = {bounding}")
+            if bounding[0] < min_x:
+                min_x = bounding[0]
+            if bounding[2] > max_x:
+                max_x = bounding[2]
+            if bounding[1] < min_y:
+                min_y = bounding[1]
+            if bounding[3] > max_y:
+                max_y = bounding[3]
+        # Get screen area in use
+        print (f"Current region {min_x}, {min_y}, {max_x}, {max_y}")
+        
+            
+        
        
     # Clear scene and then add walls
     # Full update / vs partial update - not needed on scene

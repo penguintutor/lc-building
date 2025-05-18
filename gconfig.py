@@ -51,6 +51,9 @@ class GConfig():
         
         self.pen_outer = QPen(Qt.green, 1)
         
+        self.pen_highlight = QPen(QColor(255,0,0))
+        self.pen_highlight.setWidth(3)
+        
         # Same a lcconfig setting about etch as polygon, but instead
         # based on view
         # Normally don't want this set

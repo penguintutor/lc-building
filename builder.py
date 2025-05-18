@@ -181,6 +181,17 @@ class Builder(QObject):
     def add_wall(self, wall_data, history=True):
         print ("Add Wall")
         # Todo Calculate position
+        
+        # Which scene is the wall being added to
+        scene_name = wall_data['view' ]
+        print (f"Scene name is {scene_name}")
+        # Scene is
+        scene = self.gui.view_scenes[scene_name]
+        scene.objects_info()
+        
+        #self.gui
+        
+        
         position = [0,0]
         self.walls.append(Wall(wall_data['name'], wall_data['points'], wall_data['view'], position))
         # New params are the steps required to repeat this (redo)
