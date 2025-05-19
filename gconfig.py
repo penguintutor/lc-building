@@ -30,6 +30,8 @@ class GConfig():
         if self.default_screensize[1] > status['screensize'][1]:
             self.default_screensize[1] = status['screensize'][1]
             
+        self.default_object_spacing = 10
+            
         self.pen_cut = QPen(QColor(0,0,0), 2)
         # Etch is 0 to 9
         # Note that Blue is always set high to give a blue tint

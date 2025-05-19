@@ -13,6 +13,7 @@ from lcconfig import LCConfig
 from datetime import datetime
 from history import History
 import copy
+from viewscale import ViewScale
 
 # To support history many of the methods have an optional variable history
 # If it's default / true then we add history record (allow undo)
@@ -67,6 +68,8 @@ class Builder(QObject):
         
         # This used when running a single update ## To decide if this is required
         #self.wall_update_running = False
+        # ViewScale - if need to perform size conversions
+        self.vs = ViewScale()
         
     # Only deletes the actual group
     def del_il_group (self, entry_id):
@@ -179,20 +182,37 @@ class Builder(QObject):
     # Takes a dictionary with the wall data where points is a list within the dictionary
     # Wall args are: name, points, view="front", position=[0,0]
     def add_wall(self, wall_data, history=True):
-        print ("Add Wall")
+        #print (f"Add Wall - points {wall_data['points']}")
         # Todo Calculate position
         
         # Which scene is the wall being added to
         scene_name = wall_data['view' ]
-        print (f"Scene name is {scene_name}")
+        #print (f"Scene name is {scene_name}")
         # Scene is
         scene = self.gui.view_scenes[scene_name]
-        scene.objects_info()
+        # Gets dimension of the current scene
+        # min_x, min_y, max_x, max_y
+        info = scene.scene_info()
+        # Gets number of objecs in the current scene
+        num_objs = scene.num_objs()
         
-        #self.gui
-        
-        
-        position = [0,0]
+        # Calculate position avoiding existing objects
+        # If not other objects then position is 0,0
+        if num_objs < 1:
+            position = [0,0]
+        # If just one object then add next to existing
+        if num_objs < 2:
+            # end position of the existing object will be same as the total image
+            position = [info[2] + self.gui.gconfig.default_object_spacing, 0]
+        else:
+            position = [0,0]
+            # get size from points (size is wall size - not graphics object size)
+            wall_size = self._get_size_points(wall_data['points'])
+            # convert to scale
+            scale_size = self.vs.convert(wall_size)
+            #print (f"Scale size {scale_size}")
+            position = scene.find_space(scale_size)
+            
         self.walls.append(Wall(wall_data['name'], wall_data['points'], wall_data['view'], position))
         # New params are the steps required to repeat this (redo)
         # A copy of the dictionary 
@@ -202,6 +222,18 @@ class Builder(QObject):
         self.history.add(f"Add wall {wall_data['name']}", "Add wall", old_params, new_params)
         # Return wall so it can be used elsewhere
         return self.walls[-1]
+    
+    # Get size from points
+    # This is based on one corner being 0,0 - so just find highest x and y pos
+    def _get_size_points (self, points):
+        x_max = 0
+        y_max = 0
+        for point in points:
+            if point[0] > x_max:
+                x_max = point[0]
+            if point[1] > y_max:
+                y_max = point[1]
+        return [x_max, y_max]
     
     # Restores wall properties from an undo property change
     def restore_wall_properties(self, wall_data, history=False):

@@ -46,6 +46,8 @@ class ObjView():
         self.x_max = 0
         self.y_max = 0
 
+
+    ### Todo - possibly error in this as it's not recalcualted if the object moves????
     # return minx, miny, maxx, maxy
     def get_bounding (self):
         return [
