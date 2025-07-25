@@ -253,17 +253,39 @@ class Builder(QObject):
     def restore_wall(self, wall_data, history=False):
         self.walls.append(wall_data)
         
+    # Finds next appropriate name when copying by adding (x) - eg. "Wall name (1)"
+    # other more efficient ways, but unlikely this will be a performance issue
+    # This assumes copy of original file - ie. if copy of copy then will be "Wall name (1) (1)" etc.
+    def _copy_wall_name (self, name):
+        # start with 1
+        update_num = 1
+        # Loop forever (break when confirmed name is stored in new_name)
+        while 1:
+            # Add update_num and then check to see if this matches any existing names
+            test_name = f"{name} ({update_num})"
+            duplicate_name = False
+            for wall in self.walls:
+                if wall.name == test_name:
+                    # indicate this is a duplicate
+                    duplicate_name = True
+                    break
+            if duplicate_name == True:
+                update_num += 1
+                continue
+            # if not a duplidate then test_name is valid
+            return test_name
+            
+                
+        
     def copy_wall(self, wall_to_copy, history=True):
         print ("Copy Wall")
         
-                        
-        ###### Todo - here find space
         # This is how we find space for the wall
         # First find size of the new wall (from existing wall)
         # Then search for space using  find_space (after converting to GUI dimensions)
         # get size from points (size is wall size - not graphics object size)
         wall_size = self._get_size_points(wall_to_copy.points)
-        print (f"Wall size is {wall_size}")
+        #print (f"Wall size is {wall_size}")
         
         # What scene are we adding to (same as exising object)
         scene_name = wall_to_copy.view
@@ -275,9 +297,10 @@ class Builder(QObject):
         position = scene.find_space(scale_size)
         
         
-        #position = [0,0]
         # Copy the wall object (excluding features etc. - do that afterwards)
-        self.walls.append(Wall(wall_to_copy.name+" (Copy)", wall_to_copy.points, wall_to_copy.view, position))
+        new_wall_name = self._copy_wall_name(wall_to_copy.name)
+        print (f"Old name {wall_to_copy.name} - New {new_wall_name}")
+        self.walls.append(Wall(new_wall_name, wall_to_copy.points, wall_to_copy.view, position))
         # new_wall is the last added entry
         new_wall = self.walls[-1]
         # Copy features

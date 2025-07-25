@@ -1,9 +1,6 @@
 # Todo
 
 
-# Copy wall
-Possibly - rename copied walls (1) etc. instead of (copy)
-
 # Delete wall
 Note need to update any interlockinggroups to refer to new wall references
 Does not appear to delete all interlocking references
