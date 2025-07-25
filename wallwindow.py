@@ -534,7 +534,7 @@ class WallWindowUI(QMainWindow):
             if wall_data['points'][0] != wall_data['points'][len(wall_data['points'])-1]:
                 wall_data['points'].append(wall_data['points'][0])
              
-        # Followin gives a warning but allows proceed with creating
+        # Following gives a warning but allows proceed with creating
         if (wall_data['name'] == ""):
             return_val = QMessageBox.warning(self, 'Warning name not provided', 'A name was not provided for the wall. Accept default named \"Unknown\"?', QMessageBox.Ok | QMessageBox.Cancel)
             if return_val == QMessageBox.Ok:

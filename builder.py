@@ -255,7 +255,27 @@ class Builder(QObject):
         
     def copy_wall(self, wall_to_copy, history=True):
         print ("Copy Wall")
-        position = [0,0]
+        
+                        
+        ###### Todo - here find space
+        # This is how we find space for the wall
+        # First find size of the new wall (from existing wall)
+        # Then search for space using  find_space (after converting to GUI dimensions)
+        # get size from points (size is wall size - not graphics object size)
+        wall_size = self._get_size_points(wall_to_copy.points)
+        print (f"Wall size is {wall_size}")
+        
+        # What scene are we adding to (same as exising object)
+        scene_name = wall_to_copy.view
+        #print (f"Scene name is {scene_name}")
+        scene = self.gui.view_scenes[scene_name]
+        
+        # convert to scale
+        scale_size = self.vs.convert(wall_size)
+        position = scene.find_space(scale_size)
+        
+        
+        #position = [0,0]
         # Copy the wall object (excluding features etc. - do that afterwards)
         self.walls.append(Wall(wall_to_copy.name+" (Copy)", wall_to_copy.points, wall_to_copy.view, position))
         # new_wall is the last added entry

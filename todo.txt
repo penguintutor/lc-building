@@ -1,22 +1,7 @@
 # Todo
 
-# Avoid overlap
-When adding wall then prevent it from overlapping existing (by default)
-
-In progress - position to be updated in builder add_wall
-Calculation to happen in viewscene objects_info
-
-
-Basic test for overlap
-If blank scene then just add at 0,0
-If 1 object then put it next to it horizontally
-If multiple then split into approx. grid - where grid width determined
-by object positions and find suitable position
-
-
 
 # Copy wall
-Prevent overlapping  
 Possibly - rename copied walls (1) etc. instead of (copy)
 
 # Delete wall
