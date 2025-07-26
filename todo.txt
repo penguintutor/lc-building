@@ -1,10 +1,6 @@
 # Todo
 
 
-# Delete wall
-Note need to update any interlockinggroups to refer to new wall references
-Does not appear to delete all interlocking references
-
 # Edit wall 
 Make it obvious in wall edit mode - Possibly display mode / view in top left of graphicsView 
 When choose align / position from right menu and no feature selected but is in position of menu then use that

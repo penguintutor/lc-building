@@ -584,14 +584,20 @@ class Builder(QObject):
                 if ilg.primary_wall != wall_id:
                     #print (f"Deleting from primary {self.walls[ilg.primary_wall].name}") 
                     self.walls[ilg.primary_wall].delete_il(ilg.primary_il.edge)
+                    # Update wall - there is a chance we could call this multiple times but rare that a wall would
+                    # have multiple interlocks with another wall that is being deleted
+                    self.update_wall_td(self.walls[ilg.primary_wall], complete_signal=self.gui.update_views_signal)
                 if ilg.secondary_wall != wall_id:
                     #print (f"Deleting from secondary {self.walls[ilg.secondary_wall].name}")
                     self.walls[ilg.secondary_wall].delete_il(ilg.secondary_il.edge)
+                    # Update wall - there is a chance we could call this multiple times but rare that a wall would
+                    # have multiple interlocks with another wall that is being deleted
+                    self.update_wall_td(self.walls[ilg.secondary_wall], complete_signal=self.gui.update_views_signal)
                 # Delete the group
                 self.interlocking_groups.remove(ilg)
         
         
-    # update_walls_td replaced with a single thred version
+    # update_walls_td replaced with a single thread version
     # Note that this needs to be run in separate thread to gui otherwise app not responding
     # Due to GIL running in more than one addition thread has a negative impact on performance
     # Approx 20% slower by splitting threads
@@ -608,7 +614,7 @@ class Builder(QObject):
         # As this is threaded only shouldn't get this
         if self.threadpool == None:
             print ("Warning: Attempt to run in threads without a threadpool")
-            # Insetad user the normal update
+            # Insetad use the normal update
             self.update_walls()
             return
         self.num_updates_progress = 1
