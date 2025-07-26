@@ -28,7 +28,7 @@ class History():
     # old_parameters are what was there before this change (undo)
     # new_parameters is what this change does (redo)
     def add(self, title, action, old_parameters, new_parameters):
-        print (f"Adding history {title} : {action}")
+        #print (f"Adding history {title} : {action}")
         self.file_changed = True
         # If there are items after the index position remove them
         while (len(self.activity) > self.activity_pos):

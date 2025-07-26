@@ -278,7 +278,7 @@ class Builder(QObject):
                 
         
     def copy_wall(self, wall_to_copy, history=True):
-        print ("Copy Wall")
+        #print ("Copy Wall")
         
         # This is how we find space for the wall
         # First find size of the new wall (from existing wall)
@@ -299,7 +299,7 @@ class Builder(QObject):
         
         # Copy the wall object (excluding features etc. - do that afterwards)
         new_wall_name = self._copy_wall_name(wall_to_copy.name)
-        print (f"Old name {wall_to_copy.name} - New {new_wall_name}")
+        #print (f"Old name {wall_to_copy.name} - New {new_wall_name}")
         self.walls.append(Wall(new_wall_name, wall_to_copy.points, wall_to_copy.view, position))
         # new_wall is the last added entry
         new_wall = self.walls[-1]
@@ -467,7 +467,7 @@ class Builder(QObject):
             
 
     def add_il (self, primary_wall_id, primary_edge, primary_reverse, secondary_wall_id, secondary_edge, secondary_reverse, il_type, step, parameters, history=True):
-        print ("Adding IL")
+        #print ("Adding IL")
         # il moved to wall and then get back as a reference so it can be added to the interlocking group
         primary_wall = self.walls[primary_wall_id]
         primary_il = primary_wall.add_interlocking(step, primary_edge, "primary", primary_reverse, il_type, parameters)
@@ -521,6 +521,11 @@ class Builder(QObject):
             if this_group == il_group:
                 self.interlocking_groups.remove(this_group)
             
+    # Delete the wall
+    # firest remove any interlocking objects relating to other walls
+    # then remove the actual interlocking groups
+    # Remove the wall
+    # then updating any remaining interlocking groups that relate to this wall or later (decrement by one)
     def delete_wall (self, wall, history=True):
         for i in range (0, len(self.walls)):
             if self.walls[i] == wall:
@@ -534,10 +539,24 @@ class Builder(QObject):
                 old_params = wall
                 if history == True:
                     self.history.add(f"Delete wall {wall.name}", "Delete wall", old_params, new_params)
+                # Update any il by removing any that refer to i (should not be any left)
+                # Then decrement any later ones by one
+                self.update_wall_ilg_delete_wall(i)
                 return
+           
+    # This needs to be called after any walls are removed
+    # If a wall is removed then it changes the numbering of the walls as storted in the ilgs
+    # this decrements any subsequent wall_ids by one
+    # Does nothing for this particular wall_id - that should already have been removed
+    def update_wall_ilg_delete_wall(self, wall_id):
+        for ilg in self.interlocking_groups:
+            if ilg.primary_wall > wall_id:
+                ilg.primary_wall -= 1
+            if ilg.secondary_wall > wall_id:
+                ilg.secondary_wall -= 1
         
-    # Delete interlocking objects referencing the wall ID
-    # Reduce the number of all subsequent walls by 1
+    # Delete interlocking objects (including group) referencing the wall ID
+    # Does not update the other groups - delete_wall_ilg needs to be called after this
     def delete_wall_il(self, wall_id, history=True):
         old_params = {}
         new_params = {}
@@ -561,10 +580,12 @@ class Builder(QObject):
                 
                 if history == True:
                     self.history.add(f"Delete Wall IL", "Delete Wall IL", old_params, new_params)
-                # Delete the il entries
+                # Delete the il entries from the other walls (the wall with wall_id will be completely removed with the ILs)
                 if ilg.primary_wall != wall_id:
+                    #print (f"Deleting from primary {self.walls[ilg.primary_wall].name}") 
                     self.walls[ilg.primary_wall].delete_il(ilg.primary_il.edge)
                 if ilg.secondary_wall != wall_id:
+                    #print (f"Deleting from secondary {self.walls[ilg.secondary_wall].name}")
                     self.walls[ilg.secondary_wall].delete_il(ilg.secondary_il.edge)
                 # Delete the group
                 self.interlocking_groups.remove(ilg)

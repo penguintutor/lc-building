@@ -1010,7 +1010,7 @@ class MainWindowUI(QMainWindow):
         #QMainWindow.closeEvent(self, event)
 
     def update_undo_menu(self, action):
-        print (f"Updating undo menu {action}")
+        #print (f"Updating undo menu {action}")
         self.ui.actionUndo.setEnabled(True)
         self.ui.actionUndo.setText(f"Undo: {action}")
         self.ui.actionRedo.setEnabled(False)

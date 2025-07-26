@@ -2,10 +2,6 @@
 # A wall is something that is cut out which could be a wall or a roof
 # Can have texures applied or features added
 
-# Todo
-# History is commented out in preperation for moving to appropriate window
-# should not create history in the wall class
-
 # Create using actual dimensions in mm, then many of the methods return scaled dimensions
 import math
 from texture import *
@@ -33,6 +29,10 @@ import json
 
 # Some methods include option update=True
 # Can instead set to False if multiple operations then apply manuall afterwards
+
+# Some methods include a history parameter typically history=False
+# But then don't implement anything different. This is due to history being moved away from the wall
+# class, but argument kept for consistancy - likely it will be removed in future
 
 class Wall():
     
@@ -170,14 +170,9 @@ class Wall():
     # Normally use absolute position rather than relative as that is
     # what we get from the viewscene
     def move_pos(self, pos):
-        # only add to history if changed
-        if self.position != pos:
-            #self.history.append(["move", self.position])
-            self.position = pos
+        self.position = pos
 
     def move_rel(self, pos):
-        # Store current position in history
-        #self.history.append(["move", self.position])
         self.position[0] += pos[0]
         self.position[1] += pos[1]
         
@@ -635,7 +630,6 @@ class Wall():
 
     # Delete interlock on an edge
     # as stated only one interlock should be applied to an edge, but delete any that reference this edge.
-    # Don't add to history (captured at builder / group level)
     def delete_il (self, edge):
         for this_il in self.il:
             if this_il.edge == edge:
