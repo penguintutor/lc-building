@@ -237,7 +237,10 @@ class MainWindowUI(QMainWindow):
         self.ui.interlockCheckBox.checkStateChanged.connect(self.read_checkbox)
         self.ui.textureCheckBox.checkStateChanged.connect(self.read_checkbox)
         
+        # Sets the color of the left menu
+        self.set_left_menu_mode("default")
         self.set_left_buttons("default")
+        
         
         # Update gconfig based on checkboxes - may need to load these values in future
         # interlocking view option
@@ -466,6 +469,7 @@ class MainWindowUI(QMainWindow):
         self.change_scene(self.current_scene)
         # Show in wall edit mode
         self.update_status ("Wall Edit")
+        self.set_left_menu_mode ("walledit")
         
     def delete_wall(self):
         selected_items = self.scenes[self.current_scene].get_selected()
@@ -945,6 +949,7 @@ class MainWindowUI(QMainWindow):
         self.change_scene(self.view_scenes[self.current_scene].get_wall_scene())
         # Update status bar back to normal mode
         self.update_status()
+        self.set_left_menu_mode ("default")
         
 
     # Add feature when in edit wall
@@ -1029,6 +1034,12 @@ class MainWindowUI(QMainWindow):
         self.ui.actionUndo.setText(f"Undo: {action}")
         self.ui.actionRedo.setEnabled(False)
     
+    def set_left_menu_mode (self, mode="default"):
+        if mode == "walledit":
+            self.ui.leftMenuBoxWidget.setStyleSheet("background-color: #a5d4d6;")
+        else:
+            self.ui.leftMenuBoxWidget.setStyleSheet("background-color: lightgray;")
+        
     
     def update_redo_menu(self, action):
         self.ui.actionRedo.setEnabled(True)

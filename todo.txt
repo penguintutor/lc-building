@@ -2,7 +2,6 @@
 
 
 # Edit wall 
-Make it obvious in wall edit mode - Possibly display mode / view in top left of graphicsView 
 When choose align / position from right menu and no feature selected but is in position of menu then use that
 
 # Textures
