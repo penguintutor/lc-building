@@ -1,6 +1,6 @@
 import os
 from PySide6.QtCore import Qt, QCoreApplication, QThreadPool, Signal, QFileInfo
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QProgressDialog, QLabel, QComboBox
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QProgressDialog, QLabel, QComboBox, QStatusBar
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QKeyEvent
 from vgraphicsscene import ViewGraphicsScene
@@ -49,6 +49,8 @@ class MainWindowUI(QMainWindow):
         # Pass scale instance to laser class
         Laser.sc = self.sc
         
+        self.filename = ""
+        
         # Use scale to apply reverse scale to actual material_thickness
         material_thickness = self.config.wall_width
         self.scale_material = self.sc.reverse_scale_convert(material_thickness)
@@ -60,6 +62,10 @@ class MainWindowUI(QMainWindow):
 
         self.ui = loader.load(os.path.join(basedir, "mainwindow.ui"), None)
         self.ui.setWindowTitle(app_title)
+        
+        # Bottom status bar set to initial state
+        #self.ui.statusbar.showMessage ("New building")
+        self.update_status()
         
         # Progress dialog window (create when required)
         self.progress_window = None
@@ -77,8 +83,6 @@ class MainWindowUI(QMainWindow):
         # Only used to set default size so doesn't matter if it's on a different
         # screen, but not such a good experience
         status['screensize'] = self.ui.screen().size().toTuple()
-        
-        self.filename = ""
         
         # Which scene shown in main window
         self.current_scene = 'front'
@@ -460,6 +464,8 @@ class MainWindowUI(QMainWindow):
         self.current_scene = 'walledit'
         self.view_scenes[self.current_scene].edit_wall(selected_objs[0])
         self.change_scene(self.current_scene)
+        # Show in wall edit mode
+        self.update_status ("Wall Edit")
         
     def delete_wall(self):
         selected_items = self.scenes[self.current_scene].get_selected()
@@ -584,7 +590,8 @@ class MainWindowUI(QMainWindow):
         if filename[0] == '':
             print ("No filename specified")
             return
-        self.ui.statusbar.showMessage ("Loading "+filename[0])
+        #self.ui.statusbar.showMessage ("Loading "+filename[0])
+        self.update_status ("File Load", "Loading "+filename[0])
         self.new_filename = filename[0]
         # Create progress window before starting threadpool (needs to be in main thread)
         self.start_progress("Loading ...", 100)
@@ -724,8 +731,7 @@ class MainWindowUI(QMainWindow):
         else:
             self.filename = self.new_filename
             self.update_status()
-        # update load complete message - even if failed as otherwise load is locked
-        #self.load_complete_signal.emit()
+
         
     # Called from load_complete_signal after a file has been loaded
     # Refresh display
@@ -782,10 +788,16 @@ class MainWindowUI(QMainWindow):
 
     # Update statusbar.
     # If no message then show standard message otherwise override
+    # Mode only shown if message is none - otherwise override using message
+    # Typically Design Building, or Wall Edit
     # Eg. if loading then that is shown instead
-    def update_status(self, message=None):
+    def update_status(self, mode="Design Building", message=None):
+        if self.filename != None and self.filename != "":
+            file_string = self.filename
+        else:
+            file_string = "New File"
         if message == None:
-            message = f"File {self.filename} Zoom: {int(self.zoom_level * 100)} %"
+            message = f"{file_string} Zoom: {int(self.zoom_level * 100)} % Mode: {mode}"
         self.ui.statusbar.showMessage (message)
             
         
@@ -931,6 +943,8 @@ class MainWindowUI(QMainWindow):
         #self.view_scenes[self.current_scene].wall.update()
         self.view_scenes[self.current_scene].update()
         self.change_scene(self.view_scenes[self.current_scene].get_wall_scene())
+        # Update status bar back to normal mode
+        self.update_status()
         
 
     # Add feature when in edit wall
