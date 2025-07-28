@@ -469,7 +469,7 @@ class MainWindowUI(QMainWindow):
         self.change_scene(self.current_scene)
         # Show in wall edit mode
         self.update_status ("Wall Edit")
-        self.set_left_menu_mode ("walledit")
+        #self.set_left_menu_mode ("walledit")
         
     def delete_wall(self):
         selected_items = self.scenes[self.current_scene].get_selected()
@@ -796,6 +796,7 @@ class MainWindowUI(QMainWindow):
     # Typically Design Building, or Wall Edit
     # Eg. if loading then that is shown instead
     def update_status(self, mode="Design Building", message=None):
+        print (f"Update status {mode} {message}")
         if self.filename != None and self.filename != "":
             file_string = self.filename
         else:
@@ -803,6 +804,11 @@ class MainWindowUI(QMainWindow):
         if message == None:
             message = f"{file_string} Zoom: {int(self.zoom_level * 100)} % Mode: {mode}"
         self.ui.statusbar.showMessage (message)
+        # Also update the left menu color
+        if mode == "Wall Edit":
+            self.set_left_menu_mode("walledit")
+        else:
+            self.set_left_menu_mode("default")
             
         
     # Updates each of the views by updating the scene
@@ -846,10 +852,14 @@ class MainWindowUI(QMainWindow):
         # Update table to show nothing selected
         self.update_selected_view(None)
         # Update left menu based on type of scene (eg. direction view / edit wall)
+        print ("Change Scene")
         if new_scene == "walledit":
             self.set_left_buttons("walledit")
+            print ("Wall edit")
         else:
-            self.set_left_buttons("default") 
+            self.set_left_buttons("default")
+            print ("Design building")
+            self.update_status("Design Building")
             
 
     # Add new wall dialog
@@ -949,7 +959,7 @@ class MainWindowUI(QMainWindow):
         self.change_scene(self.view_scenes[self.current_scene].get_wall_scene())
         # Update status bar back to normal mode
         self.update_status()
-        self.set_left_menu_mode ("default")
+        #self.set_left_menu_mode ("default")
         
 
     # Add feature when in edit wall
