@@ -796,7 +796,7 @@ class MainWindowUI(QMainWindow):
     # Typically Design Building, or Wall Edit
     # Eg. if loading then that is shown instead
     def update_status(self, mode="Design Building", message=None):
-        print (f"Update status {mode} {message}")
+        #print (f"Update status {mode} {message}")
         if self.filename != None and self.filename != "":
             file_string = self.filename
         else:
@@ -852,13 +852,13 @@ class MainWindowUI(QMainWindow):
         # Update table to show nothing selected
         self.update_selected_view(None)
         # Update left menu based on type of scene (eg. direction view / edit wall)
-        print ("Change Scene")
+        #print ("Change Scene")
         if new_scene == "walledit":
             self.set_left_buttons("walledit")
-            print ("Wall edit")
+            #print ("Wall edit")
         else:
             self.set_left_buttons("default")
-            print ("Design building")
+            #print ("Design building")
             self.update_status("Design Building")
             
 
